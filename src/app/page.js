@@ -1,65 +1,157 @@
-import Image from "next/image";
+// "use client";
+// import React from "react";
 
-export default function Home() {
+// function page() {
+//   return (
+//     <div className="min-h-screen bg-[#eff6fe] pt-[50px] p-[25px] sm:p-0">
+//       <div className="text-center">
+//         <img src="vk-logo.png" className="mx-auto" />
+//         <h1 className="text-[32px] font-bold">Admin Login</h1>
+//         <p className="">Access the admin dashboard</p>
+//       </div>
+//       <form className="sm:w-[420px] h-[382px] border-0 border-[#e0edfe] rounded-[20px] bg-[#ffffff] mx-auto px-[45px] py-[40px] mt-[30px] shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+//         <label className="text-[14px] font-semibold">Phone Number</label>
+//         <div className="w-full h-[48px] bg-[#f8fafc] border border-[#C5CDD7] rounded-[10px] placeholder-[#C5CDD7] my-[15px] ">
+//           <input
+//             className="w-full h-[48px] outline-none p-[15px]"
+//             placeholder="Enter Your Phone Number"
+//           />
+//         </div>
+//         <label className="text-[14px] font-semibold">Password</label>
+//         <div className="w-[full] h-[48px] bg-[#f8fafc] border border-[#C5CDD7] rounded-[10px] placeholder-[#C5CDD7] mt-[15px]">
+//           <input
+//             className="w-[full] h-[48px] outline-none p-[15px]"
+//             placeholder="Enter Your Password"
+//           />
+//         </div>
+//         <div className="text-right mt-[15px]">
+//           <a
+//             href="/forgot-password"
+//             className="text-sm text-blue-600 hover:underline hover:text-blue-800 transition"
+//           >
+//             Forgot password?
+//           </a>
+//         </div>
+//         <button className="w-full py-[10px] rounded-[10px] mt-[15px] bg-[#1C4ED8]  text-[16px] font-bold text-white">
+//           Login
+//         </button>
+//       </form>
+//     </div>
+//   );
+// }
+
+// export default page;
+"use client";
+import React, { useState } from "react";
+
+function Page() {
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // 🔐 Login function
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    // Basic validation
+    if (!phone || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch("http://localhost:5000/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // ✅ Save token (example)
+      localStorage.setItem("adminToken", data.token);
+
+      // ✅ Redirect after login
+      window.location.href = "/admin/dashboard";
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="min-h-screen bg-[#eff6fe] pt-[50px] p-[25px]">
+      <div className="text-center">
+        <img src="vk-logo.png" className="mx-auto" />
+        <h1 className="text-[32px] font-bold">Admin Login</h1>
+        <p>Access the admin dashboard</p>
+      </div>
+
+      <form
+        onSubmit={handleLogin}
+        className="sm:w-[420px] bg-white mx-auto px-[45px] py-[40px] mt-[30px] rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
+      >
+        {/* Phone */}
+        <label className="text-[14px] font-semibold">Phone Number</label>
+        <input
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Enter Your Phone Number"
+          className="w-full h-[48px] bg-[#f8fafc] border border-[#C5CDD7] rounded-[10px] px-[15px] my-[15px] outline-none"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+
+        {/* Password */}
+        <label className="text-[14px] font-semibold">Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter Your Password"
+          className="w-full h-[48px] bg-[#f8fafc] border border-[#C5CDD7] rounded-[10px] px-[15px] mt-[15px] outline-none"
+        />
+
+        {/* Error */}
+        {error && (
+          <p className="text-red-600 text-sm mt-3">{error}</p>
+        )}
+
+        {/* Forgot */}
+        <div className="text-right mt-[15px]">
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+            Forgot password?
           </a>
         </div>
-      </main>
+
+        {/* Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-[10px] rounded-[10px] mt-[15px] bg-[#1C4ED8] text-[16px] font-bold text-white hover:bg-blue-700 transition disabled:opacity-60"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
     </div>
   );
 }
+
+export default Page;
