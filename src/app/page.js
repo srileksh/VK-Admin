@@ -38,7 +38,7 @@ function Page() {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Enter Your Phone Number"
-          className="w-full h-[48px] bg-[#f8fafc] border rounded-[10px] px-[15px] my-[15px]"
+          className="w-full h-[48px] bg-[#f8fafc] border border-[#7c7d98] rounded-[10px] px-[15px] my-[15px]"
         />
 
         <label className="text-[14px] font-semibold">Password</label>
@@ -47,7 +47,7 @@ function Page() {
           value={password}
           placeholder="Enter Your Password"
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full h-[48px] bg-[#f8fafc] border rounded-[10px] px-[15px] mt-[15px]"
+          className="w-full h-[48px] bg-[#f8fafc] border border-[#7c7d98] rounded-[10px] px-[15px] mt-[15px]"
         />
 
         {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
@@ -55,7 +55,7 @@ function Page() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-[20px] bg-[#1C4ED8] text-white py-[10px] rounded-[10px] disabled:opacity-60"
+          className="w-full mt-[20px] bg-[#1f304a] text-white py-[10px] rounded-[10px] disabled:opacity-60"
         >
           {loading ? "Logging in..." : "Login"}
         </button>

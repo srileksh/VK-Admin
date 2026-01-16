@@ -11,6 +11,7 @@
 // }
 
 // export default layout
+import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 
 export default function layout({ children }) {
@@ -21,6 +22,7 @@ export default function layout({ children }) {
 
       {/* Page Content */}
       <main className="p-6 bg-gray-50 overflow-y-auto">
+        <Navbar/>
         {children}
       </main>
     </div>
