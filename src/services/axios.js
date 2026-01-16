@@ -10,61 +10,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// /* ================= REQUEST ================= */
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     const token = useAuthStore.getState().accessToken;
-
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
-
-// /* ================= RESPONSE ================= */
-// let isRefreshing = false;
-
-// axiosInstance.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config;
-
-//     if (error.response?.status === 401 && !originalRequest._retry) {
-//       originalRequest._retry = true;
-
-//       if (!isRefreshing) {
-//         isRefreshing = true;
-
-//         try {
-//           const refreshRes = await axiosInstance.post("/auth/refresh");
-
-//           const newAccessToken =
-//             refreshRes.data.data.accessToken;
-
-//           useAuthStore.setState({
-//             accessToken: newAccessToken,
-//           });
-
-//           originalRequest.headers.Authorization =
-//             `Bearer ${newAccessToken}`;
-
-//           isRefreshing = false;
-//           return axiosInstance(originalRequest);
-//         } catch (err) {
-//           isRefreshing = false;
-//           useAuthStore.getState().logout();
-//           return Promise.reject(err);
-//         }
-//       }
-//     }
-
-//     return Promise.reject(error);
-//   }
-// );
-/* ================= RESPONSE INTERCEPTOR ================= */
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {

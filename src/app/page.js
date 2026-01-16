@@ -37,7 +37,7 @@ function Page() {
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder=""
+          placeholder="Enter Your Phone Number"
           className="w-full h-[48px] bg-[#f8fafc] border rounded-[10px] px-[15px] my-[15px]"
         />
 
@@ -45,6 +45,7 @@ function Page() {
         <input
           type="password"
           value={password}
+          placeholder="Enter Your Password"
           onChange={(e) => setPassword(e.target.value)}
           className="w-full h-[48px] bg-[#f8fafc] border rounded-[10px] px-[15px] mt-[15px]"
         />
