@@ -1,13 +1,28 @@
-import Sidebar from '@/components/Sidebar'
-import React from 'react'
+// import Sidebar from '@/components/Sidebar'
+// import React from 'react'
 
-function layout({children}) {
+// function layout({children}) {
+//   return (
+//     <div className='grid grid-cols-2'>
+//       <Sidebar/>
+//       {children}
+//     </div>
+//   )
+// }
+
+// export default layout
+import Sidebar from "@/components/Sidebar";
+
+export default function layout({ children }) {
   return (
-    <div className='grid grid-cols-2'>
-      <Sidebar/>
-      {children}
-    </div>
-  )
-}
+    <div className="min-h-screen grid grid-cols-[18rem_1fr]">
+      {/* Sidebar */}
+      <Sidebar />
 
-export default layout
+      {/* Page Content */}
+      <main className="p-6 bg-gray-50 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  );
+}
