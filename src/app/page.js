@@ -37,7 +37,7 @@ function Page() {
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="+919123456789"
+          placeholder=""
           className="w-full h-[48px] bg-[#f8fafc] border rounded-[10px] px-[15px] my-[15px]"
         />
 
