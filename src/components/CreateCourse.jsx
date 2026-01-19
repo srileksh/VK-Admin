@@ -1,114 +1,353 @@
-"use client";
 
+
+// "use client";
+// import { useState } from "react";
+// import { MdClose } from "react-icons/md";
+
+// export default function CreateCourse({ isOpen, onClose, onSave }) {
+//   const [formData, setFormData] = useState({
+//     title: "",
+//     description: "",
+//     contents: "",
+//     packageType: "Students",
+//     amount: "",
+//     thumbnail: null,
+//   });
+
+//   const [preview, setPreview] = useState(null);
+
+//   if (!isOpen) return null;
+
+//   const handleChange = (e) => {
+//     setFormData({ ...formData, [e.target.name]: e.target.value });
+//   };
+
+//   const handleImageChange = (e) => {
+//     const file = e.target.files[0];
+//     if (!file) return;
+//     setFormData({ ...formData, thumbnail: file });
+//     setPreview(URL.createObjectURL(file));
+//   };
+
+//   const handleSubmit = () => {
+//     onSave({ ...formData, preview });
+//     setFormData({
+//       title: "",
+//       description: "",
+//       contents: "",
+//       packageType: "Students",
+//       amount: "",
+//       thumbnail: null,
+//     });
+//     setPreview(null);
+//   };
+
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+//       <div className="bg-white w-full max-w-[1000px] rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+//         {/* Close */}
+//         <button
+//           onClick={onClose}
+//           className="absolute top-4 right-4 text-2xl text-gray-500"
+//         >
+//           <MdClose />
+//         </button>
+
+//         <h2 className="text-xl font-semibold mb-6 text-[#1F304A]">
+//           Create Course
+//         </h2>
+
+//         <div className="grid grid-cols-1 md:grid-cols-[65%_35%]  gap-2">
+//           {/* Left */}
+//           <div className="space-y-4  ">
+//             <div>
+//               <label className="text-sm font-medium">Course Title *</label>
+//               <input
+//                 name="title"
+//                 value={formData.title}
+//                 onChange={handleChange}
+//                 className="w-full border rounded-xl p-3"
+//               />
+//             </div>
+
+//             <div>
+//               <label className="text-sm font-medium">Course Description *</label>
+//               <textarea
+//                 name="description"
+//                 value={formData.description}
+//                 onChange={handleChange}
+//                 rows="4"
+//                 className="w-full border rounded-xl p-3"
+//               />
+//             </div>
+
+//             <div>
+//               <label className="text-sm font-medium">Course Contents</label>
+//               <textarea
+//                 name="contents"
+//                 value={formData.contents}
+//                 onChange={handleChange}
+//                 rows="3"
+//                 className="w-full border rounded-xl p-3"
+//               />
+//             </div>
+//           </div>
+
+//           {/* Right */}
+//           <div className="space-y-4 px-3">
+//             <div>
+//               <label className="text-sm font-medium">Course Thumbnail</label>
+//               <label className=" h-[160px] border rounded-xl flex items-center justify-center cursor-pointer overflow-hidden">
+//                 {preview ? (
+//                   <img
+//                     src={preview}
+//                     className="w-full h-full object-cover"
+//                   />
+//                 ) : (
+//                   <span className="text-gray-400">Upload Image</span>
+//                 )}
+//                 <input
+//                   type="file"
+//                   accept="image/*"
+//                   onChange={handleImageChange}
+//                   className="hidden"
+//                 />
+//               </label>
+//             </div>
+
+//             <div>
+//               <label className="text-sm font-medium">Package</label>
+//               <select
+//                 name="packageType"
+//                 value={formData.packageType}
+//                 onChange={handleChange}
+//                 className="w-full border rounded-xl p-3"
+//               >
+//                 <option>Students</option>
+//                 <option>Plus two</option>
+//               </select>
+//             </div>
+
+//             <div>
+//               <label className="text-sm font-medium">Total Amount *</label>
+//               <input
+//                 name="amount"
+//                 value={formData.amount}
+//                 onChange={handleChange}
+//                 className="w-full border rounded-xl p-3"
+//                 placeholder="INR 5000"
+//               />
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Footer */}
+//         <div className="flex justify-end gap-4 mt-8">
+//           <button
+//             onClick={onClose}
+//             className="px-6 py-3 rounded-xl bg-gray-300"
+//           >
+//             Cancel
+//           </button>
+//           <button
+//             onClick={handleSubmit}
+//             className="px-6 py-3 rounded-xl bg-[#1F304A] text-white"
+//           >
+//             Save & Continue
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+"use client";
+import React, { useState, useEffect } from "react";
 import { MdClose } from "react-icons/md";
 
-export default function CreateCourse({ isOpen, onClose }) {
+export default function CreateCourse({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+}) {
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    contents: "",
+    packageType: "Students",
+    amount: "",
+    thumbnail: null,
+  });
+
+  const [preview, setPreview] = useState(null);
+
+  // 🔹 Prefill form when editing
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || "",
+        description: initialData.description || "",
+        contents: initialData.contents || "",
+        packageType: initialData.packageType || "Students",
+        amount: initialData.amount || "",
+        thumbnail: initialData.thumbnail || null,
+      });
+
+      setPreview(initialData.preview || null);
+    }
+  }, [initialData]);
+
+  // 🔹 Reset form when creating new course
+  useEffect(() => {
+    if (!initialData && isOpen) {
+      setFormData({
+        title: "",
+        description: "",
+        contents: "",
+        packageType: "Students",
+        amount: "",
+        thumbnail: null,
+      });
+      setPreview(null);
+    }
+  }, [isOpen, initialData]);
+
   if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFormData({ ...formData, thumbnail: file });
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleSubmit = () => {
+    onSave({ ...formData, preview });
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div
-        className="bg-white w-full max-w-[1000px] rounded-[20px]
-                   p-4 sm:p-6 md:p-8 relative shadow-xl
-                   max-h-[90vh] overflow-y-auto"
-      >
-        {/* Close button */}
+      <div className="bg-white w-full max-w-[1000px] rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+        {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-xl sm:text-2xl text-gray-500 hover:text-black"
+          className="absolute top-4 right-4 text-2xl text-gray-500"
         >
           <MdClose />
         </button>
 
-        <h2 className="text-[18px] sm:text-[20px] md:text-[22px] font-semibold mb-6 text-[#1F304A]">
-          Create Course
+        <h2 className="text-xl font-semibold mb-6 text-[#1F304A]">
+          {initialData ? "Edit Course" : "Create Course"}
         </h2>
 
-        {/* Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-2">
           {/* Left */}
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">
-                Course Title <span className="text-red-500">*</span>
-              </label>
+              <label className="text-sm font-medium">Course Title *</label>
               <input
-                type="text"
-                className="w-full mt-1 border rounded-xl p-3 text-sm"
-                placeholder="Course title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full border rounded-xl p-3"
               />
             </div>
 
             <div>
               <label className="text-sm font-medium">
-                Course Description <span className="text-red-500">*</span>
+                Course Description *
               </label>
               <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
                 rows="4"
-                className="w-full mt-1 border rounded-xl p-3 text-sm"
-                placeholder="Course description"
+                className="w-full border rounded-xl p-3"
               />
             </div>
 
             <div>
               <label className="text-sm font-medium">Course Contents</label>
               <textarea
+                name="contents"
+                value={formData.contents}
+                onChange={handleChange}
                 rows="3"
-                className="w-full mt-1 border rounded-xl p-3 text-sm"
+                className="w-full border rounded-xl p-3"
               />
             </div>
           </div>
 
           {/* Right */}
-          <div className="space-y-4">
+          <div className="space-y-4 px-3">
             <div>
               <label className="text-sm font-medium">Course Thumbnail</label>
-              <div
-                className="mt-2 h-[120px] sm:h-[140px] md:h-[160px]
-                           border rounded-xl flex items-center justify-center
-                           text-gray-400 text-sm"
-              >
-                Upload Image
-              </div>
+              <label className="h-[160px] border rounded-xl flex items-center justify-center cursor-pointer overflow-hidden">
+                {preview ? (
+                  <img
+                    src={preview}
+                    alt="Thumbnail Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400">Upload Image</span>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
             </div>
 
             <div>
               <label className="text-sm font-medium">Package</label>
-              <select className="w-full mt-1 border rounded-xl p-3 text-sm pr-10">
-                <option className="">Students</option>
-              </select>
-              <select className="w-full mt-2 border rounded-xl p-3 text-sm pr-10">
+              <select
+                name="packageType"
+                value={formData.packageType}
+                onChange={handleChange}
+                className="w-full border rounded-xl p-3"
+              >
+                <option>Students</option>
                 <option>Plus two</option>
               </select>
             </div>
 
             <div>
-              <label className="text-sm font-medium">
-                Total Amount <span className="text-red-500">*</span>
-              </label>
+              <label className="text-sm font-medium">Total Amount *</label>
               <input
-                type="text"
-                className="w-full mt-1 border rounded-xl p-3 text-sm"
+                name="amount"
+                value={formData.amount}
+                onChange={handleChange}
+                className="w-full border rounded-xl p-3"
                 placeholder="INR 5000"
               />
             </div>
           </div>
         </div>
 
-        {/* Footer buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8">
+        {/* Footer */}
+        <div className="flex justify-end gap-4 mt-8">
           <button
             onClick={onClose}
-            className="px-6 py-3 rounded-xl bg-gray-300 hover:bg-[#555555]
-                       text-black hover:text-white w-full sm:w-auto"
+            className="px-6 py-3 rounded-xl bg-gray-300"
           >
             Cancel
           </button>
           <button
-            className="px-6 py-3 rounded-xl bg-gray-300 hover:bg-[#555555]
-                       text-black hover:text-white w-full sm:w-auto"
+            onClick={handleSubmit}
+            className="px-6 py-3 rounded-xl bg-[#1F304A] text-white"
           >
-            Save & Continue
+            {initialData ? "Update Course" : "Save & Continue"}
           </button>
         </div>
       </div>
