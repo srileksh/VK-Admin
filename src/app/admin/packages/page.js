@@ -285,6 +285,7 @@
 import { useState } from "react";
 import CreatePackageModal from "@/components/Package/CreatePackageModal";
 import PackageList from "@/components/Package/PackageList";
+import PackageItem from "@/components/Package/PackageItem";
 
 export default function Page() {
   const [packages, setPackages] = useState([]);
@@ -325,7 +326,7 @@ export default function Page() {
         </button>
       </div>
 
-      <PackageList packages={packages} addSubPackage={addSubPackage} />
+      <PackageItem packages={packages} addSubPackage={addSubPackage} />
 
       {showPopup && (
         <CreatePackageModal
