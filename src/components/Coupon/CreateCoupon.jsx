@@ -1,7 +1,3 @@
-
-
-
-
 "use client";
 import React, { useState } from "react";
 import { MdClose, MdCalendarToday } from "react-icons/md";
@@ -65,8 +61,8 @@ export default function CreateCoupon({ isOpen, onClose }) {
               className="w-full mt-1 border rounded-lg px-3 py-3 text-md text-[#3F3D3D]"
             >
              
-              <option value="percentage">Percentage</option>
-              <option value="flat">Fixed Amount</option>
+              <option value="percentage" className="bg-yellow-50">Percentage</option>
+              <option value="flat" className="bg-yellow-50">Fixed Amount</option>
             </select>
           </div>
 
@@ -109,10 +105,10 @@ export default function CreateCoupon({ isOpen, onClose }) {
           onChange={handleChange}
           className="w-full mt-1 mb-3 border rounded-lg px-3 py-3 text-md text-[#3F3D3D]"
         >
-          {/* <option value="">Select</option> */}
-          <option value="students">Students</option>
-          <option value="plus-two">Plus Two</option>
-          <option value="degree">Degree</option>
+         
+          <option value="students" className="bg-yellow-50">Students</option>
+          <option value="plus-two" className="bg-yellow-50">Plus Two</option>
+          <option value="degree" className="bg-yellow-50">Degree</option>
         </select>
 
         {/* No of Users */}
@@ -121,12 +117,12 @@ export default function CreateCoupon({ isOpen, onClose }) {
           name="users"
           value={formData.users}
           onChange={handleChange}
-          className="w-full mt-1 mb-5 border rounded-lg px-3 py-3 text-md text-[#3F3D3D]"
+          className="w-full mt-1 mb-5 border rounded-lg px-3 py-3 text-md text-[#3F3D3D] "
         >
-          <option value="">Select</option>
-          <option value="10">10</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
+          <option value="" className="bg-yellow-50" >Select</option>
+          <option value="10" className="bg-yellow-50">10</option>
+          <option value="50" className="bg-yellow-50">50</option>
+          <option value="100" className="bg-yellow-50">100</option>
         </select>
 
         {/* Footer Buttons */}
