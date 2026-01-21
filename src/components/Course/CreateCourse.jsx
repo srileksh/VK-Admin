@@ -1,15 +1,11 @@
-
-
 "use client";
 import React, { useState, useEffect } from "react";
 import { MdClose } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
-export default function CreateCourse({
-  isOpen,
-  onClose,
-  onSave,
-  initialData,
-}) {
+export default function CreateCourse({ isOpen, onClose, initialData }) {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -21,7 +17,6 @@ export default function CreateCourse({
 
   const [preview, setPreview] = useState(null);
 
-  // 🔹 Prefill form when editing
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -32,12 +27,10 @@ export default function CreateCourse({
         amount: initialData.amount || "",
         thumbnail: initialData.thumbnail || null,
       });
-
       setPreview(initialData.preview || null);
     }
   }, [initialData]);
 
-  // 🔹 Reset form when creating new course
   useEffect(() => {
     if (!initialData && isOpen) {
       setFormData({
@@ -67,14 +60,13 @@ export default function CreateCourse({
   };
 
   const handleSubmit = () => {
-    onSave({ ...formData, preview });
+    router.push("/admin/courses/createmodules");
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="bg-white w-full max-w-[1000px] rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
-        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-2xl text-gray-500"
@@ -83,11 +75,10 @@ export default function CreateCourse({
         </button>
 
         <h2 className="text-xl font-semibold mb-6 text-[#1F304A]">
-          {initialData ? "Edit Course" : "Create Course"}
+          Create Course
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-2">
-          {/* Left */}
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium">Course Title *</label>
@@ -100,9 +91,7 @@ export default function CreateCourse({
             </div>
 
             <div>
-              <label className="text-sm font-medium">
-                Course Description *
-              </label>
+              <label className="text-sm font-medium">Course Description *</label>
               <textarea
                 name="description"
                 value={formData.description}
@@ -124,7 +113,6 @@ export default function CreateCourse({
             </div>
           </div>
 
-          {/* Right */}
           <div className="space-y-4 px-3">
             <div>
               <label className="text-sm font-medium">Course Thumbnail</label>
@@ -167,13 +155,11 @@ export default function CreateCourse({
                 value={formData.amount}
                 onChange={handleChange}
                 className="w-full border rounded-xl p-3"
-                placeholder="INR 5000"
               />
             </div>
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex justify-end gap-4 mt-8">
           <button
             onClick={onClose}
@@ -185,7 +171,7 @@ export default function CreateCourse({
             onClick={handleSubmit}
             className="px-6 py-3 rounded-xl bg-[#1F304A] text-white"
           >
-            {initialData ? "Update Course" : "Save & Continue"}
+            Save & Continue
           </button>
         </div>
       </div>
