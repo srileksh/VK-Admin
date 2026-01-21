@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { MdEditNote } from "react-icons/md";
-import CreateCourse from "@/components/CreateCourse";
+import CreateCourse from "@/components/Course/CreateCourse";
 
 export default function Page() {
   const [createCourse, setCreateCourse] = useState(false);
