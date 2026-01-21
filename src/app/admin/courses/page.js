@@ -4,33 +4,16 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { MdEditNote } from "react-icons/md";
 import CreateCourse from "@/components/Course/CreateCourse";
 
-export default function Page() {
+export default function page() {
   const [createCourse, setCreateCourse] = useState(false);
   const [courses, setCourses] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
 
-  // ADD or UPDATE
-  const handleSaveCourse = (courseData) => {
-    if (editingIndex !== null) {
-      // update
-      const updatedCourses = [...courses];
-      updatedCourses[editingIndex] = courseData;
-      setCourses(updatedCourses);
-      setEditingIndex(null);
-    } else {
-      // add
-      setCourses((prev) => [...prev, courseData]);
-    }
-    setCreateCourse(false);
-  };
-
-  // DELETE
   const handleDelete = (index) => {
     const filtered = courses.filter((_, i) => i !== index);
     setCourses(filtered);
   };
 
-  // EDIT
   const handleEdit = (index) => {
     setEditingIndex(index);
     setCreateCourse(true);
@@ -72,21 +55,10 @@ export default function Page() {
             </div>
 
             <div>
-              <p className="text-xs text-gray-500">Number of videos</p>
-              <p>{course.videos || "—"}</p>
-            </div>
-
-            <div>
               <p className="text-xs text-gray-500">Course amount</p>
               <p>{course.amount}</p>
             </div>
 
-            <div>
-              <p className="text-xs text-gray-500">Duration</p>
-              <p>{course.duration || "—"}</p>
-            </div>
-
-            {/* Actions */}
             <div className="flex gap-4">
               <button
                 onClick={() => handleDelete(index)}
@@ -110,7 +82,6 @@ export default function Page() {
       <CreateCourse
         isOpen={createCourse}
         onClose={() => setCreateCourse(false)}
-        onSave={handleSaveCourse}
         initialData={editingIndex !== null ? courses[editingIndex] : null}
       />
     </div>

@@ -14,23 +14,20 @@ function Sidebar() {
   ];
   const isActive = (path) => pathname === path;
   return (
-    <aside
-      className="w-72 min-h-screen bg-[#1F304A] flex flex-col items-center py-8"
-    >
+    <aside className="w-72 min-h-screen bg-[#1F304A] flex flex-col items-center py-8">
       {/* Logo */}
-      
+      <div>
+        <img src="/logo.png" />
+      </div>
       <Link href="/admin/dashbord" className="mb-6">
-        <h1 className="text-3xl font-bold text-white">
-             
-        </h1>
+        <h1 className="text-3xl font-bold text-white"></h1>
       </Link>
 
       {/* Profile */}
-      <div >
-        <img src="/profile.png" className="rounded-[100%]"/>
+      <div>
+        <img src="/profile.png" className="rounded-[100%]" />
       </div>
       <div className="flex flex-col items-center mb-8">
-        
         <p className="mt-4 text-white text-3xl font-semibold">John David</p>
       </div>
 
@@ -43,9 +40,8 @@ function Sidebar() {
             className={` block w-full text-start px-8 py-4 text-black  rounded-lg transition
                 ${
                   isActive(item.path)
-                   
-                     ? "bg-[#8BA8D4]  text-white font-semibold"
-            : "text-white  hover:text-white"
+                    ? "bg-[#8BA8D4]  text-white font-semibold"
+                    : "text-white  hover:text-white"
                 }`}
           >
             {item.name}
