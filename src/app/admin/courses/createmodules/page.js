@@ -1,8 +1,11 @@
+import CreateModules from '@/components/Course/CreateModules'
 import React from 'react'
 
 function page() {
   return (
-    <div>create modules</div>
+    <div>
+        <CreateModules/>
+    </div>
   )
 }
 
