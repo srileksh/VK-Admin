@@ -6,3 +6,7 @@ const response = await axiosInstance.post("/auth/login",{
     });
     return response.data;
 }
+export const logoutApi = async () => {
+  const response = await axiosInstance.post("/auth/logout");
+  return response.data;
+};

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { loginApi } from "@/services/apiAuth";
+import { loginApi, logoutApi } from "@/services/apiAuth";
 
 const useAuthStore = create(
   persist(
@@ -13,12 +13,15 @@ const useAuthStore = create(
       login: async (phone, password) => {
         try {
           set({ loading: true, error: null });
+
           const data = await loginApi(phone, password);
+
           set({
             user: data.data.user,
             accessToken: data.data.accessToken,
             loading: false,
           });
+
           return true;
         } catch (err) {
           set({
@@ -29,9 +32,23 @@ const useAuthStore = create(
         }
       },
 
-      logout: () => set({ user: null, accessToken: null }),
+      logout: async () => {
+        try {
+          await logoutApi(); // 🔹 backend logout
+        } catch (error) {
+          console.error("Logout error", error);
+        } finally {
+          set({
+            user: null,
+            accessToken: null,
+            error: null,
+          });
+        }
+      },
     }),
-    { name: "auth-storage" } // persists in localStorage
+    {
+      name: "auth-storage",
+    }
   )
 );
 
