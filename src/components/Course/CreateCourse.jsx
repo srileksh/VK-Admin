@@ -14,48 +14,48 @@ export default function CreateCourse() {
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-6xl rounded-xl shadow-lg p-6">
         {/* Header */}
-        <h2 className="text-xl font-semibold text-[#1F2A44] mb-6">
+        <h2 className="text-xl px-4 font-semibold text-[#1F2A44] mb-6">
           Create Course
         </h2>
 
         {/* Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* LEFT SECTION */}
-          <div className="space-y-5 border-r-1 px-4">
+          <div className="space-y-5 border-[#B3B8B8]  border-r-1 px-4">
             {/* Course Title */}
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-md text-[#5D5D5D] font-medium mb-1">
                 Course Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 placeholder=""
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border-[#B3B8B8] border-1 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
 
             {/* Course Description */}
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-md text-[#5D5D5D] font-medium ">
                 Course Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={5}
                 placeholder=""
-                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border-[#B3B8B8] border-1 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
 
             {/* Thumbnail */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-md text-[#5D5D5D] font-medium mb-2">
                 Thumbnail
               </label>
-              <div className="flex gap-4 items-center border rounded-lg p-4">
+              <div className="flex gap-4 items-center border-[#B3B8B8] border-1 rounded-lg p-4">
                 <img
                   src="/profile.png"
                   alt="thumbnail"
-                  className="w-80 h-24 object-cover rounded-md"
+                  className="w-60 h-30 object-cover rounded-md"
                 />
                 <p className="text-sm text-gray-500">
                   Text regarding the image pixel size that can be uploaded and
@@ -68,9 +68,9 @@ export default function CreateCourse() {
           {/* RIGHT SECTION */}
           <div className="">
             {/* Faculty Info */}
-            <h3 className="text-sm font-semibold mb-2">Faculty info</h3>
+            <h3 className="text-md text-[#5D5D5D] font-semibold mb-1.5">Faculty info</h3>
 
-            <div className="border rounded-lg p-4">
+            <div className="border-[#B3B8B8] border-1 rounded-lg p-4 ">
               {/* Faculty List */}
               <div className="flex gap-3 mb-4">
                 {[1, 2, 3, 4].map((item) => (
@@ -95,12 +95,12 @@ export default function CreateCourse() {
                   <input
                     type="text"
                     placeholder="John David"
-                    className="border rounded-lg px-3  py-2 text-sm"
+                    className="border-[#B3B8B8] border-1 rounded-lg px-3  py-2 text-sm"
                   />
                   <input
                     type="text"
                     placeholder="M.com, CAIIB"
-                    className="border rounded-lg px-3 py-2 text-sm"
+                    className="border-[#B3B8B8] border-1  rounded-lg px-3 py-2 text-sm"
                   />
                 </div>
 
@@ -108,7 +108,7 @@ export default function CreateCourse() {
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <img
-                      src="https://randomuser.me/api/portraits/men/75.jpg"
+                      src="/profile.png"
                       className="w-22 h-22 rounded-full"
                     />
                     <span className="absolute inset-0 flex items-center justify-center text-xs text-white bg-black/40 rounded-full">
@@ -129,29 +129,29 @@ export default function CreateCourse() {
             </div>
 
             {/* Total Amount */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
+            <div className="mt-[140px]">
+              <label className=" text-md text-[#5D5D5D] font-medium ">
                 Total Amount <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value="INR 5000"
-                readOnly
-                className="w-full border rounded-lg px-4 py-2 bg-gray-50"
+                
+               
+                className="w-full border-[#B3B8B8] border-1 rounded-lg px-4 py-2 bg-gray-50"
               />
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-center gap-6 mt-8">
-          <button className="px-10 py-2 rounded-lg bg-gray-400 text-white" >
+        <div className="flex justify-end gap-4 mt-8">
+          <button className="px-20 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white" >
             Cancel
           </button>
           <button
           onClick={handleSubmit}
           
-          className="px-10 py-2 rounded-lg bg-gray-700 text-white" >
+          className="px-10 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white" >
             Save & Continue
           </button>
         </div>
