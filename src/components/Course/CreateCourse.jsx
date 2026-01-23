@@ -180,6 +180,70 @@
 // }
 
 "use client";
+import React, { useState, useEffect } from "react";
+import { MdClose } from "react-icons/md";
+import { useRouter } from "next/navigation";
+
+export default function CreateCourse({ isOpen, onClose, initialData }) {
+  const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    contents: "",
+    packageType: "Students",
+    amount: "",
+    thumbnail: null,
+  });
+
+  const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || "",
+        description: initialData.description || "",
+        contents: initialData.contents || "",
+        packageType: initialData.packageType || "Students",
+        amount: initialData.amount || "",
+        thumbnail: initialData.thumbnail || null,
+      });
+      setPreview(initialData.preview || null);
+    }
+  }, [initialData]);
+
+  useEffect(() => {
+    if (!initialData && isOpen) {
+      setFormData({
+        title: "",
+        description: "",
+        contents: "",
+        packageType: "Students",
+        amount: "",
+        thumbnail: null,
+      });
+      setPreview(null);
+    }
+  }, [isOpen, initialData]);
+
+  if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFormData({ ...formData, thumbnail: file });
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleSubmit = () => {
+    router.push("/admin/courses/createmodule");
+    onClose();
+  };
 import React from "react";
 import { X } from "lucide-react";
 import { ImArrowUp } from "react-icons/im";
