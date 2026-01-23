@@ -1,23 +1,22 @@
-"use client"
-import React, { useState } from 'react'
+"use client";
+import React, { useState } from "react";
 
 function DeletePackage() {
-      const [showDelete, setShowDelete] = useState(false);
-    
+  const [showDelete, setShowDelete] = useState(false);
+
   return (
     <div>
-              {/* DELETE MODAL */}
+      {/* DELETE MODAL */}
       {showDelete && selectedDelete && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg w-[420px]">
-            <h2 className="text-[20px] font-semibold mb-4">
-              Confirm Delete
-            </h2>
+            <h2 className="text-[20px] font-semibold mb-4">Confirm Delete</h2>
             <p>
               Are you sure you want to delete{" "}
               <strong>{selectedDelete.name}</strong>
               {selectedDelete.children?.length > 0 &&
-                ` and its ${selectedDelete.children.length} sub-package(s)`}?
+                ` and its ${selectedDelete.children.length} sub-package(s)`}
+              ?
             </p>
 
             <div className="flex gap-4 mt-6">
@@ -37,10 +36,8 @@ function DeletePackage() {
           </div>
         </div>
       )}
-
-        
     </div>
-  )
+  );
 }
 
-export default DeletePackage
+export default DeletePackage;

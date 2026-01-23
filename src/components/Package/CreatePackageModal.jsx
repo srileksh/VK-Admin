@@ -4,12 +4,8 @@ import toast from "react-hot-toast";
 import useCategoryStore from "@/store/categoryStore";
 
 export default function CreateCategoryModal({ onClose }) {
-  const {
-    categories,
-    fetchCategories,
-    createCategory,
-    loading,
-  } = useCategoryStore();
+  const { categories, fetchCategories, createCategory, loading } =
+    useCategoryStore();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -42,7 +38,7 @@ export default function CreateCategoryModal({ onClose }) {
       onClose();
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Failed to create category"
+        error?.response?.data?.message || "Failed to create category",
       );
     }
   };
@@ -50,9 +46,7 @@ export default function CreateCategoryModal({ onClose }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-2xl w-[450px] shadow-xl">
-        <h2 className="text-[22px] font-semibold mb-6">
-          Create New Category
-        </h2>
+        <h2 className="text-[22px] font-semibold mb-6">Create New Category</h2>
 
         {/* Category Name */}
         <label className="text-sm font-semibold text-[#5d5d5d]">
