@@ -5,8 +5,10 @@ import { FaPen } from "react-icons/fa";
 import { GoPlus } from "react-icons/go";
 import { TbZoomReplace } from "react-icons/tb";
 import { HiMiniMinus } from "react-icons/hi2";
+import { useRouter } from "next/navigation";
 
 export default function createModules() {
+  const router = useRouter();
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-[1000px] rounded-xl shadow-lg p-6 px-8">
@@ -135,7 +137,9 @@ export default function createModules() {
 
         {/* Footer buttons */}
         <div className="flex justify-end mt-5 gap-6">
-          <button className="bg-gray-300 px-15 py-2 rounded-xl text-gray-700">
+          <button
+           onClick={() => router.push("/admin/courses")}
+          className="bg-gray-300 px-15 py-2 rounded-xl text-gray-700">
             Cancel
           </button>
           <button className="bg-gray-700 px-15 py-2 rounded-xl text-white">
