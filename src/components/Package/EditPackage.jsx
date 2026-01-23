@@ -1,12 +1,12 @@
-"use client"
-import React, { useState } from 'react'
+"use client";
+import React, { useState } from "react";
 
 function EditPackage() {
-      const [showInput, setShowInput] = useState(false);
-    
+  const [showInput, setShowInput] = useState(false);
+
   return (
     <div>
-        {/* ADD / EDIT MODAL */}
+      {/* ADD / EDIT MODAL */}
       {showInput && (selectedParent || selectedEdit) && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg w-[420px]">
@@ -16,9 +16,7 @@ function EditPackage() {
                 : `Create new package for ${selectedParent.name}`}
             </h2>
 
-            <p className="text-[#5d5d5d] font-semibold mb-1">
-              Name of package
-            </p>
+            <p className="text-[#5d5d5d] font-semibold mb-1">Name of package</p>
 
             <input
               value={subName}
@@ -49,9 +47,8 @@ function EditPackage() {
           </div>
         </div>
       )}
-
     </div>
-  )
+  );
 }
 
-export default EditPackage
+export default EditPackage;
