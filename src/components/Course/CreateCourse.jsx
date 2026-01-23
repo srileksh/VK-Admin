@@ -60,7 +60,7 @@ export default function CreateCourse({ isOpen, onClose, initialData }) {
   };
 
   const handleSubmit = () => {
-    router.push("/admin/courses/createmodules");
+    router.push("/admin/courses/createmodule");
     onClose();
   };
 

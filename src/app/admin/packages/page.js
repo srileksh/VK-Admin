@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import CreatePackageModal from "@/components/Package/CreatePackageModal";
-import PackageList from "@/components/Package/PackageList";
 import PackageItem from "@/components/Package/PackageItem";
 
 export default function Page() {
