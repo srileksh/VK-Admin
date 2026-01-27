@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 
 import { ImArrowUp } from "react-icons/im";
 
-export default function CreateCourse() {
+export default function CreateCourse({onCancel}) {
+  
   const router = useRouter();
   const handleSubmit = () => {
     router.push("/admin/courses/course-content");
@@ -145,7 +146,9 @@ export default function CreateCourse() {
 
         {/* Footer */}
         <div className="flex justify-end gap-4 mt-8">
-          <button className="px-20 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white" >
+          <button 
+          onClick={onCancel}
+          className="px-20 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white" >
             Cancel
           </button>
           <button
