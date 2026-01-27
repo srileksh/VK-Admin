@@ -42,7 +42,9 @@ export default function Page() {
         </button>
       </div>
 
-      <PackageItem packages={packages} addSubPackage={addSubPackage} />
+     <div className="overflow-scroll">
+       <PackageItem packages={packages} addSubPackage={addSubPackage} />
+     </div>
 
       {showPopup && (
         <CreatePackageModal
