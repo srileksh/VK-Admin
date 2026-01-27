@@ -1,15 +1,45 @@
-"use client";
-import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
 
+"use client";
+import { useState } from "react";
+import useCourseStore from "@/store/useCourseStore";
+import { X } from "lucide-react";
 import { ImArrowUp } from "react-icons/im";
 
-export default function CreateCourse() {
-  const router = useRouter();
-  const handleSubmit = () => {
-    router.push("/admin/courses/course-content");
-    
-  }
+export default function CreateCourse({ onCancel, onSuccess }) {
+  const { createCourse, loading } = useCourseStore();
+
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    price: "",
+  });
+
+  // Faculty array for API
+  const [faculty] = useState([
+    {
+      name: "John Doe",
+      qualification: "M.com, CAIIB",
+      profileImage: "/profile.png",
+    },
+  ]);
+
+  const handleSubmit = async () => {
+    // Replace with your real category UUID
+    const payload = {
+      title: form.title,
+      description: form.description,
+      thumbnail: "https://example.com/course.png",
+      price: Number(form.price),
+      duration: 600,
+      level: "BEGINNER",
+      faculty, // ✅ faculty array
+   
+    };
+
+    const courseId = await createCourse(payload);
+    onSuccess(courseId);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-6xl rounded-xl shadow-lg p-6">
@@ -21,7 +51,7 @@ export default function CreateCourse() {
         {/* Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* LEFT SECTION */}
-          <div className="space-y-5 border-[#B3B8B8]  border-r-1 px-4">
+          <div className="space-y-5 border-[#B3B8B8] border-r-1 px-4">
             {/* Course Title */}
             <div>
               <label className="block text-md text-[#5D5D5D] font-medium mb-1">
@@ -29,20 +59,26 @@ export default function CreateCourse() {
               </label>
               <input
                 type="text"
-                placeholder=""
                 className="w-full border-[#B3B8B8] border-1 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={form.title}
+                onChange={(e) =>
+                  setForm({ ...form, title: e.target.value })
+                }
               />
             </div>
 
             {/* Course Description */}
             <div>
-              <label className="block text-md text-[#5D5D5D] font-medium ">
+              <label className="block text-md text-[#5D5D5D] font-medium">
                 Course Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={5}
-                placeholder=""
                 className="w-full border-[#B3B8B8] border-1 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
               />
             </div>
 
@@ -66,12 +102,12 @@ export default function CreateCourse() {
           </div>
 
           {/* RIGHT SECTION */}
-          <div className="">
-            {/* Faculty Info */}
-            <h3 className="text-md text-[#5D5D5D] font-semibold mb-1.5">Faculty info</h3>
+          <div>
+            <h3 className="text-md text-[#5D5D5D] font-semibold mb-1.5">
+              Faculty info
+            </h3>
 
-            <div className="border-[#B3B8B8] border-1 rounded-lg p-4 ">
-              {/* Faculty List */}
+            <div className="border-[#B3B8B8] border-1 rounded-lg p-4">
               <div className="flex gap-3 mb-4">
                 {[1, 2, 3, 4].map((item) => (
                   <div key={item} className="relative text-center">
@@ -88,23 +124,20 @@ export default function CreateCourse() {
                 ))}
               </div>
 
-              {/* Faculty Form */}
-
               <div className="flex gap-4">
                 <div className="grid grid-row-2 gap-3 w-[300px]">
                   <input
                     type="text"
                     placeholder="John David"
-                    className="border-[#B3B8B8] border-1 rounded-lg px-3  py-2 text-sm"
+                    className="border-[#B3B8B8] border-1 rounded-lg px-3 py-2 text-sm"
                   />
                   <input
                     type="text"
                     placeholder="M.com, CAIIB"
-                    className="border-[#B3B8B8] border-1  rounded-lg px-3 py-2 text-sm"
+                    className="border-[#B3B8B8] border-1 rounded-lg px-3 py-2 text-sm"
                   />
                 </div>
 
-                {/* Image Upload */}
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <img
@@ -116,12 +149,12 @@ export default function CreateCourse() {
                     </span>
                   </div>
                 </div>
+
                 <div className="text-gray-600">
                   <p className="px-10">
                     <ImArrowUp />
                   </p>
-
-                  <button className="flex items-center gap-2 text-md ">
+                  <button className="flex items-center gap-2 text-md">
                     + Add New
                   </button>
                 </div>
@@ -130,14 +163,16 @@ export default function CreateCourse() {
 
             {/* Total Amount */}
             <div className="mt-[140px]">
-              <label className=" text-md text-[#5D5D5D] font-medium ">
+              <label className="text-md text-[#5D5D5D] font-medium">
                 Total Amount <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                
-               
                 className="w-full border-[#B3B8B8] border-1 rounded-lg px-4 py-2 bg-gray-50"
+                value={form.price}
+                onChange={(e) =>
+                  setForm({ ...form, price: e.target.value })
+                }
               />
             </div>
           </div>
@@ -145,14 +180,19 @@ export default function CreateCourse() {
 
         {/* Footer */}
         <div className="flex justify-end gap-4 mt-8">
-          <button className="px-20 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white" >
+          <button
+            onClick={onCancel}
+            className="px-20 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white"
+          >
             Cancel
           </button>
+
           <button
-          onClick={handleSubmit}
-          
-          className="px-10 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white" >
-            Save & Continue
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-10 py-2 rounded-lg bg-[#9D9D9D] hover:bg-[#555555] text-white"
+          >
+            {loading ? "Saving..." : "Save & Continue"}
           </button>
         </div>
       </div>
