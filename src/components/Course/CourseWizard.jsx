@@ -2,21 +2,40 @@
 // import { useState } from "react";
 // import CreateCourse from "./CreateCourse";
 // import CourseContent from "./CourseContent";
+// import CreateModules from "./CreateModules";
 
 // export default function CourseWizard({ onClose }) {
 //   const [step, setStep] = useState(1);
+//   const [courseId, setCourseId] = useState(null);
 
 //   return (
-//     <div className="p-6">
+//     <>
 //       {step === 1 && (
 //         <CreateCourse
-//           onCancel={onClose}
-//           onSave={() => setStep(2)}
+//   onCancel={onClose}
+//   onSuccess={(courseId) => {
+//     setCourseId(courseId);
+//     setStep(2);
+//   }}
+// />
+//       )}
+
+//       {step === 2 && (
+//         <CourseContent
+//           courseId={courseId}
+//           onBack={() => setStep(1)}
+//           onNext={() => setStep(3)}
 //         />
 //       )}
 
-//       {step === 2 && <CourseContent />}
-//     </div>
+//       {step === 3 && (
+//         <CreateModules
+//           courseId={courseId}
+//           onCancel={() => setStep(2)}
+//           onFinish={onClose}
+//         />
+//       )}
+//     </>
 //   );
 // }
 "use client";
@@ -27,18 +46,23 @@ import CreateModules from "./CreateModules";
 
 export default function CourseWizard({ onClose }) {
   const [step, setStep] = useState(1);
+  const [courseId, setCourseId] = useState(null);
 
   return (
     <>
       {step === 1 && (
         <CreateCourse
           onCancel={onClose}
-          onSave={() => setStep(2)}
+          onSuccess={(courseId) => {
+            setCourseId(courseId);
+            setStep(2);
+          }}
         />
       )}
 
       {step === 2 && (
         <CourseContent
+          courseId={courseId}
           onBack={() => setStep(1)}
           onNext={() => setStep(3)}
         />
@@ -46,6 +70,7 @@ export default function CourseWizard({ onClose }) {
 
       {step === 3 && (
         <CreateModules
+          courseId={courseId}
           onCancel={() => setStep(2)}
           onFinish={onClose}
         />
