@@ -62,13 +62,14 @@ export default function CourseWizard({ onClose }) {
 
       {step === 2 && (
         <CourseContent
+        onCancel={onClose}
           courseId={courseId}
           onBack={() => setStep(1)}
           onNext={() => setStep(3)}
         />
       )}
 
-      {step === 3 && (
+     {step === 3 && (
         <CreateModules
           courseId={courseId}
           onCancel={() => setStep(2)}
