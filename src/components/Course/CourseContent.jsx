@@ -3,7 +3,7 @@ import { BiSolidEdit } from "react-icons/bi";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaChevronDown } from "react-icons/fa";
 
-export default function ContentInputs() {
+export default function ContentInputs({onCancel}) {
   const inputs = Array.from({ length: 5 });
   const items = Array.from({ length: 3 });
     const handleSubmit = () => {
@@ -74,7 +74,7 @@ export default function ContentInputs() {
           </div>
         </div>
         <div className="flex justify-end gap-6 mt-8">
-          <button onClick={oncancel} className="px-10 py-2 rounded-lg bg-gray-400 text-white w-[200px]">
+          <button onClick={onCancel} className="px-10 py-2 rounded-lg bg-gray-400 text-white w-[200px]">
             Cancel
           </button>
           <button onClick={handleSubmit} className="px-10 py-2 rounded-lg bg-[#1f304a] text-white w-[200px]">
