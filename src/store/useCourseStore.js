@@ -1,22 +1,38 @@
+
 import { create } from "zustand";
-import {  createCourse } from "@/services/coursesApi";
+import { createCourseApi, updateCourseApi } from "@/services/coursecontentApi";
 
 const useCourseStore = create((set) => ({
   loading: false,
-  currentCourseId: null,
+  error: null,
 
+  // SCREEN 1
   createCourse: async (payload) => {
-    set({ loading: true });
     try {
-      const res = await createCourse(payload);
-      set({ currentCourseId: res.data.id });
-      return res.data.id;
+      set({ loading: true });
+      const data = await createCourseApi(payload);
+      return data.data.id; // courseId
+    } catch (error) {
+      set({ error });
+      throw error;
     } finally {
       set({ loading: false });
     }
   },
 
-  clearCurrentCourse: () => set({ currentCourseId: null }),
+  // SCREEN 2
+  updateCourse: async (courseId, payload) => {
+    try {
+      set({ loading: true });
+      const data = await updateCourseApi(courseId, payload);
+      return data;
+    } catch (error) {
+      set({ error });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
 
 export default useCourseStore;
