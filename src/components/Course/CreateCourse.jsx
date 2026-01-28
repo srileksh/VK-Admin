@@ -129,6 +129,11 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                   src={thumbnailUrl || "/profile.png"}
                   className="w-60 h-32 object-cover rounded-md"
                 />
+                 {uploading && (
+      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+      </div>
+    )}
                 <input
                   type="file"
                   hidden
@@ -140,6 +145,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                 <p className="text-sm text-gray-500">
                   Click to upload thumbnail
                 </p>
+                
               </label>
             </div>
           </div>
@@ -149,7 +155,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
             <h3 className="font-semibold mb-2">Faculty info</h3>
 
             {/* 🔥 TOP HORIZONTAL AVATARS */}
-            <div className="flex gap-4 mb-4 border rounded-lg p-4 flex-wrap">
+            <div className="flex gap-4 mb-4 h-[220px] border rounded-lg p-4 flex-wrap">
               {faculty.map((f, index) => (
                 <div key={index} className="relative text-center">
                   <img
