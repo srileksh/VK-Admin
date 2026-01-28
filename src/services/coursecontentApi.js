@@ -9,7 +9,7 @@ export const createCourseApi = async (payload) => {
 // UPDATE COURSE (Screen 2)
 export const updateCourseApi = async (courseId, payload) => {
   const res = await axiosInstance.put(
-    `/api/v1/courses/${courseId}`,
+    `/courses/${courseId}`,
     payload
   );
   return res.data;
