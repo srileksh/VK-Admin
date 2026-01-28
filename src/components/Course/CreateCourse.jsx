@@ -125,6 +125,9 @@ export default function CreateCourse({ onCancel, onSuccess }) {
             <div>
               <label className="block font-medium mb-2">Thumbnail</label>
               <label className="flex gap-4 items-center border rounded-lg p-4 cursor-pointer">
+                <div className="relative w-60 h-32 rounded-md overflow-hidden">
+
+               
                 <img
                   src={thumbnailUrl || "/profile.png"}
                   className="w-60 h-32 object-cover rounded-md"
@@ -134,6 +137,9 @@ export default function CreateCourse({ onCancel, onSuccess }) {
         <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
       </div>
     )}
+     </div>
+
+
                 <input
                   type="file"
                   hidden
