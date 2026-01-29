@@ -6,6 +6,8 @@ import { IoLogOutSharp } from "react-icons/io5";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { RiLogoutBoxRFill } from "react-icons/ri";
+
 
 function Navbar() {
   const logout = useAuthStore((state) => state.logout);
@@ -23,7 +25,7 @@ function Navbar() {
   };
 
   return (
-    <div className="flex justify-between items-center px-10 py-8">
+    <div className="flex justify-between items-center px-10 py-5">
       <div>
         <h1 className="text-[30px] text-[#1f285b] font-semibold">
           Welcome, {user?.name || "User"}
@@ -31,15 +33,15 @@ function Navbar() {
       </div>
 
       <div className="flex justify-center gap-[50px]">
-        <button className="text-[#606060] flex items-center gap-[3px]">
+        <button className="text-[#606060] flex items-center gap-[3px] text-[16px]">
           <IoIosSettings className="size-[29px]" /> Settings
         </button>
 
         <button
           onClick={handleLogout}
-          className="text-[#606060] flex items-center gap-[3px]"
+          className="text-[#606060] flex items-center gap-[3px] text-[16px]"
         >
-          <IoLogOutSharp className="size-[29px]" /> Logout
+          <RiLogoutBoxRFill className="size-[29px]" /> Logout
         </button>
       </div>
     </div>
