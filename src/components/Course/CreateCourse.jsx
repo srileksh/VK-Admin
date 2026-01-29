@@ -497,7 +497,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                   <label className="relative cursor-pointer">
                     <img
                       src={draftFaculty.profileImage || "/profile.png"}
-                      className="w-20 h-20 rounded-full object-cover"
+                      className="w-22 h-22 rounded-full object-cover"
                     />
                     <input
                       type="file"
@@ -512,14 +512,14 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                     </span>
                   </label>
 
-                  <div className="text-gray-600">
+                  <div className="text-gray-600 pt-4">
                     <p className="px-10">
                       <ImArrowUp />
                     </p>
                     <button
                       onClick={addFaculty}
                       disabled={facultyUploading}
-                      className="flex items-center gap-2 text-md"
+                      className="flex items-center gap-2  text-md"
                     >
                       + Add New
                     </button>
