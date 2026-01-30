@@ -2,7 +2,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div>dashboard</div>
+    <div className='px-5'>dashboard</div>
   )
 }
 
