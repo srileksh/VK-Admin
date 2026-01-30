@@ -25,7 +25,7 @@ function Navbar() {
   };
 
   return (
-    <div className="flex justify-between items-center px-10 py-5">
+    <div className="flex justify-between items-center px-10 py-5 border-b shadow-sm border-blue-50  mb-5">
       <div>
         <h1 className="text-[30px] text-[#1f285b] font-semibold">
           Welcome, {user?.name || "User"}

@@ -8,7 +8,7 @@ export default function layout({ children }) {
       <Sidebar />
 
       {/* Page Content */}
-      <main className="p-6 bg-gray-50 overflow-y-auto">
+      <main className=" bg-gray-50 overflow-y-auto">
         <Navbar/>
         {children}
       </main>
