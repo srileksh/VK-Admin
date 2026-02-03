@@ -39,9 +39,9 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-[#eff6fe] pt-[50px] p-[25px]">
+    <div className="min-h-screen bg-[#e5dcc9] pt-[50px] p-[25px]">
       <div className="text-center">
-        <img src="logo.png" className="mx-auto" />
+        <img src="VK-Logo.png" className="mx-auto" />
         <h1 className="text-[32px] font-bold">Admin Login</h1>
         <p>Access the admin dashboard</p>
       </div>
@@ -101,7 +101,7 @@ function Page() {
 
         <button
           type="submit"
-          disabled={loading}
+          disable={loading}
           className="w-full mt-[20px] bg-[#1f304a] text-white py-[10px] rounded-[10px] disabled:opacity-60"
         >
           {loading ? "Logging in..." : "Login"}
