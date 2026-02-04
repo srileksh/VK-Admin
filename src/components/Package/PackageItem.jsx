@@ -5,11 +5,12 @@ import {
   IoIosArrowDown,
   IoMdAddCircle,
 } from "react-icons/io";
-import { RiDeleteBin5Fill } from "react-icons/ri";
-import { BiSolidEdit } from "react-icons/bi";
 import useCategoryStore from "@/store/categoryStore";
 import EditPackage from "./EditPackage";
 import DeletePackage from "./DeletePackage";
+import { MdEditNote } from "react-icons/md";
+import { RiDeleteBin5Line } from "react-icons/ri";
+
 
 export default function PackageItem() {
   const {
@@ -101,7 +102,7 @@ const cardStyle =
           </div>
 
           {/* ACTIONS */}
-          <div className="flex gap-5 items-center">
+          <div className="flex gap-2 xl:gap-5 items-center">
             {/* ADD */}
             <button
               onClick={(e) => {
@@ -118,15 +119,15 @@ const cardStyle =
                 transition-all duration-200 w-[160px]
               "
             >
-              <IoMdAddCircle className="text-[24px]" />
+              <IoMdAddCircle className="text-[22px]" />
               Add Sub package
             </button>
 
             {/* EDIT */}
-            <BiSolidEdit
+            <MdEditNote
               className="
-                text-[24px] cursor-pointer
-                hover:text-[#60606] hover:scale-110
+                text-[28px] cursor-pointer
+                hover:text-[#555555] hover:scale-110
                 transition-all duration-200
               "
               onClick={(e) => {
@@ -139,9 +140,9 @@ const cardStyle =
             />
 
             {/* DELETE */}
-            <RiDeleteBin5Fill
+            <RiDeleteBin5Line
               className="
-                text-[24px] cursor-pointer
+                text-[22px] cursor-pointer
                 hover:text-[#555555] hover:scale-110
                 transition-all duration-200
               "
@@ -162,17 +163,19 @@ const cardStyle =
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="py-2  space-y-4">
       {categories.map((category) => renderCategory(category))}
         {showInput && (selectedParent || selectedEdit) && (
-<EditPackage
+<EditPackage className=""
   isOpen={showInput && (selectedParent || selectedEdit)}
   isEdit={!!selectedEdit}
   value={subName}
   title={
+
     selectedEdit
       ? `Edit ${selectedEdit.name}`
-      : `Create new package for ${selectedParent?.name}`
+      : `Create new package for  ${selectedParent?.name} `
+    
   }
   onChange={setSubName}
   onCancel={() => {

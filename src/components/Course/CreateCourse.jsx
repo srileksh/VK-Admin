@@ -94,11 +94,11 @@ export default function CreateCourse({ onCancel, onSuccess }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* LEFT */}
-          <div className="space-y-5 border-r px-4">
+          <div className="space-y-5 border-r border-[#a09f9f] px-4">
             <div>
               <label className="block font-medium mb-1">Course Title *</label>
               <input
-                className="w-full border rounded-lg px-4 py-2"
+                className="w-full border border-[#a09f9f] rounded-lg px-4 py-2"
                 value={form.title}
                 onChange={(e) =>
                   setForm({ ...form, title: e.target.value })
@@ -110,7 +110,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
               <label className="block font-medium">Course Description *</label>
               <textarea
                 rows={5}
-                className="w-full border rounded-lg px-4 py-2"
+                className="w-full border border-[#a09f9f] rounded-lg px-4 py-2"
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
@@ -121,7 +121,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
             {/* THUMBNAIL */}
             <div>
               <label className="block font-medium mb-2">Thumbnail</label>
-              <label className="flex gap-4 items-center border rounded-lg p-4 cursor-pointer">
+              <label className="flex gap-4 items-center border border-[#a09f9f] rounded-lg p-4 cursor-pointer">
                 <div className="relative w-60 h-32 rounded-md overflow-hidden">
                   <img
                     src={thumbnailUrl || "/profile.png"}
@@ -154,12 +154,12 @@ export default function CreateCourse({ onCancel, onSuccess }) {
           <div>
             <h3 className="font-semibold mb-2">Faculty info</h3>
 
-            <div className="flex gap-4 mb-4 h-[220px] border rounded-lg p-4 flex-wrap">
+            <div className="flex gap-4 mb-4 h-[220px] border  border-[#a09f9f] rounded-lg p-4 flex-wrap">
               {faculty.map((f, index) => (
                 <div key={index} className="relative text-center">
                   <img
                     src={f.profileImage || "/profile.png"}
-                    className="w-12 h-12 rounded-full border object-cover"
+                    className="w-12 h-12 rounded-full border border-[#a09f9f] object-cover"
                   />
                   <button
                     onClick={() => removeFaculty(index)}
@@ -179,7 +179,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                   <div className="grid gap-3 w-[300px]">
                     <input
                       placeholder="John David"
-                      className="border rounded-lg px-3 py-2 text-sm"
+                      className="border border-[#a09f9f] rounded-lg px-3 py-2 text-sm"
                       value={draftFaculty.name}
                       onChange={(e) =>
                         setDraftFaculty({
@@ -190,7 +190,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                     />
                     <input
                       placeholder="M.com, CAIIB"
-                      className="border rounded-lg px-3 py-2 text-sm"
+                      className="border border-[#a09f9f] rounded-lg px-3 py-2 text-sm"
                       value={draftFaculty.qualification}
                       onChange={(e) =>
                         setDraftFaculty({
@@ -238,7 +238,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
             <div className="mt-[150px]">
               <label className="font-medium">Total Amount *</label>
               <input
-                className="w-full border rounded-lg px-4 py-2 bg-gray-50"
+                className="w-full border border-[#a09f9f] rounded-lg px-4 py-2 bg-gray-50"
                 value={form.price}
                 onChange={(e) =>
                   setForm({ ...form, price: e.target.value })

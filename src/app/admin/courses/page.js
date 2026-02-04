@@ -25,15 +25,19 @@ export default function Page() {
       {!showWizard && (
         <div className="px-4 sm:px-6 md:px-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-[20px] font-semibold">Courses</h1>
+            <h1 className="text-[27px] text-[#1f304a] font-medium">Courses</h1>
             <button
               onClick={() => {
                 setEditingIndex(null);
                 setShowWizard(true);
               }}
-              className="bg-[#1F304A] text-white px-6 py-3 rounded-xl"
+              className="px-6 xl:px-10 py-3
+    bg-[#1f304a] text-white
+    rounded-xl text-[18px] xl:text-[20px]
+    transition-colors duration-300
+    hover:bg-[#314279]"
             >
-              Create new course
+              Create new Course
             </button>
           </div>
 
