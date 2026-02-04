@@ -10,14 +10,13 @@ function Sidebar() {
     { name: "Packages", path: "/admin/packages" },
     { name: "Courses", path: "/admin/courses" },
     { name: "Coupons", path: "/admin/coupons" },
-    { name: "Logout", path: "/admin/logout" },
   ];
   const isActive = (path) => pathname === path;
   return (
     <aside className="w-72 min-h-screen bg-[#1F304A] flex flex-col items-center py-8">
       {/* Logo */}
       <div>
-        <img src="/logo.png" />
+        {/* <img src="/VK-Logo.png" /> */}
       </div>
       <Link href="/admin/dashbord" className="mb-6">
         <h1 className="text-3xl font-bold text-white"></h1>

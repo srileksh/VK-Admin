@@ -31,12 +31,12 @@ export default function Page() {
   };
 
   return (
-    <div className="px-10 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-[27px]">Course Type</h1>
+    <div className="px-8 ">
+      <div className="flex justify-between mb-2 xl:mb-4">
+        <h1 className="text-[27px] text-[#1f304a] font-medium">Course Type</h1>
         <button
           onClick={() => setShowPopup(true)}
-          className="px-18 py-3 bg-[#1f304a] text-white rounded-xl text-[20px]"
+          className="px-6 xl:px-10 py-3 bg-[#1f304a] text-white rounded-xl text-[18px] xl:text-[20px]"
         >
           Create new package
         </button>

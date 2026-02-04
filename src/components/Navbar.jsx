@@ -86,12 +86,12 @@ function Navbar() {
       {/* ================= NAVBAR ================= */}
       <div className="flex justify-between items-center px-10 py-5 border-b shadow-sm border-blue-50 mb-5">
         <div>
-          <h1 className="text-[30px] text-[#1f285b] font-semibold">
+          <h1 className= "text-[28px] xl:text-[30px] text-[#1f285b] font-semibold">
             Welcome, {user?.name || "User"}
           </h1>
         </div>
 
-        <div className="flex justify-center gap-[50px]">
+        <div className="flex justify-center gap-[30px] xl:gap-[50px]">
           <button className="text-[#606060] flex items-center gap-[3px] text-[16px]">
             <IoIosSettings className="size-[29px]" /> Settings
           </button>
