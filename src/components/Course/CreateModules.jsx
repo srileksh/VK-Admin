@@ -1,51 +1,43 @@
-
-// "use client";
-// import PromoVideoSection from "./PromoVideoSection";
-// import LessonSection from "./LessonSection";
-// import { GoPlus } from "react-icons/go";
-
-// export default function CreateModules({ onCancel, onFinish }) {
-//   return (
-//     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-//       <div className="bg-white w-full max-w-[1000px] rounded-xl shadow-lg p-6 px-8 max-h-[90vh] overflow-y-auto">
-//         <h2 className="text-lg font-semibold mb-4 text-[#1F304A]">
-//           Create modules
-//         </h2>
-
-//         <PromoVideoSection />
-//         <LessonSection title="Section 1" />
-
-//         <div className="flex justify-end mb-6">
-//           <button className="flex items-center gap-1 p-3 shadow-md rounded-lg">
-//             <GoPlus /> Add new section
-//           </button>
-//         </div>
-
-//         <div className="flex justify-end gap-6">
-//           <button
-//             onClick={onCancel}
-//             className="bg-gray-300 px-10 py-2 rounded-xl"
-//           >
-//             Cancel
-//           </button>
-//           <button
-//             onClick={onFinish}
-//             className="bg-gray-700 px-10 py-2 rounded-xl text-white"
-//           >
-//             Finish
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 "use client";
+import { useState } from "react";
 import PromoVideoSection from "./PromoVideoSection";
 import LessonSection from "./LessonSection";
 import { GoPlus } from "react-icons/go";
+import useCourseStore from "@/store/useCourseStore";
+import useSectionStore from "@/store/useSectionStore";
 
 export default function CreateModules({ onCancel, onFinish }) {
+  const { courseId } = useCourseStore();
+  const { createSection } = useSectionStore();
+
+  const [sections, setSections] = useState([]);
+  const [isAdding, setIsAdding] = useState(false);
+  const [sectionTitle, setSectionTitle] = useState("");
+
+  const handleCreateSection = async () => {
+    if (!sectionTitle.trim()) return;
+
+    try {
+      const data = await createSection({
+        courseId,
+        title: sectionTitle.trim(),
+      });
+
+      setSections((prev) => [
+        ...prev,
+        {
+          id: data.id,
+          title: sectionTitle.trim(),
+        },
+      ]);
+
+      setSectionTitle("");
+      setIsAdding(false);
+    } catch (err) {
+      alert("Failed to create section");
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
       <div className="bg-white w-full max-w-[1000px] rounded-xl shadow-lg p-6 px-8 max-h-[90vh] overflow-y-auto">
@@ -53,23 +45,56 @@ export default function CreateModules({ onCancel, onFinish }) {
           Create modules
         </h2>
 
-        {/* Promo video */}
         <PromoVideoSection />
 
-        {/* Lesson section */}
-        <LessonSection
-          sectionId="section-1"
-          title="Section 1"
-        />
+        {/* SECTIONS */}
+        {sections.map((section) => (
+          <LessonSection
+            key={section.id}
+            sectionId={section.id}
+            title={section.title}
+          />
+        ))}
 
-        {/* Add section */}
+        {/* ADD SECTION */}
         <div className="flex justify-end mb-6">
-          <button className="flex items-center gap-1 p-3 shadow-md rounded-lg">
-            <GoPlus /> Add new section
-          </button>
+          {!isAdding ? (
+            <button
+              onClick={() => setIsAdding(true)}
+              className="flex items-center gap-1 p-3 shadow-md rounded-lg"
+            >
+              <GoPlus /> Add new section
+            </button>
+          ) : (
+            <div className="flex gap-3">
+              <input
+                autoFocus
+                value={sectionTitle}
+                onChange={(e) => setSectionTitle(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCreateSection()}
+                placeholder="Section title"
+                className="border px-3 py-2 rounded-lg"
+              />
+              <button
+                onClick={handleCreateSection}
+                className="bg-gray-700 text-white px-4 py-2 rounded-lg"
+              >
+                Create
+              </button>
+              <button
+                onClick={() => {
+                  setIsAdding(false);
+                  setSectionTitle("");
+                }}
+                className="text-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Footer */}
+        {/* FOOTER */}
         <div className="flex justify-end gap-6">
           <button
             onClick={onCancel}
@@ -88,4 +113,3 @@ export default function CreateModules({ onCancel, onFinish }) {
     </div>
   );
 }
-
