@@ -101,7 +101,7 @@ function Page() {
 
         <button
           type="submit"
-          disable={loading}
+          disabled={loading}
           className="w-full mt-[20px] bg-[#1f304a] text-white py-[10px] rounded-[10px] disabled:opacity-60"
         >
           {loading ? "Logging in..." : "Login"}
