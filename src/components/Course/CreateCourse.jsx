@@ -1,3 +1,531 @@
+// "use client";
+// import { useState } from "react";
+// import useCourseStore from "@/store/useCourseStore";
+// import { X } from "lucide-react";
+// import { ImArrowUp } from "react-icons/im";
+// import { uploadImageToCloudinary } from "../../../src/utils/cloudinaryImageUpload";
+
+// export default function CreateCourse({ onCancel, onSuccess }) {
+//   const { createCourse, loading } = useCourseStore();
+
+//   const [form, setForm] = useState({
+//     title: "",
+//     description: "",
+//     price: "",
+//   });
+
+//   const [thumbnailUrl, setThumbnailUrl] = useState("");
+
+//   /* ✅ LOADING STATES */
+//   const [thumbnailUploading, setThumbnailUploading] = useState(false);
+//   const [facultyUploading, setFacultyUploading] = useState(false);
+
+//   /* 🔹 FACULTY */
+//   const [faculty, setFaculty] = useState([]);
+//   const [draftFaculty, setDraftFaculty] = useState({
+//     name: "",
+//     qualification: "",
+//     profileImage: "",
+//   });
+
+//   /* ================= THUMBNAIL ================= */
+//   const handleThumbnailUpload = async (file) => {
+//     if (!file) return;
+
+//     setThumbnailUploading(true);
+//     try {
+//       const url = await uploadImageToCloudinary(file);
+//       setThumbnailUrl(url);
+//     } finally {
+//       setThumbnailUploading(false);
+//     }
+//   };
+
+//   /* ================= FACULTY IMAGE ================= */
+//   const uploadFacultyImage = async (file) => {
+//     if (!file) return;
+
+//     setFacultyUploading(true);
+//     try {
+//       const url = await uploadImageToCloudinary(file);
+//       setDraftFaculty({ ...draftFaculty, profileImage: url });
+//     } finally {
+//       setFacultyUploading(false);
+//     }
+//   };
+
+//   /* ================= FACULTY ================= */
+//   const addFaculty = () => {
+//     if (!draftFaculty.name || !draftFaculty.qualification) return;
+
+//     setFaculty([...faculty, draftFaculty]);
+//     setDraftFaculty({
+//       name: "",
+//       qualification: "",
+//       profileImage: "",
+//     });
+//   };
+
+//   const removeFaculty = (index) => {
+//     setFaculty(faculty.filter((_, i) => i !== index));
+//   };
+
+//   /* ================= SUBMIT ================= */
+//   const handleSubmit = async () => {
+//     const payload = {
+//       title: form.title,
+//       description: form.description,
+//       thumbnail: thumbnailUrl,
+//       price: Number(form.price),
+//       duration: 600,
+//       level: "BEGINNER",
+//       faculty,
+//     };
+
+//     const courseId = await createCourse(payload);
+//     onSuccess(courseId);
+//   };
+
+//   return (
+//     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
+//       <div className="bg-white w-full 2xl:max-w-6xl rounded-xl shadow-lg p-6">
+//         <h2 className="text-xl px-4 font-semibold mb-6">Create Course</h2>
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//           {/* LEFT */}
+//           <div className="space-y-5 border-r px-4">
+//             <div>
+//               <label className="block font-medium mb-1">Course Title *</label>
+//               <input
+//                 className="w-full border rounded-lg px-4 py-2"
+//                 value={form.title}
+//                 onChange={(e) =>
+//                   setForm({ ...form, title: e.target.value })
+//                 }
+//               />
+//             </div>
+
+//             <div>
+//               <label className="block font-medium">Course Description *</label>
+//               <textarea
+//                 rows={5}
+//                 className="w-full border rounded-lg px-4 py-2"
+//                 value={form.description}
+//                 onChange={(e) =>
+//                   setForm({ ...form, description: e.target.value })
+//                 }
+//               />
+//             </div>
+
+//             {/* THUMBNAIL */}
+//             <div>
+//               <label className="block font-medium mb-2">Thumbnail</label>
+//               <label className="flex gap-4 items-center border rounded-lg p-4 cursor-pointer">
+//                 <div className="relative w-60 h-32 rounded-md overflow-hidden">
+//                   <img
+//                     src={thumbnailUrl || "/profile.png"}
+//                     className="w-full h-full object-cover"
+//                   />
+
+//                   {thumbnailUploading && (
+//                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+//                       <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 <input
+//                   type="file"
+//                   hidden
+//                   accept="image/*"
+//                   onChange={(e) =>
+//                     handleThumbnailUpload(e.target.files[0])
+//                   }
+//                 />
+//                 <p className="text-sm text-gray-500">
+//                   Click to upload thumbnail
+//                 </p>
+//               </label>
+//             </div>
+//           </div>
+
+//           {/* RIGHT */}
+//           <div>
+//             <h3 className="font-semibold mb-2">Faculty info</h3>
+
+//             <div className="flex gap-4 mb-4 h-[220px] border rounded-lg p-4 flex-wrap">
+//               {faculty.map((f, index) => (
+//                 <div key={index} className="relative text-center">
+//                   <img
+//                     src={f.profileImage || "/profile.png"}
+//                     className="w-12 h-12 rounded-full border object-cover"
+//                   />
+//                   <button
+//                     onClick={() => removeFaculty(index)}
+//                     className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"
+//                   >
+//                     <X size={12} />
+//                   </button>
+//                   <p className="text-xs mt-1 font-medium">{f.name}</p>
+//                   <p className="text-[10px] text-gray-500">
+//                     {f.qualification}
+//                   </p>
+//                 </div>
+//               ))}
+
+//               <div>
+//                 <div className="flex gap-4">
+//                   <div className="grid gap-3 w-[300px]">
+//                     <input
+//                       placeholder="John David"
+//                       className="border rounded-lg px-3 py-2 text-sm"
+//                       value={draftFaculty.name}
+//                       onChange={(e) =>
+//                         setDraftFaculty({
+//                           ...draftFaculty,
+//                           name: e.target.value,
+//                         })
+//                       }
+//                     />
+//                     <input
+//                       placeholder="M.com, CAIIB"
+//                       className="border rounded-lg px-3 py-2 text-sm"
+//                       value={draftFaculty.qualification}
+//                       onChange={(e) =>
+//                         setDraftFaculty({
+//                           ...draftFaculty,
+//                           qualification: e.target.value,
+//                         })
+//                       }
+//                     />
+//                   </div>
+
+//                   <label className="relative cursor-pointer">
+//                     <img
+//                       src={draftFaculty.profileImage || "/profile.png"}
+//                       className="w-22 h-22 rounded-full object-cover"
+//                     />
+//                     <input
+//                       type="file"
+//                       hidden
+//                       accept="image/*"
+//                       onChange={(e) =>
+//                         uploadFacultyImage(e.target.files[0])
+//                       }
+//                     />
+//                     <span className="absolute inset-0 flex items-center justify-center text-xs text-white bg-black/40 rounded-full">
+//                       {facultyUploading ? "Uploading..." : "Change Photo"}
+//                     </span>
+//                   </label>
+
+//                   <div className="text-gray-600 pt-4">
+//                     <p className="px-10">
+//                       <ImArrowUp />
+//                     </p>
+//                     <button
+//                       onClick={addFaculty}
+//                       disabled={facultyUploading}
+//                       className="flex items-center gap-2 text-md"
+//                     >
+//                       + Add New
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             <div className="mt-[150px]">
+//               <label className="font-medium">Total Amount *</label>
+//               <input
+//                 className="w-full border rounded-lg px-4 py-2 bg-gray-50"
+//                 value={form.price}
+//                 onChange={(e) =>
+//                   setForm({ ...form, price: e.target.value })
+//                 }
+//               />
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* FOOTER */}
+//         <div className="flex justify-end gap-4 mt-8">
+//           <button
+//             onClick={onCancel}
+//             className="px-20 py-2 rounded-lg bg-gray-400 text-white"
+//           >
+//             Cancel
+//           </button>
+
+//           <button
+//             onClick={handleSubmit}
+//             disabled={loading || thumbnailUploading}
+//             className="px-10 py-2 rounded-lg bg-gray-600 text-white"
+//           >
+//             {thumbnailUploading ? "Uploading..." : "Save & Continue"}
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// "use client";
+// import { useState } from "react";
+// import useCourseStore from "@/store/useCourseStore";
+// import { X } from "lucide-react";
+// import { ImArrowUp } from "react-icons/im";
+// import { uploadImageToCloudinary } from "../../../src/utils/cloudinaryImageUpload";
+
+// export default function CreateCourse({ onCancel, onSuccess }) {
+//   const { createCourse, loading } = useCourseStore();
+
+//   const [form, setForm] = useState({
+//     title: "",
+//     description: "",
+//     price: "",
+//   });
+
+//   const [thumbnailUrl, setThumbnailUrl] = useState("");
+
+//   const [thumbnailUploading, setThumbnailUploading] = useState(false);
+//   const [facultyUploading, setFacultyUploading] = useState(false);
+
+//   const [faculty, setFaculty] = useState([]);
+//   const [draftFaculty, setDraftFaculty] = useState({
+//     name: "",
+//     qualification: "",
+//     profileImage: "",
+//   });
+
+//   const handleThumbnailUpload = async (file) => {
+//     if (!file) return;
+//     setThumbnailUploading(true);
+//     try {
+//       const url = await uploadImageToCloudinary(file);
+//       setThumbnailUrl(url);
+//     } finally {
+//       setThumbnailUploading(false);
+//     }
+//   };
+
+//   const uploadFacultyImage = async (file) => {
+//     if (!file) return;
+//     setFacultyUploading(true);
+//     try {
+//       const url = await uploadImageToCloudinary(file);
+//       setDraftFaculty({ ...draftFaculty, profileImage: url });
+//     } finally {
+//       setFacultyUploading(false);
+//     }
+//   };
+
+//   const addFaculty = () => {
+//     if (!draftFaculty.name || !draftFaculty.qualification) return;
+//     setFaculty([...faculty, draftFaculty]);
+//     setDraftFaculty({ name: "", qualification: "", profileImage: "" });
+//   };
+
+//   const removeFaculty = (index) => {
+//     setFaculty(faculty.filter((_, i) => i !== index));
+//   };
+
+//   const handleSubmit = async () => {
+//     const payload = {
+//       title: form.title,
+//       description: form.description,
+//       thumbnail: thumbnailUrl,
+//       price: Number(form.price),
+//       duration: 600,
+//       level: "BEGINNER",
+//       faculty,
+//     };
+//     const courseId = await createCourse(payload);
+//     onSuccess(courseId);
+//   };
+
+//   return (
+//     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-6 ">
+//       <div className="bg-white w-full max-w-6xl rounded-xl shadow-lg p-4 sm:p-6 max-h-[95vh] flex flex-col">
+//         <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 pb-6">
+//         <h2 className="text-lg sm:text-xl font-semibold mb-6">
+//           Create Course
+//         </h2>
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//           {/* LEFT */}
+//           <div className="space-y-5 md:border-r md:pr-6">
+//             <div>
+//               <label className="block font-medium mb-1">Course Title *</label>
+//               <input
+//                 className="w-full border rounded-lg px-4 py-2"
+//                 value={form.title}
+//                 onChange={(e) =>
+//                   setForm({ ...form, title: e.target.value })
+//                 }
+//               />
+//             </div>
+
+//             <div>
+//               <label className="block font-medium">Course Description *</label>
+//               <textarea
+//                 rows={4}
+//                 className="w-full border rounded-lg px-4 py-2"
+//                 value={form.description}
+//                 onChange={(e) =>
+//                   setForm({ ...form, description: e.target.value })
+//                 }
+//               />
+//             </div>
+
+//             {/* THUMBNAIL */}
+//             <div>
+//               <label className="block font-medium mb-2">Thumbnail *</label>
+//               <label className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border rounded-lg p-4 cursor-pointer">
+//                 <div className="relative w-full sm:w-60 h-32 rounded-md overflow-hidden">
+//                   <img
+//                     src={thumbnailUrl || "/profile.png"}
+//                     className="w-full h-full object-cover"
+//                   />
+//                   {thumbnailUploading && (
+//                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+//                       <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 <input
+//                   type="file"
+//                   hidden
+//                   accept="image/*"
+//                   onChange={(e) =>
+//                     handleThumbnailUpload(e.target.files[0])
+//                   }
+//                 />
+//                 <p className="text-sm text-gray-500">
+//                   Click to upload thumbnail
+//                 </p>
+//               </label>
+//             </div>
+//           </div>
+
+//           {/* RIGHT */}
+//           <div>
+//             <h3 className="font-semibold mb-2">Faculty info *</h3>
+
+//             <div className="border rounded-lg p-4 max-h-[220px] mb-38 overflow-y-auto flex flex-wrap gap-4">
+//               {faculty.map((f, index) => (
+//                 <div key={index} className="relative text-center">
+//                   <img
+//                     src={f.profileImage || "/profile.png"}
+//                     className="w-12 h-12 rounded-full border object-cover"
+//                   />
+//                   <button
+//                     onClick={() => removeFaculty(index)}
+//                     className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"
+//                   >
+//                     <X size={12} />
+//                   </button>
+//                   <p className="text-xs mt-1 font-medium">{f.name}</p>
+//                   <p className="text-[10px] text-gray-500">
+//                     {f.qualification}
+//                   </p>
+//                 </div>
+//               ))}
+
+//               <div className="w-full">
+//                 <div className="flex flex-col sm:flex-row gap-4 items-center h-[68px]">
+//                   <div className="grid gap-3 w-full sm:w-[300px]">
+//                     <input
+//                       placeholder="John David"
+//                       className="border rounded-lg px-3 py-2 text-sm"
+//                       value={draftFaculty.name}
+//                       onChange={(e) =>
+//                         setDraftFaculty({
+//                           ...draftFaculty,
+//                           name: e.target.value,
+//                         })
+//                       }
+//                     />
+//                     <input
+//                       placeholder="M.com, CAIIB"
+//                       className="border rounded-lg px-3 py-2 text-sm"
+//                       value={draftFaculty.qualification}
+//                       onChange={(e) =>
+//                         setDraftFaculty({
+//                           ...draftFaculty,
+//                           qualification: e.target.value,
+//                         })
+//                       }
+//                     />
+//                   </div>
+
+//                   <label className="relative cursor-pointer">
+//                     <img
+//                       src={draftFaculty.profileImage || "/profile.png"}
+//                       className="w-20 md:w-25  lg:w-19 xl:w-20  h-20 md:h-14 lg:h-17 xl:h-20 rounded-full object-cover"
+//                     />
+//                     <input
+//                       type="file"
+//                       hidden
+//                       accept="image/*"
+//                       onChange={(e) =>
+//                         uploadFacultyImage(e.target.files[0])
+//                       }
+//                     />
+//                     <span className="absolute inset-0 flex items-center justify-center text-[6px] lg:text-[8px] xl:text-xs text-white bg-black/40 rounded-full">
+//                       {facultyUploading ? "Uploading..." : "Change Photo"}
+//                     </span>
+//                   </label>
+
+//                   <div className="text-gray-600 flex flex-col items-center">
+//                     <ImArrowUp />
+//                     <button
+//                       onClick={addFaculty}
+//                       disabled={facultyUploading}
+//                       className="text-sm md:text-[8px] lg:text-[10px] xl:text-sm mt-1"
+//                     >
+//                       + Add New
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             <div className="mt-6">
+//               <label className="font-medium">Total Amount *</label>
+//               <input
+//                 className="w-full border rounded-lg px-4 py-2 bg-gray-50"
+//                 value={form.price}
+//                 onChange={(e) =>
+//                   setForm({ ...form, price: e.target.value })
+//                 }
+//               />
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* FOOTER */}
+//         <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">
+//           <button
+//             onClick={onCancel}
+//             className="px-10 py-2 rounded-lg bg-gray-400 text-white"
+//           >
+//             Cancel
+//           </button>
+
+//           <button
+//             onClick={handleSubmit}
+//             disabled={loading || thumbnailUploading}
+//             className="px-10 py-2 rounded-lg bg-gray-600 text-white"
+//           >
+//             {thumbnailUploading ? "Uploading..." : "Save & Continue"}
+//           </button>
+//         </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 "use client";
 import { useState } from "react";
@@ -15,13 +543,12 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     price: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [thumbnailUrl, setThumbnailUrl] = useState("");
 
-  /* ✅ LOADING STATES */
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [facultyUploading, setFacultyUploading] = useState(false);
 
-  /* 🔹 FACULTY */
   const [faculty, setFaculty] = useState([]);
   const [draftFaculty, setDraftFaculty] = useState({
     name: "",
@@ -29,23 +556,20 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     profileImage: "",
   });
 
-  /* ================= THUMBNAIL ================= */
   const handleThumbnailUpload = async (file) => {
     if (!file) return;
-
     setThumbnailUploading(true);
     try {
       const url = await uploadImageToCloudinary(file);
       setThumbnailUrl(url);
+      setErrors((p) => ({ ...p, thumbnail: "" }));
     } finally {
       setThumbnailUploading(false);
     }
   };
 
-  /* ================= FACULTY IMAGE ================= */
   const uploadFacultyImage = async (file) => {
     if (!file) return;
-
     setFacultyUploading(true);
     try {
       const url = await uploadImageToCloudinary(file);
@@ -55,24 +579,49 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     }
   };
 
-  /* ================= FACULTY ================= */
   const addFaculty = () => {
-    if (!draftFaculty.name || !draftFaculty.qualification) return;
+    const newErrors = {};
+    if (!draftFaculty.name.trim())
+      newErrors.facultyName = "This field is mandatory";
+    if (!draftFaculty.qualification.trim())
+      newErrors.facultyQualification = "This field is mandatory";
+
+    if (Object.keys(newErrors).length) {
+      setErrors((p) => ({ ...p, ...newErrors }));
+      return;
+    }
 
     setFaculty([...faculty, draftFaculty]);
-    setDraftFaculty({
-      name: "",
-      qualification: "",
-      profileImage: "",
-    });
+    setDraftFaculty({ name: "", qualification: "", profileImage: "" });
+    setErrors((p) => ({
+      ...p,
+      faculty: "",
+      facultyName: "",
+      facultyQualification: "",
+    }));
   };
 
   const removeFaculty = (index) => {
     setFaculty(faculty.filter((_, i) => i !== index));
   };
 
-  /* ================= SUBMIT ================= */
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (!form.title.trim()) newErrors.title = "This field is required";
+    if (!form.description.trim())
+      newErrors.description = "This field is required";
+    if (!thumbnailUrl) newErrors.thumbnail = "This field is required";
+    if (!form.price) newErrors.price = "This field is required";
+    if (faculty.length === 0) newErrors.faculty = "This field is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async () => {
+    if (!validateFields()) return;
+
     const payload = {
       title: form.title,
       description: form.description,
@@ -88,182 +637,201 @@ export default function CreateCourse({ onCancel, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-6xl rounded-xl shadow-lg p-6">
-        <h2 className="text-xl px-4 font-semibold mb-6">Create Course</h2>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-6">
+      <div className="bg-white w-full max-w-6xl rounded-xl shadow-lg p-4 sm:p-6 max-h-[95vh] flex flex-col">
+        <div className="flex-1 overflow-y-auto px-4 lg:px-6 pt-6 pb-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-6">
+            Create Course
+          </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* LEFT */}
-          <div className="space-y-5 border-r px-4">
-            <div>
-              <label className="block font-medium mb-1">Course Title *</label>
-              <input
-                className="w-full border rounded-lg px-4 py-2"
-                value={form.title}
-                onChange={(e) =>
-                  setForm({ ...form, title: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium">Course Description *</label>
-              <textarea
-                rows={5}
-                className="w-full border rounded-lg px-4 py-2"
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-              />
-            </div>
-
-            {/* THUMBNAIL */}
-            <div>
-              <label className="block font-medium mb-2">Thumbnail</label>
-              <label className="flex gap-4 items-center border rounded-lg p-4 cursor-pointer">
-                <div className="relative w-60 h-32 rounded-md overflow-hidden">
-                  <img
-                    src={thumbnailUrl || "/profile.png"}
-                    className="w-full h-full object-cover"
-                  />
-
-                  {thumbnailUploading && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  )}
-                </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* LEFT */}
+            <div className="space-y-5 md:border-r border-[#a09f9f] md:pr-6">
+              <div>
+                <label className="block font-medium mb-1">Course Title *</label>
                 <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleThumbnailUpload(e.target.files[0])
-                  }
+                  className="w-full border border-[#a09f9f] rounded-lg px-4 py-2"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
                 />
-                <p className="text-sm text-gray-500">
-                  Click to upload thumbnail
-                </p>
-              </label>
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div>
-            <h3 className="font-semibold mb-2">Faculty info</h3>
-
-            <div className="flex gap-4 mb-4 h-[220px] border rounded-lg p-4 flex-wrap">
-              {faculty.map((f, index) => (
-                <div key={index} className="relative text-center">
-                  <img
-                    src={f.profileImage || "/profile.png"}
-                    className="w-12 h-12 rounded-full border object-cover"
-                  />
-                  <button
-                    onClick={() => removeFaculty(index)}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"
-                  >
-                    <X size={12} />
-                  </button>
-                  <p className="text-xs mt-1 font-medium">{f.name}</p>
-                  <p className="text-[10px] text-gray-500">
-                    {f.qualification}
-                  </p>
-                </div>
-              ))}
+                {errors.title && (
+                  <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+                )}
+              </div>
 
               <div>
-                <div className="flex gap-4">
-                  <div className="grid gap-3 w-[300px]">
-                    <input
-                      placeholder="John David"
-                      className="border rounded-lg px-3 py-2 text-sm"
-                      value={draftFaculty.name}
-                      onChange={(e) =>
-                        setDraftFaculty({
-                          ...draftFaculty,
-                          name: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      placeholder="M.com, CAIIB"
-                      className="border rounded-lg px-3 py-2 text-sm"
-                      value={draftFaculty.qualification}
-                      onChange={(e) =>
-                        setDraftFaculty({
-                          ...draftFaculty,
-                          qualification: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
+                <label className="block font-medium mb-1">
+                  Course Description *
+                </label>
+                <textarea
+                  rows={4}
+                  className="w-full border  border-[#a09f9f] rounded-lg px-4 py-2"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                />
+                {errors.description && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.description}
+                  </p>
+                )}
+              </div>
 
-                  <label className="relative cursor-pointer">
+              {/* THUMBNAIL */}
+              <div>
+                <label className="block font-medium mb-1">Thumbnail *</label>
+                <label className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border border-[#a09f9f] rounded-lg p-4 cursor-pointer">
+                  <div className="relative w-full sm:w-60 h-32 rounded-md overflow-hidden">
                     <img
-                      src={draftFaculty.profileImage || "/profile.png"}
-                      className="w-22 h-22 rounded-full object-cover"
+                      src={thumbnailUrl || "/profile.png"}
+                      className="w-full h-full object-cover"
                     />
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={(e) =>
-                        uploadFacultyImage(e.target.files[0])
-                      }
-                    />
-                    <span className="absolute inset-0 flex items-center justify-center text-xs text-white bg-black/40 rounded-full">
-                      {facultyUploading ? "Uploading..." : "Change Photo"}
-                    </span>
-                  </label>
-
-                  <div className="text-gray-600 pt-4">
-                    <p className="px-10">
-                      <ImArrowUp />
-                    </p>
-                    <button
-                      onClick={addFaculty}
-                      disabled={facultyUploading}
-                      className="flex items-center gap-2 text-md"
-                    >
-                      + Add New
-                    </button>
+                    {thumbnailUploading && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
                   </div>
-                </div>
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => handleThumbnailUpload(e.target.files[0])}
+                  />
+                </label>
+                {errors.thumbnail && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.thumbnail}
+                  </p>
+                )}
               </div>
             </div>
 
-            <div className="mt-[150px]">
-              <label className="font-medium">Total Amount *</label>
-              <input
-                className="w-full border rounded-lg px-4 py-2 bg-gray-50"
-                value={form.price}
-                onChange={(e) =>
-                  setForm({ ...form, price: e.target.value })
-                }
-              />
+            {/* RIGHT */}
+            <div>
+              <h3 className="font-semibold ">Faculty info *</h3>
+              {errors.faculty && (
+                <p className="text-xs text-red-500 ">{errors.faculty}</p>
+              )}
+
+              <div className="border border-[#a09f9f] rounded-lg p-4 h-[250px] md:h-[250px] mb-4 mt-2  flex flex-wrap gap-4">
+                {faculty.map((f, index) => (
+                  <div key={index} className="relative text-center">
+                    <img
+                      src={f.profileImage || "/profile.png"}
+                      className="w-13 h-13 rounded-full border border-[#a09f9f] object-cover"
+                    />
+                    <button
+                      onClick={() => removeFaculty(index)}
+                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"
+                    >
+                      <X size={12} />
+                    </button>
+                    <p className="text-xs mt-1 font-medium ">{f.name}</p>
+                    <p className="text-[10px] text-gray-500">
+                      {f.qualification}
+                    </p>
+                  </div>
+                ))}
+
+                <div className="w-full">
+                  <div className="flex flex-col sm:flex-row gap-1 items-center  mt-4">
+                    <div className="grid gap-3 w-full sm:w-[300px] ">
+                      <input
+                        placeholder="John David"
+                        className="border  border-[#a09f9f] rounded-lg px-3  py-2 text-sm"
+                        value={draftFaculty.name}
+                        onChange={(e) =>
+                          setDraftFaculty({
+                            ...draftFaculty,
+                            name: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.facultyName && (
+                        <p className="text-xs text-red-500">
+                          {errors.facultyName}
+                        </p>
+                      )}
+
+                      <input
+                        placeholder="M.com, CAIIB"
+                        className="border border-[#a09f9f] rounded-lg px-3 py-2 text-sm"
+                        value={draftFaculty.qualification}
+                        onChange={(e) =>
+                          setDraftFaculty({
+                            ...draftFaculty,
+                            qualification: e.target.value,
+                          })
+                        }
+                      />
+                      {errors.facultyQualification && (
+                        <p className="text-xs text-red-500">
+                          {errors.facultyQualification}
+                        </p>
+                      )}
+                    </div>
+
+                    <label className="relative cursor-pointer">
+                      <img
+                        src={draftFaculty.profileImage || "/profile.png"}
+                        className="w-15 h-15 sm:w-14 sm:h-14 md:w-20 md:h-12 lg:w-20 lg:h-18 xl:w-20 xl:h-20 rounded-full object-cover"
+                      />
+
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => uploadFacultyImage(e.target.files[0])}
+                      />
+                    </label>
+
+                    <div className="text-gray-600 flex flex-col items-center">
+                      <ImArrowUp />
+                      <button
+                        onClick={addFaculty}
+                        disabled={facultyUploading}
+                        className="text-sm mt-1"
+                      >
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 md:mt-24">
+                <label className="font-medium ">Total Amount *</label>
+                <input
+                  className="w-full mt-1 border-[#a09f9f] border rounded-lg px-4 py-2 bg-gray-50"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                />
+                {errors.price && (
+                  <p className="text-xs text-red-500 mt-1">{errors.price}</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* FOOTER */}
-        <div className="flex justify-end gap-4 mt-8">
-          <button
-            onClick={onCancel}
-            className="px-20 py-2 rounded-lg bg-gray-400 text-white"
-          >
-            Cancel
-          </button>
+          {/* FOOTER */}
+          <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">
+            <button
+              onClick={onCancel}
+              className="px-10 py-2 rounded-lg bg-gray-400 text-white"
+            >
+              Cancel
+            </button>
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || thumbnailUploading}
-            className="px-10 py-2 rounded-lg bg-gray-600 text-white"
-          >
-            {thumbnailUploading ? "Uploading..." : "Save & Continue"}
-          </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || thumbnailUploading}
+              className="px-10 py-2 rounded-lg bg-gray-600 text-white"
+            >
+              Save & Continue
+            </button>
+          </div>
         </div>
       </div>
     </div>
