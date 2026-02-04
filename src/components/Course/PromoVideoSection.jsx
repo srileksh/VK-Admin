@@ -131,7 +131,7 @@ export default function PromoVideoSection() {
 
   /* ---------------- UI ---------------- */
   return (
-    <div className="border border-gray-100 shadow-md rounded-lg p-5 mb-4">
+    <div className="border border-gray-100 shadow-md rounded-lg p-4 sm:p-5 mb-4">
       {/* Header */}
       <div className="flex justify-between items-center border-b pb-2 mb-4">
         <div className="flex items-center gap-2">
