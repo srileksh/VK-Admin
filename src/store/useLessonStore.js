@@ -1,63 +1,126 @@
+
+// import { create } from "zustand";
+// import { initiateVideoUpload } from "@/services/video.service";
+// import { uploadToVimeo } from "@/utils/vimeoUpload";
+// import axiosInstance from "@/services/axios";
+
+// const useLessonStore = create((set) => ({
+//   loading: false,
+//   progress: 0,
+
+//   uploadLessonVideo: async (file, sectionId, payload) => {
+//     try {
+//       set({ loading: true, progress: 0 });
+
+//       // 1. Initiate upload
+//       const { uploadUrl, videoAssetId } = await initiateVideoUpload({
+//         purpose: "LESSON",
+//         size: file.size,
+//       });
+
+//       // 2. Upload to Vimeo (TUS)
+//       await uploadToVimeo(uploadUrl, file, (p) =>
+//         set({ progress: p })
+//       );
+
+//       // 3. Create lesson
+//       await axiosInstance.post("/lessons", {
+//         sectionId,
+//         videoAssetId,
+//         ...payload,
+//       });
+
+//     } catch (err) {
+//       console.error("Upload lesson failed", err);
+//     } finally {
+//       set({ loading: false });
+//     }
+//   },
+
+//   replaceLessonVideo: async (lessonId, file) => {
+//     const { uploadUrl, videoAssetId } = await initiateVideoUpload({
+//       purpose: "LESSON",
+//       size: file.size,
+//     });
+
+//     await uploadToVimeo(uploadUrl, file);
+
+//     await axiosInstance.patch(`/lessons/${lessonId}`, {
+//       videoAssetId,
+//     });
+//   },
+
+//   removeLesson: async (lessonId) => {
+//     await axiosInstance.delete(`/lessons/${lessonId}`);
+//   },
+// }));
+
+// export default useLessonStore;
 import { create } from "zustand";
 import { initiateVideoUpload } from "@/services/video.service";
+import { uploadToVimeo } from "@/utils/vimeoUpload";
 import {
   createLesson,
   updateLesson,
   deleteLesson,
-  reorderLessons,
 } from "@/services/lesson.service";
-import { uploadToVimeo } from "@/utils/vimeoUpload";
 
 const useLessonStore = create((set) => ({
   loading: false,
+  progress: 0,
 
-  // ✅ Upload + create lesson
-  uploadLessonVideo: async (file, sectionId, meta) => {
-    set({ loading: true });
+  uploadLessonVideo: async (file, sectionId, payload) => {
+    try {
+      set({ loading: true, progress: 0 });
 
-    const { uploadUrl, videoAssetId, provider } =
-      await initiateVideoUpload("LESSON");
+      if (!sectionId) {
+        throw new Error("Section ID missing");
+      }
 
-    await uploadToVimeo(uploadUrl, file);
+      /* 1️⃣ Initiate Vimeo upload */
+      const { uploadUrl, videoAssetId } = await initiateVideoUpload({
+        purpose: "LESSON",
+        size: file.size,
+      });
 
-    await createLesson({
-      sectionId,
-      videoAssetId,
-      videoProvider: provider,
-      ...meta,
-    });
+      /* 2️⃣ Upload video */
+      await uploadToVimeo(uploadUrl, file, (p) =>
+        set({ progress: p })
+      );
 
-    set({ loading: false });
+      /* 3️⃣ Create lesson (API) */
+      await createLesson({
+        sectionId,
+        videoAssetId,
+        title: payload.title,
+        description: payload.description,
+        thumbnail: payload.thumbnail,
+        duration: payload.duration,
+        order: payload.order ?? 0, // 🔥 REQUIRED
+        isFree: payload.isFree,
+      });
+
+    } catch (err) {
+      console.error("Lesson creation failed:", err);
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
   },
 
-  // 🔁 Replace lesson video
   replaceLessonVideo: async (lessonId, file) => {
-    set({ loading: true });
-
-    const { uploadUrl, videoAssetId, provider } =
-      await initiateVideoUpload("LESSON");
+    const { uploadUrl, videoAssetId } = await initiateVideoUpload({
+      purpose: "LESSON",
+      size: file.size,
+    });
 
     await uploadToVimeo(uploadUrl, file);
 
-    await updateLesson(lessonId, {
-      videoAssetId,
-      videoProvider: provider,
-    });
-
-    set({ loading: false });
+    await updateLesson(lessonId, { videoAssetId });
   },
 
-  // ❌ Remove lesson
   removeLesson: async (lessonId) => {
     await deleteLesson(lessonId);
-  },
-
-  // 🔀 Reorder lessons
-  reorderLessons: async (sectionId, lessons) => {
-    await reorderLessons({
-      sectionId,
-      lessons,
-    });
   },
 }));
 

@@ -1,5 +1,5 @@
+// services/lesson.service.js
 import axiosInstance from "./axios";
-
 
 export const createLesson = async (payload) => {
   const res = await axiosInstance.post("/lessons", payload);
