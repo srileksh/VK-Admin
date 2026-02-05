@@ -1,24 +1,72 @@
+
 "use client";
 import { useRef, useState } from "react";
-import { FaCircleMinus } from "react-icons/fa6";
-import { FaPen } from "react-icons/fa";
+import { FaCircleMinus, FaPen } from "react-icons/fa6";
 import { GoPlus } from "react-icons/go";
 import { TbZoomReplace } from "react-icons/tb";
 import { HiMiniMinus } from "react-icons/hi2";
 import useLessonStore from "@/store/useLessonStore";
+import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 
 export default function LessonSection({ title, sectionId }) {
   const [isOpen, setIsOpen] = useState(true);
+
+  const [lessonTitle, setLessonTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [videoFile, setVideoFile] = useState(null);
+
   const fileRef = useRef(null);
+  const thumbnailRef = useRef(null);
 
   const {
     uploadLessonVideo,
     replaceLessonVideo,
     removeLesson,
     loading,
+    progress,
   } = useLessonStore();
 
   const lessonId = "temp-lesson-id";
+
+  /* ---------------- Thumbnail Upload ---------------- */
+  const handleThumbnailUpload = async (file) => {
+    if (!file) return;
+    try {
+      const url = await uploadImageToCloudinary(file);
+      setThumbnailUrl(url);
+    } catch (err) {
+      console.error(err);
+      alert("Thumbnail upload failed");
+    }
+  };
+
+  /* ---------------- Save Lesson ---------------- */
+  const handleSaveLesson = async () => {
+    if (!sectionId) {
+      alert("Section ID missing");
+      return;
+    }
+
+    if (!lessonTitle) {
+      alert("Lesson title is required");
+      return;
+    }
+
+    if (!videoFile) {
+      alert("Please upload a video");
+      return;
+    }
+
+    await uploadLessonVideo(videoFile, sectionId, {
+      title: lessonTitle,
+      description,
+      thumbnail: thumbnailUrl,
+      duration: 300,
+      order: 0, // ✅ REQUIRED
+      isFree: false,
+    });
+  };
 
   return (
     <div className="border border-gray-100 shadow-md rounded-lg p-4 sm:p-5 mb-4">
@@ -26,57 +74,49 @@ export default function LessonSection({ title, sectionId }) {
       <div className="flex justify-between items-center border-b pb-2 mb-4">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">{title}</span>
-          <button className="text-[16px] text-gray-400 hover:text-gray-700">
+          <button className="text-gray-400">
             <FaPen />
           </button>
         </div>
-
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-[26px] text-gray-400 hover:text-gray-700"
-        >
+        <button onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <FaCircleMinus /> : <GoPlus />}
         </button>
       </div>
 
       {isOpen && (
         <>
-          <label className="text-sm text-gray-700 block mb-3">
-            Video title
-          </label>
+          <label className="text-sm block mb-3">Video title</label>
 
-          {/* Main layout */}
-          <div className="flex flex-col lg:flex-row gap-6 mb-4">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* LEFT */}
             <div className="flex-1">
-              {/* Inputs */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
+              <div className="flex gap-4 mb-4">
                 <input
-                  placeholder="Title of the video"
-                  className="border rounded-lg px-4 py-2 w-full sm:w-[250px]"
+                  className="border px-4 py-2 rounded w-60"
+                  placeholder="Title"
+                  value={lessonTitle}
+                  onChange={(e) => setLessonTitle(e.target.value)}
                 />
                 <input
-                  placeholder="Short description"
-                  className="border rounded-lg px-4 py-2 w-full"
+                  className="border px-4 py-2 rounded w-full"
+                  placeholder="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
 
-              {/* Upload + Status */}
-              <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="flex gap-6">
                 {/* Upload */}
-                <div className="flex gap-3 items-start">
-                  <div className="w-24 h-20 border rounded flex items-center justify-center text-xs text-gray-400 shrink-0">
-                    No Video
+                <div className="flex gap-3">
+                  <div className="w-24 h-20 border flex items-center justify-center text-xs">
+                    {videoFile ? videoFile.name : "No Video"}
                   </div>
 
                   <div>
-                    <p className="text-sm truncate max-w-[160px]">
-                      lesson-video.mp4
-                    </p>
-
                     <button
                       onClick={() => fileRef.current.click()}
-                      className="flex items-center gap-1 text-sm mt-4"
+                      className="flex gap-1 mt-4"
+                      disabled={loading}
                     >
                       <GoPlus /> Upload Video
                     </button>
@@ -85,34 +125,22 @@ export default function LessonSection({ title, sectionId }) {
                       ref={fileRef}
                       type="file"
                       hidden
-                      onChange={(e) =>
-                        uploadLessonVideo(
-                          e.target.files[0],
-                          sectionId,
-                          {
-                            title: "Lesson video",
-                            description: "Short description",
-                            thumbnail: "",
-                            duration: 300,
-                            order: 0,
-                            isFree: false,
-                          }
-                        )
-                      }
+                      onChange={(e) => setVideoFile(e.target.files[0])}
                     />
                   </div>
                 </div>
 
                 {/* Status */}
-                <div className="flex-1 w-full text-sm text-gray-600">
-                  <p className="mb-2">Upload status</p>
-
-                  <div className="relative w-full h-6">
-                    <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
-                    <div className="absolute h-[2px] bg-green-400 w-[40%] top-1/2" />
+                <div className="flex-1 text-sm">
+                  <p>Upload status</p>
+                  <div className="relative h-1 bg-gray-300 mt-2">
+                    <div
+                      className="absolute h-1 bg-green-400"
+                      style={{ width: `${progress}%` }}
+                    />
                   </div>
 
-                  <div className="flex flex-wrap gap-4 justify-between mt-4 text-gray-800">
+                  <div className="flex justify-between mt-4">
                     <button
                       onClick={() =>
                         replaceLessonVideo(
@@ -120,38 +148,56 @@ export default function LessonSection({ title, sectionId }) {
                           fileRef.current?.files?.[0]
                         )
                       }
-                      className="flex items-center gap-1 text-sm"
+                      disabled={!videoFile}
                     >
-                      <TbZoomReplace /> Replace Video
+                      <TbZoomReplace /> Replace
                     </button>
-
-                    <button
-                      onClick={() => removeLesson(lessonId)}
-                      className="flex items-center gap-1 text-sm"
-                    >
-                      <HiMiniMinus /> Remove Video
+                    <button onClick={() => removeLesson(lessonId)}>
+                      <HiMiniMinus /> Remove
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* THUMBNAIL */}
-            <div className="flex flex-col items-start lg:items-center">
-              <div className="w-32 sm:w-36 lg:w-40 h-24 lg:h-28 bg-gray-300 rounded-lg flex items-center justify-center text-xs">
-                Add thumbnail
+              {/* Save Button */}
+              <div className="mt-6">
+                <button
+                  onClick={handleSaveLesson}
+                  className="px-6 py-2 bg-black text-white rounded"
+                  disabled={loading}
+                >
+                  Save Lesson
+                </button>
               </div>
-              <p className="text-[10px] text-center mt-1">
-                Resolution - X - Px
-              </p>
             </div>
-          </div>
 
-          {/* Add video */}
-          <div className="flex justify-center text-gray-600">
-            <button className="flex items-center gap-1">
-              <GoPlus /> Add new video
-            </button>
+            {/* Thumbnail */}
+            <div className="flex flex-col items-center">
+              <div
+                onClick={() => thumbnailRef.current.click()}
+                className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center cursor-pointer overflow-hidden"
+              >
+                {thumbnailUrl ? (
+                  <img
+                    src={thumbnailUrl}
+                    alt="thumbnail"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  "Add thumbnail"
+                )}
+              </div>
+
+              <input
+                ref={thumbnailRef}
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) =>
+                  handleThumbnailUpload(e.target.files[0])
+                }
+              />
+            </div>
           </div>
         </>
       )}
