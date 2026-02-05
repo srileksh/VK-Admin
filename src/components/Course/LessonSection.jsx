@@ -1,4 +1,3 @@
-
 "use client";
 import { useRef, useState } from "react";
 import { FaCircleMinus, FaPen } from "react-icons/fa6";
@@ -11,10 +10,15 @@ import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 export default function LessonSection({ title, sectionId }) {
   const [isOpen, setIsOpen] = useState(true);
 
+  const [videoName, setVideoName] = useState("");
   const [lessonTitle, setLessonTitle] = useState("");
   const [description, setDescription] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [videoFile, setVideoFile] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [toastType, setToastType] = useState("error"); // error | success
+  const [toastMsg, setToastMsg] = useState("");
 
   const fileRef = useRef(null);
   const thumbnailRef = useRef(null);
@@ -29,7 +33,22 @@ export default function LessonSection({ title, sectionId }) {
 
   const lessonId = "temp-lesson-id";
 
-  /* ---------------- Thumbnail Upload ---------------- */
+  const handleVideoSelect = async (file) => {
+    if (!file || !sectionId) return;
+
+    setVideoFile(file);
+    setVideoName(file.name);
+
+    await uploadLessonVideo(file, sectionId, {
+      title: lessonTitle || "Lesson video",
+      description,
+      thumbnail: thumbnailUrl,
+      duration: 300,
+      order: 0,
+      isFree: false,
+    });
+  };
+
   const handleThumbnailUpload = async (file) => {
     if (!file) return;
     try {
@@ -41,31 +60,19 @@ export default function LessonSection({ title, sectionId }) {
     }
   };
 
-  /* ---------------- Save Lesson ---------------- */
-  const handleSaveLesson = async () => {
-    if (!sectionId) {
-      alert("Section ID missing");
-      return;
-    }
-
+  const handleSaveLesson = () => {
     if (!lessonTitle) {
-      alert("Lesson title is required");
+      alert("Upload video and add title");
       return;
     }
+    alert("Lesson saved");
+  };
 
-    if (!videoFile) {
-      alert("Please upload a video");
-      return;
-    }
-
-    await uploadLessonVideo(videoFile, sectionId, {
-      title: lessonTitle,
-      description,
-      thumbnail: thumbnailUrl,
-      duration: 300,
-      order: 0, // ✅ REQUIRED
-      isFree: false,
-    });
+  const handleEditLesson = () => {
+    setIsSaved(false);
+    setToastType("success");
+    setToastMsg("Edit mode enabled")
+    
   };
 
   return (
@@ -74,17 +81,20 @@ export default function LessonSection({ title, sectionId }) {
       <div className="flex justify-between items-center border-b pb-2 mb-4">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">{title}</span>
-          <button className="text-gray-400">
+          <button className="text-[16px] text-gray-400 hover:text-gray-700">
             <FaPen />
           </button>
         </div>
-        <button onClick={() => setIsOpen(!isOpen)}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="text-[26px] text-gray-400 hover:text-gray-700"
+        >
           {isOpen ? <FaCircleMinus /> : <GoPlus />}
         </button>
       </div>
 
       {isOpen && (
-        <>
+        <div>
           <label className="text-sm block mb-3">Video title</label>
 
           <div className="flex flex-col lg:flex-row gap-6">
@@ -92,13 +102,13 @@ export default function LessonSection({ title, sectionId }) {
             <div className="flex-1">
               <div className="flex gap-4 mb-4">
                 <input
-                  className="border px-4 py-2 rounded w-60"
+                  className="border px-4 py-2 rounded-lg w-[250px]"
                   placeholder="Title"
                   value={lessonTitle}
                   onChange={(e) => setLessonTitle(e.target.value)}
                 />
                 <input
-                  className="border px-4 py-2 rounded w-full"
+                  className="border px-4 py-2 rounded-lg flex-1"
                   placeholder="Description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -109,13 +119,17 @@ export default function LessonSection({ title, sectionId }) {
                 {/* Upload */}
                 <div className="flex gap-3">
                   <div className="w-24 h-20 border flex items-center justify-center text-xs">
-                    {videoFile ? videoFile.name : "No Video"}
+                    {videoFile ? "Video" : "No Video"}
                   </div>
 
                   <div>
+                    <p className="text-sm truncate max-w-[180px]">
+                      {videoName || "Lesson-video.mp4"}
+                    </p>
+
                     <button
                       onClick={() => fileRef.current.click()}
-                      className="flex gap-1 mt-4"
+                      className="flex items-center gap-1 text-sm mt-4 disabled:opacity-50"
                       disabled={loading}
                     >
                       <GoPlus /> Upload Video
@@ -125,48 +139,66 @@ export default function LessonSection({ title, sectionId }) {
                       ref={fileRef}
                       type="file"
                       hidden
-                      onChange={(e) => setVideoFile(e.target.files[0])}
+                      accept="video/*"
+                      onChange={(e) =>
+                        handleVideoSelect(e.target.files[0])
+                      }
                     />
                   </div>
                 </div>
 
                 {/* Status */}
                 <div className="flex-1 text-sm">
-                  <p>Upload status</p>
-                  <div className="relative h-1 bg-gray-300 mt-2">
+                  <p className="mb-1">Upload status</p>
+
+                  <div className="relative w-full h-6">
+                    <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
                     <div
-                      className="absolute h-1 bg-green-400"
+                      className="absolute h-[2px] bg-green-400 top-1/2 transition-all"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
 
-                  <div className="flex justify-between mt-4">
+                  <div className="flex justify-between mt-2 text-gray-800">
                     <button
+                      className="flex items-center gap-[5px]"
                       onClick={() =>
                         replaceLessonVideo(
                           lessonId,
                           fileRef.current?.files?.[0]
                         )
                       }
-                      disabled={!videoFile}
+                      disabled={!videoFile || loading}
                     >
-                      <TbZoomReplace /> Replace
+                      <TbZoomReplace /> Replace Video
                     </button>
-                    <button onClick={() => removeLesson(lessonId)}>
-                      <HiMiniMinus /> Remove
+
+                    <button
+                      onClick={() => removeLesson(lessonId)}
+                      className="flex items-center gap-[5px]"
+                      disabled={loading}
+                    >
+                      <HiMiniMinus /> Remove Video
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Save Button */}
-              <div className="mt-6">
+              {/* Save + Edit Buttons */}
+              <div className="mt-6 flex gap-3">
                 <button
                   onClick={handleSaveLesson}
                   className="px-6 py-2 bg-black text-white rounded"
                   disabled={loading}
                 >
-                  Save Lesson
+                  Save
+                </button>
+
+                <button
+                  onClick={handleEditLesson}
+                  className="flex items-center px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
+                >
+                  <FaPen /> Edit
                 </button>
               </div>
             </div>
@@ -199,7 +231,7 @@ export default function LessonSection({ title, sectionId }) {
               />
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
