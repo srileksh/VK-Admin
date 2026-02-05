@@ -736,7 +736,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                 ))}
 
                 <div className="w-full">
-                  <div className="flex flex-col sm:flex-row gap-1 items-center  mt-4">
+                  <div className="flex flex-col sm:flex-row  gap-3  md:gap-1 xl:gap-4 items-center  mt-4 px-6 md:px-0 lg:px-2.5">
                     <div className="grid gap-3 w-full sm:w-[300px] ">
                       <input
                         placeholder="John David"
@@ -776,7 +776,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                     <label className="relative cursor-pointer">
                       <img
                         src={draftFaculty.profileImage || "/profile.png"}
-                        className="w-15 h-15 sm:w-14 sm:h-14 md:w-20 md:h-12 lg:w-20 lg:h-18 xl:w-20 xl:h-20 rounded-full object-cover"
+                        className="w-15 h-15 sm:w-14 sm:h-14 md:w-20 md:h-13 lg:w-20 lg:h-18 xl:w-20 xl:h-20 rounded-full object-cover"
                       />
 
                       <input
@@ -792,7 +792,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                       <button
                         onClick={addFaculty}
                         disabled={facultyUploading}
-                        className="text-sm mt-1"
+                        className=" text-[12px] md:text-[10px] lg:text-sm mt-1"
                       >
                         Upload
                       </button>
