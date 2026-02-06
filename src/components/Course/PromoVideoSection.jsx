@@ -1,4 +1,3 @@
-"use client";
 import { useRef, useState } from "react";
 import { FaCircleMinus } from "react-icons/fa6";
 import { FaPen } from "react-icons/fa";
@@ -31,9 +30,8 @@ export default function PromoVideoSection() {
 
   const [isSaved, setIsSaved] = useState(false);
 
-  /* 🔔 TOAST */
   const [toastMsg, setToastMsg] = useState("");
-  const [toastType, setToastType] = useState("error"); // error | success
+  const [toastType, setToastType] = useState("error");
 
   const fileRef = useRef(null);
   const thumbRef = useRef(null);
@@ -111,14 +109,12 @@ export default function PromoVideoSection() {
     }
   };
 
-  /* ---------------- EDIT ---------------- */
   const handleEdit = () => {
     setIsSaved(false);
     setToastType("success");
     setToastMsg("Edit mode enabled");
   };
 
-  /* ---------------- THUMBNAIL ---------------- */
   const handleThumbnailUpload = async (file) => {
     if (!file) return;
     try {
@@ -132,10 +128,13 @@ export default function PromoVideoSection() {
 
   return (
     <div className="relative border border-gray-100 shadow-md rounded-lg p-4 sm:p-5 mb-4">
-      {/* Header */}
-      <div className="flex justify-between items-center border-b pb-2 mb-4">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Promo video</span>
+          <span className="text-sm font-medium">
+            {title ? title : "Promo video"}
+          </span>
           <FaPen className="text-gray-400" />
         </div>
 
@@ -147,142 +146,145 @@ export default function PromoVideoSection() {
         </button>
       </div>
 
-      {/* 🔔 TOAST (FIXED POSITION – DOES NOT BREAK UI) */}
-      {toastMsg && (
-        <div
-          className={`
-            absolute top-[62px] left-6
-            px-4 py-2 rounded-md text-sm shadow
-            ${
-              toastType === "success"
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-red-50 text-red-600 border border-red-200"
-            }
-          `}
-        >
-          {toastMsg}
-        </div>
-      )}
+      {/* COLLAPSED STATE → SHOW ONLY TITLE */}
+      {!isOpen && null}
 
+      {/* EXPANDED STATE */}
       {isOpen && (
-        <div className="flex justify-between gap-6">
-          {/* LEFT */}
-          <div className="flex-1">
-            <div className="flex gap-4 mb-6">
-              <input
-                disabled={isSaved}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title of the video"
-                className="border rounded-lg px-4 py-2 w-[250px]"
-              />
-              <input
-                disabled={isSaved}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Short description"
-                className="border rounded-lg px-4 py-2 flex-1"
-              />
+        <>
+          <div className="border-b mt-2 mb-4" />
+
+          {/* TOAST */}
+          {toastMsg && (
+            <div
+              className={`absolute top-[70px] left-6 px-4 py-2 rounded-md text-sm shadow ${toastType === "success"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-600 border border-red-200"
+                }`}
+            >
+              {toastMsg}
             </div>
+          )}
 
-            <div className="flex gap-6 items-start">
-              <div className="flex gap-2 items-start">
-                <div className="w-24 h-20 border rounded flex items-center justify-center text-xs text-gray-400">
-                  {videoName ? "Video" : "No Video"}
-                </div>
-
-                <div>
-                  <p className="text-sm truncate max-w-[180px]">
-                    {videoName || "promo-video.mp4"}
-                  </p>
-
-                  <button
-                    disabled={uploading || isSaved}
-                    onClick={() => fileRef.current.click()}
-                    className="text-sm mt-4 disabled:opacity-50"
-                  >
-                    + Upload Video
-                  </button>
-
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="video/*"
-                    hidden
-                    onChange={(e) => uploadPromo(e.target.files[0])}
-                  />
-                </div>
-              </div>
-
-              {/* Progress */}
-              <div className="flex-1 text-sm text-gray-600">
-                <p className="mb-1">Upload status</p>
-
-                <div className="relative w-full h-6">
-                  <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
-                  <div
-                    className="absolute h-[2px] bg-green-400 top-1/2"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-
-                <div className="flex justify-between mt-2 text-gray-800">
-                  <button disabled className="flex items-center gap-1 text-sm">
-                    <TbZoomReplace /> Replace Video
-                  </button>
-                  <button disabled className="flex items-center gap-1 text-sm">
-                    <HiMiniMinus /> Remove Video
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div>
-            <label className="cursor-pointer">
-              <div className="w-40 h-28 bg-gray-300 rounded-lg overflow-hidden relative">
-                <img
-                  src={thumbnailUrl || "/profile.png"}
-                  className="w-full h-full object-cover"
+          <div className="flex justify-between gap-6">
+            {/* LEFT */}
+            <div className="flex-1">
+              <div className="flex gap-4 mb-6">
+                <input
+                  disabled={isSaved}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Title of the video"
+                  className="border rounded-lg px-4 py-2 w-[250px]"
                 />
-                <span className="absolute inset-0 flex items-center justify-center text-xs text-white bg-black/40">
-                  Upload Thumbnail
-                </span>
+                <input
+                  disabled={isSaved}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Short description"
+                  className="border rounded-lg px-4 py-2 flex-1"
+                />
               </div>
-              <input
-                ref={thumbRef}
-                type="file"
-                accept="image/*"
-                hidden
-                disabled={isSaved}
-                onChange={(e) =>
-                  handleThumbnailUpload(e.target.files[0])
-                }
-              />
-            </label>
+
+              <div className="flex gap-6 items-start">
+                <div className="flex gap-2 items-start">
+                  <div className="w-24 h-20 border rounded flex items-center justify-center text-xs text-gray-400">
+                    {videoName ? "Video" : "No Video"}
+                  </div>
+
+                  <div>
+                    <p className="text-sm truncate max-w-[180px]">
+                      {videoName || "promo-video.mp4"}
+                    </p>
+
+                    <button
+                      disabled={uploading || isSaved}
+                      onClick={() => fileRef.current.click()}
+                      className="text-sm mt-4 disabled:opacity-50"
+                    >
+                      + Upload Video
+                    </button>
+
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="video/*"
+                      hidden
+                      onChange={(e) => uploadPromo(e.target.files[0])}
+                    />
+                  </div>
+                </div>
+
+                {/* Progress */}
+                <div className="flex-1 text-sm text-gray-600">
+                  <p className="mb-1">Upload status</p>
+
+                  <div className="relative w-full h-6">
+                    <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
+                    <div
+                      className="absolute h-[2px] bg-green-400 top-1/2"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+
+                  <div className="flex justify-between mt-2 text-gray-800">
+                    <button disabled className="flex items-center gap-1 text-sm">
+                      <TbZoomReplace /> Replace Video
+                    </button>
+                    <button disabled className="flex items-center gap-1 text-sm">
+                      <HiMiniMinus /> Remove Video
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT */}
+            <div>
+              <label className="cursor-pointer">
+                <div className="w-40 h-28 bg-gray-300 rounded-lg overflow-hidden relative">
+                  <img
+                    src={thumbnailUrl || "/profile.png"}
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center text-xs text-white bg-black/40">
+                    Upload Thumbnail
+                  </span>
+                </div>
+                <input
+                  ref={thumbRef}
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  disabled={isSaved}
+                  onChange={(e) =>
+                    handleThumbnailUpload(e.target.files[0])
+                  }
+                />
+              </label>
+            </div>
           </div>
-        </div>
+
+          {/* ACTION BUTTONS */}
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              onClick={handleEdit}
+              disabled={!isSaved}
+              className="flex items-center px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
+            >
+              <FaPen /> Edit
+            </button>
+
+            <button
+              onClick={handleSave}
+              disabled={saving || isSaved}
+              className="px-8 py-2 bg-[#1F304A] text-white rounded-xl disabled:opacity-60"
+            >
+              {saving ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </>
       )}
-
-      {/* ACTION BUTTONS */}
-      <div className="flex justify-end gap-4 mt-6">
-        <button
-          onClick={handleEdit}
-          disabled={!isSaved}
-          className="flex items-center px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
-        >
-          <FaPen /> Edit
-        </button>
-
-        <button
-          onClick={handleSave}
-          disabled={saving || isSaved}
-          className="px-8 py-2 bg-[#1F304A] text-white rounded-xl disabled:opacity-60"
-        >
-          {saving ? "Saving..." : "Save"}
-        </button>
-      </div>
     </div>
   );
 }
