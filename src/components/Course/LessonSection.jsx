@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 import { useRef, useState } from "react";
 import { FaCircleMinus, FaPen } from "react-icons/fa6";
 import { GoPlus } from "react-icons/go";
@@ -17,6 +17,8 @@ export default function LessonSection({ sectionId }) {
       videoName: "",
       videoFile: null,
       thumbnailUrl: "",
+      isSaved: false,
+      saving: false,
     },
   ]);
 
@@ -31,19 +33,29 @@ export default function LessonSection({ sectionId }) {
     progress,
   } = useLessonStore();
 
+  /* ✅ CLOSE ALL & ADD NEW */
   const handleAddLesson = () => {
-    setLessons((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        isOpen: true,
-        lessonTitle: "",
-        description: "",
-        videoName: "",
-        videoFile: null,
-        thumbnailUrl: "",
-      },
-    ]);
+    setLessons((prev) => {
+      const closedLessons = prev.map((lesson) => ({
+        ...lesson,
+        isOpen: false,
+      }));
+
+      return [
+        ...closedLessons,
+        {
+          id: Date.now(),
+          isOpen: true,
+          lessonTitle: "",
+          description: "",
+          videoName: "",
+          videoFile: null,
+          thumbnailUrl: "",
+          isSaved: false,
+          saving: false,
+        },
+      ];
+    });
   };
 
   const handleUpdateLesson = (id, key, value) => {
@@ -74,6 +86,27 @@ export default function LessonSection({ sectionId }) {
     if (!file) return;
     const url = await uploadImageToCloudinary(file);
     handleUpdateLesson(lesson.id, "thumbnailUrl", url);
+  };
+
+  /* ✅ SAVE WITH STATUS */
+  const handleSave = async (lesson) => {
+    try {
+      handleUpdateLesson(lesson.id, "saving", true);
+      handleUpdateLesson(lesson.id, "isSaved", false);
+
+      // 👉 Replace with real API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      handleUpdateLesson(lesson.id, "isSaved", true);
+    } catch (error) {
+      console.error("Save failed", error);
+    } finally {
+      handleUpdateLesson(lesson.id, "saving", false);
+    }
+  };
+
+  const handleEdit = (lesson) => {
+    handleUpdateLesson(lesson.id, "isSaved", false);
   };
 
   return (
@@ -117,6 +150,7 @@ export default function LessonSection({ sectionId }) {
                 <div className="flex-1">
                   <div className="flex gap-4 mb-4">
                     <input
+                      disabled={lesson.isSaved}
                       className="border px-4 py-2 rounded-lg w-[250px]"
                       placeholder="Title"
                       value={lesson.lessonTitle}
@@ -130,6 +164,7 @@ export default function LessonSection({ sectionId }) {
                     />
 
                     <input
+                      disabled={lesson.isSaved}
                       className="border px-4 py-2 rounded-lg flex-1"
                       placeholder="Description"
                       value={lesson.description}
@@ -152,8 +187,7 @@ export default function LessonSection({ sectionId }) {
 
                       <div>
                         <p className="text-sm truncate max-w-[180px]">
-                          {lesson.videoName ||
-                            "Lesson-video.mp4"}
+                          {lesson.videoName || "Lesson-video.mp4"}
                         </p>
 
                         <button
@@ -161,7 +195,7 @@ export default function LessonSection({ sectionId }) {
                             fileRefs.current[lesson.id].click()
                           }
                           className="flex items-center gap-1 text-sm mt-4"
-                          disabled={loading}
+                          disabled={loading || lesson.isSaved}
                         >
                           <GoPlus /> Upload Video
                         </button>
@@ -211,6 +245,7 @@ export default function LessonSection({ sectionId }) {
                 <div className="flex flex-col items-center">
                   <div
                     onClick={() =>
+                      !lesson.isSaved &&
                       thumbnailRefs.current[lesson.id].click()
                     }
                     className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center cursor-pointer overflow-hidden"
@@ -244,6 +279,31 @@ export default function LessonSection({ sectionId }) {
               </div>
             </>
           )}
+
+          {/* ACTION BUTTONS */}
+          {lesson.isOpen && (
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                onClick={() => handleEdit(lesson)}
+                disabled={!lesson.isSaved}
+                className="flex items-center px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
+              >
+                <FaPen /> Edit
+              </button>
+
+              <button
+                onClick={() => handleSave(lesson)}
+                disabled={lesson.saving || lesson.isSaved}
+                className="px-8 py-2 bg-[#1F304A] text-white rounded-xl disabled:opacity-60"
+              >
+                {lesson.saving
+                  ? "Saving..."
+                  : lesson.isSaved
+                  ? "Saved"
+                  : "Save"}
+              </button>
+            </div>
+          )}
         </div>
       ))}
 
@@ -256,6 +316,7 @@ export default function LessonSection({ sectionId }) {
           + Add new video
         </button>
       </div>
+      
     </>
   );
 }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,9 +15,16 @@ export default function ContentInputs({ onCancel, onNext }) {
   const [contents, setContents] = useState(["", "", "", "", ""]);
   const [selectedIds, setSelectedIds] = useState({});
   const [selectedPath, setSelectedPath] = useState([]);
+  const [categoryLoading, setCategoryLoading] = useState(true);
 
   useEffect(() => {
-    fetchCategories();
+    const loadCategories = async () => {
+      setCategoryLoading(true);
+      await fetchCategories();
+      setCategoryLoading(false);
+    };
+
+    loadCategories();
   }, [fetchCategories]);
 
   const getOptionsByLevel = (level) => {
@@ -135,12 +141,18 @@ export default function ContentInputs({ onCancel, onNext }) {
             </div>
 
             {/* RIGHT */}
-            <div className="w-1/2">
+            <div className="w-1/2 relative">
               <h1 className="font-semibold mb-3">Select package</h1>
 
-              {Array.from({ length: selectedPath.length + 1 }).map(
-                (_, level) => (
-                  <CategoryDropdown key={level} level={level} />
+              {categoryLoading ? (
+                <div className="flex items-center justify-center h-[250px]">
+                  <div className="w-10 h-10 border-4 border-[#1f304a] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                Array.from({ length: selectedPath.length + 1 }).map(
+                  (_, level) => (
+                    <CategoryDropdown key={level} level={level} />
+                  )
                 )
               )}
             </div>
