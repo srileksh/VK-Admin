@@ -420,11 +420,11 @@ export default function PromoVideoSection() {
     <div className="relative border border-gray-100 shadow-md rounded-lg p-4 sm:p-5 mb-4">
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">
-            {title ? title : "Promo video"}
+        <div className="flex items-center gap-2 text-[#1F304A]">
+          <span className="text-[20px] font-medium ">
+            Promo video
           </span>
-          <FaPen className="text-gray-400" />
+          <FaPen className="text-[18px]" />
         </div>
 
         <button
