@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,11 +18,19 @@ export default function ContentInputs({ onCancel, onNext }) {
   const [selectedPath, setSelectedPath] = useState([]);
   const [categoryLoading, setCategoryLoading] = useState(true);
 
+  // ✅ ONLY category loading controls overlay
+  const isLoading = categoryLoading;
+
   useEffect(() => {
     const loadCategories = async () => {
-      setCategoryLoading(true);
-      await fetchCategories();
-      setCategoryLoading(false);
+      try {
+        setCategoryLoading(true);
+        await fetchCategories();
+      } catch (error) {
+        console.error("Category fetch failed:", error);
+      } finally {
+        setCategoryLoading(false);
+      }
     };
 
     loadCategories();
@@ -56,7 +65,7 @@ export default function ContentInputs({ onCancel, onNext }) {
 
     try {
       await updateCourse(payload);
-      onNext();
+      onNext(); // 🔥 No overlay during navigation
     } catch (error) {
       console.error("Update failed:", error);
       alert(error.message);
@@ -85,97 +94,110 @@ export default function ContentInputs({ onCancel, onNext }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-[1000px] h-[550px] rounded-xl flex flex-col">
+      <div className="bg-white w-full max-w-[1000px] h-[550px] rounded-xl flex flex-col relative overflow-hidden">
 
-        {/* HEADER */}
-        <div className="px-8 py-5">
-          <h1 className="text-[#1f285b] text-[20px] font-semibold">
-            Course thumbnail & contents
-          </h1>
-        </div>
+        {/* MAIN CONTENT WRAPPER */}
+        <div
+          className={`flex flex-col h-full transition-opacity duration-300 ${
+            isLoading ? "opacity-40 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          {/* HEADER */}
+          <div className="px-8 py-5">
+            <h1 className="text-[#1f285b] text-[20px] font-semibold">
+              Course thumbnail & contents
+            </h1>
+          </div>
 
-        {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto px-8 py-6">
-          <div className="flex gap-5">
+          {/* BODY */}
+          <div className="flex-1 overflow-y-auto px-8 py-6">
+            <div className="flex gap-5">
 
-            {/* LEFT */}
-            <div className="w-1/2 border-r pr-5">
-              <h2 className="flex items-center gap-1 font-semibold mb-3">
-                Content title <FaPen />
-              </h2>
+              {/* LEFT */}
+              <div className="w-1/2 border-r pr-5">
+                <h2 className="flex items-center gap-1 font-semibold mb-3">
+                  Content title <FaPen />
+                </h2>
 
-              {contents.map((value, index) => (
-                <div key={index} className="flex gap-2 mb-3">
-                  <input
-                    className="p-3 rounded-lg w-[85%] border"
-                    placeholder={`Type content ${index + 1}`}
-                    value={value}
-                    onChange={(e) => {
-                      const updated = [...contents];
-                      updated[index] = e.target.value;
-                      setContents(updated);
-                    }}
-                  />
+                {contents.map((value, index) => (
+                  <div key={index} className="flex gap-2 mb-3">
+                    <input
+                      className="p-3 rounded-lg w-[85%] border"
+                      placeholder={`Type content ${index + 1}`}
+                      value={value}
+                      onChange={(e) => {
+                        const updated = [...contents];
+                        updated[index] = e.target.value;
+                        setContents(updated);
+                      }}
+                    />
 
-                  <button><BiSolidEdit /></button>
+                    <button type="button">
+                      <BiSolidEdit />
+                    </button>
 
-                  <button
-                    disabled={contents.length === 1}
-                    onClick={() =>
-                      setContents((prev) =>
-                        prev.filter((_, i) => i !== index)
-                      )
-                    }
-                  >
-                    <RiDeleteBin5Fill />
-                  </button>
-                </div>
-              ))}
+                    <button
+                      type="button"
+                      disabled={contents.length === 1}
+                      onClick={() =>
+                        setContents((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                    >
+                      <RiDeleteBin5Fill />
+                    </button>
+                  </div>
+                ))}
 
-              <button
-                onClick={() => setContents((prev) => [...prev, ""])}
-                className="text-sm font-semibold"
-              >
-                + Add more topics
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setContents((prev) => [...prev, ""])}
+                  className="text-sm font-semibold"
+                >
+                  + Add more topics
+                </button>
+              </div>
 
-            {/* RIGHT */}
-            <div className="w-1/2 relative">
-              <h1 className="font-semibold mb-3">Select package</h1>
+              {/* RIGHT */}
+              <div className="w-1/2">
+                <h1 className="font-semibold mb-3">Select package</h1>
 
-              {categoryLoading ? (
-                <div className="flex items-center justify-center h-[250px]">
-                  <div className="w-10 h-10 border-4 border-[#1f304a] border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : (
-                Array.from({ length: selectedPath.length + 1 }).map(
+                {Array.from({ length: selectedPath.length + 1 }).map(
                   (_, level) => (
                     <CategoryDropdown key={level} level={level} />
                   )
-                )
-              )}
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* FOOTER */}
+          <div className="px-8 py-4 flex justify-end gap-4">
+            <button
+              onClick={onCancel}
+              disabled={isLoading}
+              className="px-10 py-2 bg-gray-400 text-white rounded-lg"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-10 py-2 bg-[#1f304a] text-white rounded-lg"
+            >
+              {loading ? "Saving..." : "Save & Continue"}
+            </button>
           </div>
         </div>
 
-        {/* FOOTER */}
-        <div className="px-8 py-4 flex justify-end gap-4">
-          <button
-            onClick={onCancel}
-            className="px-10 py-2 bg-gray-400 text-white rounded-lg"
-          >
-            Cancel
-          </button>
-
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-10 py-2 bg-[#1f304a] text-white rounded-lg"
-          >
-            {loading ? "Saving..." : "Save & Continue"}
-          </button>
-        </div>
+        {/* FULL COMPONENT LOADER — ONLY FOR CATEGORY FETCH */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm z-50">
+            <div className="w-14 h-14 border-4 border-[#1f304a] border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
       </div>
     </div>
   );
