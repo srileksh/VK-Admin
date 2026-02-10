@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import { CgProfile } from "react-icons/cg";
+
 
 function Sidebar() {
   const pathname = usePathname();
@@ -23,8 +25,10 @@ function Sidebar() {
       </Link>
 
       {/* Profile */}
-      <div>
-        <img src="/profile.png" className="rounded-[100%]" />
+      <div className="text-[100px] text-gray-300">
+        {/* <img src="/profile.png" className="rounded-[100%]" /> */}
+        <CgProfile />
+
       </div>
       <div className="flex flex-col items-center mb-8">
         <p className="mt-4 text-white text-3xl font-semibold">John David</p>

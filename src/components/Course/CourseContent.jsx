@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -18,8 +19,8 @@ export default function ContentInputs({ onCancel, onNext }) {
   const [selectedPath, setSelectedPath] = useState([]);
   const [categoryLoading, setCategoryLoading] = useState(true);
 
-  // ✅ ONLY category loading controls overlay
-  const isLoading = categoryLoading;
+  // 🔥 Unified loading state
+  const isLoading = loading || categoryLoading;
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -65,7 +66,7 @@ export default function ContentInputs({ onCancel, onNext }) {
 
     try {
       await updateCourse(payload);
-      onNext(); // 🔥 No overlay during navigation
+      onNext();
     } catch (error) {
       console.error("Update failed:", error);
       alert(error.message);
@@ -184,7 +185,7 @@ export default function ContentInputs({ onCancel, onNext }) {
 
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={isLoading}
               className="px-10 py-2 bg-[#1f304a] text-white rounded-lg"
             >
               {loading ? "Saving..." : "Save & Continue"}
@@ -192,9 +193,9 @@ export default function ContentInputs({ onCancel, onNext }) {
           </div>
         </div>
 
-        {/* FULL COMPONENT LOADER — ONLY FOR CATEGORY FETCH */}
+        {/* FULL COMPONENT LOADER */}
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/30 backdrop-blur-sm z-50">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm z-50">
             <div className="w-14 h-14 border-4 border-[#1f304a] border-t-transparent rounded-full animate-spin" />
           </div>
         )}
