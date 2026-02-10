@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useCourseStore from "@/store/useCourseStore";
 import { X } from "lucide-react";
 import { ImArrowUp } from "react-icons/im";
 import { uploadImageToCloudinary } from "../../../src/utils/cloudinaryImageUpload";
+import { MdAccountCircle } from "react-icons/md";
+import { GrGallery } from "react-icons/gr";
 
 export default function CreateCourse({ onCancel, onSuccess }) {
   const { createCourse, loading } = useCourseStore();
+  const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -16,12 +19,9 @@ export default function CreateCourse({ onCancel, onSuccess }) {
 
   const [errors, setErrors] = useState({});
   const [thumbnailUrl, setThumbnailUrl] = useState("");
-
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [facultyUploading, setFacultyUploading] = useState(false);
-
   const [faculty, setFaculty] = useState([]);
-  const [isPopular, setIsPopular] = useState(false); // ✅ NEW STATE
 
   const [draftFaculty, setDraftFaculty] = useState({
     name: "",
@@ -46,7 +46,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     setFacultyUploading(true);
     try {
       const url = await uploadImageToCloudinary(file);
-      setDraftFaculty({ ...draftFaculty, profileImage: url });
+      setDraftFaculty((prev) => ({ ...prev, profileImage: url }));
     } finally {
       setFacultyUploading(false);
     }
@@ -80,7 +80,6 @@ export default function CreateCourse({ onCancel, onSuccess }) {
 
   const validateFields = () => {
     const newErrors = {};
-
     if (!form.title.trim()) newErrors.title = "This field is required";
     if (!form.description.trim())
       newErrors.description = "This field is required";
@@ -102,7 +101,6 @@ export default function CreateCourse({ onCancel, onSuccess }) {
       price: Number(form.price),
       duration: 600,
       level: "BEGINNER",
-      isPopular, // ✅ ADDED TO PAYLOAD
       faculty,
     };
 
@@ -119,7 +117,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* LEFT */}
+            {/* LEFT SIDE SAME AS BEFORE */}
             <div className="space-y-5 md:border-r border-[#a09f9f] md:pr-6">
               <div>
                 <label className="block font-medium mb-1">Course Title *</label>
@@ -151,16 +149,19 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                   </p>
                 )}
               </div>
-
-              {/* THUMBNAIL */}
-              <div>
-                <label className="block font-medium mb-1">Thumbnail *</label>
-                <label className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border border-[#a09f9f] rounded-lg p-4 cursor-pointer">
-                  <div className="relative w-full sm:w-60 h-32 rounded-md overflow-hidden">
-                    <img
-                      src={thumbnailUrl || "/profile.png"}
-                      className="w-full h-full object-cover"
-                    />
+               <label className="block font-medium mb-1">Thumbnail *</label>
+                 <label className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border border-[#a09f9f] rounded-lg p-4 cursor-pointer">
+                   <div className="relative w-full sm:w-60 h-32 rounded-md overflow-hidden">
+                     {thumbnailUrl ? (
+  <img
+    src={thumbnailUrl}
+    className="w-full h-full object-cover"
+  />
+) : (
+  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+    <GrGallery size={50} className="text-gray-400" />
+  </div>
+)}
                     {thumbnailUploading && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
@@ -180,9 +181,10 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                   </p>
                 )}
               </div>
-            </div>
+            
+         
 
-            {/* RIGHT */}
+            {/* RIGHT SIDE */}
             <div>
               <h3 className="font-semibold ">Faculty info *</h3>
               {errors.faculty && (
@@ -190,12 +192,18 @@ export default function CreateCourse({ onCancel, onSuccess }) {
               )}
 
               <div className="border border-[#a09f9f] rounded-lg p-4 h-[250px] mb-4 mt-2 flex flex-wrap gap-4">
+
+                {/* Faculty List */}
                 {faculty.map((f, index) => (
                   <div key={index} className="relative text-center">
-                    <img
-                      src={f.profileImage || "/profile.png"}
-                      className="w-13 h-13 rounded-full border border-[#a09f9f] object-cover"
-                    />
+                   {draftFaculty.profileImage ? (
+                        <img
+                          src={draftFaculty.profileImage}
+                          className="w-full h-full object-fill"
+                        />
+                      ) : (
+                        <MdAccountCircle  size={50} className="text-gray-400" />
+                      )}
                     <button
                       onClick={() => removeFaculty(index)}
                       className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"
@@ -212,6 +220,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                 {/* Add Faculty Section */}
                 <div className="w-full">
                   <div className="flex flex-col sm:flex-row gap-3 items-center mt-4 px-6 md:px-0 lg:px-2.5">
+
                     <div className="grid gap-3 w-full sm:w-[300px]">
                       <input
                         placeholder="John David"
@@ -224,11 +233,6 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                           })
                         }
                       />
-                      {errors.facultyName && (
-                        <p className="text-xs text-red-500">
-                          {errors.facultyName}
-                        </p>
-                      )}
 
                       <input
                         placeholder="M.com, CAIIB"
@@ -241,25 +245,32 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                           })
                         }
                       />
-                      {errors.facultyQualification && (
-                        <p className="text-xs text-red-500">
-                          {errors.facultyQualification}
-                        </p>
+                    </div>
+
+                    {/* PROFILE ICON FIXED */}
+                    <div
+                      onClick={() => fileInputRef.current.click()}
+                      className="w-18 h-18 rounded-full flex items-center justify-center cursor-pointer overflow-hidden "
+                    >
+                      {draftFaculty.profileImage ? (
+                        <img
+                          src={draftFaculty.profileImage}
+                          className="w-full h-full object-fill"
+                        />
+                      ) : (
+                        <MdAccountCircle  size={100} className="text-gray-400" />
                       )}
                     </div>
 
-                    <label className="relative cursor-pointer">
-                      <img
-                        src={draftFaculty.profileImage || "/profile.png"}
-                        className="w-20 h-20 rounded-full object-cover"
-                      />
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={(e) => uploadFacultyImage(e.target.files[0])}
-                      />
-                    </label>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={(e) =>
+                        uploadFacultyImage(e.target.files[0])
+                      }
+                    />
 
                     <div className="text-gray-600 flex flex-col items-center">
                       <ImArrowUp />
@@ -271,31 +282,26 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                         Upload
                       </button>
                     </div>
+
                   </div>
                 </div>
               </div>
 
-              {/* POPULAR TOGGLE + PRICE */}
-              <div className="mt-6 md:mt-24">
-               
-
-                <label className="font-medium">Total Amount *</label>
-                <input
-                  className="  w-full mt-1 border-[#a09f9f] border rounded-lg px-4 py-2 bg-gray-50"
-                  type="number"
-                  
-                  value={form.price}
-                  onChange={(e) =>
-                    setForm({ ...form, price: e.target.value })
-                  }
-                />
-                {errors.price && (
-                  <p className="text-xs text-red-500 mt-1">
-                    {errors.price}
-                  </p>
-                )}
-              </div>
+             <div className="mt-24">
+               <label className="font-medium ">Total Amount *</label>
+              <input
+                className="w-full mt-1 border-[#a09f9f] border rounded-lg px-4 py-2 bg-gray-50"
+                type="number"
+                value={form.price}
+                onChange={(e) =>
+                  setForm({ ...form, price: e.target.value })
+                }
+              />
+             </div>
             </div>
+            </div>
+             <div>
+  
           </div>
 
           {/* FOOTER */}
