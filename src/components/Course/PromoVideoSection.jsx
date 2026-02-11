@@ -288,7 +288,7 @@
 //     </div>
 //   );
 // }
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaCircleMinus } from "react-icons/fa6";
 import { FaPen } from "react-icons/fa";
 import { GoPlus } from "react-icons/go";
@@ -327,6 +327,16 @@ export default function PromoVideoSection() {
   const thumbRef = useRef(null);
 
   /* ---------------- UPLOAD VIDEO ---------------- */
+
+  useEffect(() => {
+    if (!toastMsg) return;
+
+    const timer = setTimeout(() => {
+      setToastMsg("");
+    }, 2000); // hides after 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [toastMsg]);
   const uploadPromo = async (file) => {
     if (!file || isSaved) return;
 
