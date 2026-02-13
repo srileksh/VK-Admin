@@ -327,7 +327,7 @@ export default function Page() {
                       togglePopular(course.id, course.isPopular)
                     }
                     className={`w-10 h-5 flex items-center rounded-full p-1 transition ${
-                      course.isPopular ? "bg-green-500" : "bg-gray-300"
+                      course.isPopular ? "bg-blue-950" : "bg-gray-300"
                     }`}
                   >
                     <div
