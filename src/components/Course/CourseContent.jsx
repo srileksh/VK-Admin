@@ -79,7 +79,7 @@ export default function ContentInputs({ onCancel, onNext }) {
 
     return (
       <select
-        className="w-full p-3 mb-3 border rounded-lg text-sm border-gray-400"
+        className="w-full p-3 mb-3 border rounded-lg text-sm"
         value={selectedIds[level] || ""}
         onChange={(e) => handleSelect(level, e.target.value)}
       >
@@ -116,14 +116,14 @@ export default function ContentInputs({ onCancel, onNext }) {
 
               {/* LEFT */}
               <div className="w-1/2 border-r pr-5">
-                <h2 className="flex items-center gap-1 font-semibold mb-3 text-gray-600">
-                  Content title  <FaPen  className="text-gray-600"/>
+                <h2 className="flex items-center gap-1 font-semibold mb-3">
+                  Content title <FaPen />
                 </h2>
 
                 {contents.map((value, index) => (
-                  <div key={index} className="flex gap-[2px] mb-3">
+                  <div key={index} className="flex gap-2 mb-3">
                     <input
-                      className="p-3 rounded-lg w-[85%] border-gray-400 border outline-gray-500"
+                      className="p-3 rounded-lg w-[85%] border"
                       placeholder={`Type content ${index + 1}`}
                       value={value}
                       onChange={(e) => {
@@ -133,8 +133,8 @@ export default function ContentInputs({ onCancel, onNext }) {
                       }}
                     />
 
-                    {/* <button type="button">
-                      <BiSolidEdit  className="text-gray-600"/>
+                    <button type="button">
+                      <BiSolidEdit />
                     </button>
 
                     <button
@@ -146,36 +146,15 @@ export default function ContentInputs({ onCancel, onNext }) {
                         )
                       }
                     >
-                      <RiDeleteBin5Fill className="text-gray-600"/>
-                    </button> */}
-                    <button
-  type="button"
-  className="p-2 rounded-md transition-colors duration-200 hover:bg-blue-100"
->
-  <BiSolidEdit className="text-gray-600 hover:text-blue-800 text-lg" />
-</button>
-
-<button
-  type="button"
-  disabled={contents.length === 1}
-  onClick={() =>
-    setContents((prev) =>
-      prev.filter((_, i) => i !== index)
-    )
-  }
-  className="p-2 rounded-md transition-colors duration-200 
-             hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed"
->
-  <RiDeleteBin5Fill className="text-gray-600 hover:text-red-600 text-lg" />
-</button>
-
+                      <RiDeleteBin5Fill />
+                    </button>
                   </div>
                 ))}
 
                 <button
                   type="button"
                   onClick={() => setContents((prev) => [...prev, ""])}
-                  className="text-sm font-semibold text-gray-600 p-[10px]"
+                  className="text-sm font-semibold"
                 >
                   + Add more topics
                 </button>
@@ -183,7 +162,7 @@ export default function ContentInputs({ onCancel, onNext }) {
 
               {/* RIGHT */}
               <div className="w-1/2">
-                <h1 className="font-semibold mb-3 text-gray-600">Select package</h1>
+                <h1 className="font-semibold mb-3">Select package</h1>
 
                 {Array.from({ length: selectedPath.length + 1 }).map(
                   (_, level) => (

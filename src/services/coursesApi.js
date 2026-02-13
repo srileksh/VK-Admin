@@ -70,7 +70,7 @@ export const deleteCourseApi = async (courseId) => {
   return res.data;
 };
 
-/* ================= PUBLISH ================= */
+ /* ================= PUBLISH ================= */
 export const publishCourse = async (courseId) => {
   const res = await axiosInstance.post(`/courses/${courseId}/publish`);
   return res.data;
