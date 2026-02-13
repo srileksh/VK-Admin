@@ -41,14 +41,9 @@
 //   const res = await axiosInstance.post(`/courses/${courseId}/publish`);
 //   return res.data;
 // };
-// /* ================= TOGGLE POPULAR ================= */
-// export const togglePopularApi = async (courseId, isPopular) => {
-//   const res = await axiosInstance.patch(
-//     `/admin/courses/${courseId}/popular`,
-//     { isPopular }
-//   );
-//   return res.data;
-// };
+
+
+
 import axiosInstance from "./axios";
 
 /* ================= GET ALL COURSES ================= */
@@ -81,11 +76,31 @@ export const publishCourse = async (courseId) => {
   return res.data;
 };
 
-/* ================= TOGGLE POPULAR ================= */
-export const togglePopularApi = async (courseId, isPopular) => {
-  const res = await axiosInstance.patch(
-    `/admin/courses/${courseId}/popular`,
-    { is_popular: isPopular }
-  );
+/* ================= REPLACE PROMO VIDEO ================= */
+/*
+PUT /courses/:courseId
+{
+  videoAssetId,
+  videoProvider
+}
+*/
+export const replacePromoVideoApi = async (
+  courseId,
+  videoAssetId,
+  videoProvider
+) => {
+  const res = await axiosInstance.put(`/courses/${courseId}`, {
+    promoVideoAssetId: videoAssetId,
+    promoVideoProvider: videoProvider,
+  });
+  return res.data;
+};
+
+/* ================= REMOVE PROMO VIDEO ================= */
+export const removePromoVideoApi = async (courseId) => {
+  const res = await axiosInstance.put(`/courses/${courseId}`, {
+    promoVideoAssetId: null,
+    promoVideoProvider: null,
+  });
   return res.data;
 };

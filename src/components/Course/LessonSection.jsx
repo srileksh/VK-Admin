@@ -738,7 +738,7 @@ export default function LessonSection({
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg mb-4 shadow-sm">
+    <div className="border border-gray-200 rounded-lg mb-4 shadow-sm mt-[10px]">
       {/* SECTION HEADER */}
       <div className="flex justify-between items-center p-4 border-b bg-gray-50">
         <div className="flex items-center gap-2">
