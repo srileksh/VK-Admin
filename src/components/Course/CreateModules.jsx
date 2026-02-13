@@ -220,8 +220,8 @@ export default function CreateModules({ onCancel, onFinish }) {
         </h2>
 
         <PromoVideoSection />
-        <div className="border border-gray-200 rounded-lg mb-4 shadow-sm p-[12px] font-semibold text-[20px] text-[#1F304A]">
-          <div className="border-b flex items-center gap-[5px]">Lessons<FaPen className="text-[18px]"/></div>
+        <div className="border border-gray-200 rounded-lg mb-4 shadow-sm p-[12px] font-semibold text-sm text-[#1F304A]">
+          <div className=" flex items-center gap-[5px]">Lessons<FaPen/></div>
 
           {/* SECTIONS */}
           {sections.map((section) => (
