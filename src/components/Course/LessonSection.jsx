@@ -807,7 +807,7 @@ export default function LessonSection({
                       </div>
 
                       <div>
-                        <p className="text-sm truncate max-w-[180px]">
+                        <p className="text-sm truncate max-w-[150px]">
                           {lesson.videoName || "Lesson-video.mp4"}
                         </p>
 
