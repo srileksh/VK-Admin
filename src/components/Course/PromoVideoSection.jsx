@@ -5,6 +5,7 @@ import { GoPlus } from "react-icons/go";
 import { TbZoomReplace } from "react-icons/tb";
 import { HiMiniMinus } from "react-icons/hi2";
 import { GrGallery } from "react-icons/gr";
+import toast from "react-hot-toast";
 
 import { initiateVideoUpload } from "@/services/video.service";
 import { uploadToVimeo } from "@/utils/vimeoUpload";
@@ -17,19 +18,24 @@ export default function PromoVideoSection() {
 
   const [isOpen, setIsOpen] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  /* Video */
   const [videoName, setVideoName] = useState("");
   const [selectedVideoFile, setSelectedVideoFile] = useState(null);
-
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-
   const [videoAssetId, setVideoAssetId] = useState(null);
   const [videoProvider, setVideoProvider] = useState(null);
 
+  /* Thumbnail */
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [selectedThumbnailFile, setSelectedThumbnailFile] = useState(null);
+  const [thumbnailName, setThumbnailName] = useState("");
+
+  /* Form */
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [isSaved, setIsSaved] = useState(false);
 
   const fileRef = useRef(null);
@@ -42,12 +48,23 @@ export default function PromoVideoSection() {
     thumbnail: "",
   });
 
-  /* ---------------- VIDEO UPLOAD ---------------- */
-  const uploadPromo = async (file) => {
+  /* ================= VIDEO ================= */
+
+  const handleFileSelect = (file) => {
     if (!file || isSaved) return;
+    setSelectedVideoFile(file);
+    setVideoName(file.name);
+    setErrors((p) => ({ ...p, video: "" }));
+  };
+
+  const uploadPromo = async () => {
+    if (!selectedVideoFile || isSaved) {
+      setErrors((p) => ({ ...p, video: "Promo video is required" }));
+      return;
+    }
 
     if (!courseId) {
-      alert("Course must be created first");
+      toast.error("Course must be created first");
       return;
     }
 
@@ -55,14 +72,16 @@ export default function PromoVideoSection() {
       setUploading(true);
       setProgress(0);
 
+      toast.loading("Uploading video...", { id: "video" });
+
       const response = await initiateVideoUpload({
         purpose: "PROMO",
-        size: file.size,
+        size: selectedVideoFile.size,
       });
 
       const { uploadUrl, videoAssetId, provider } = response;
 
-      await uploadToVimeo(uploadUrl, file, setProgress);
+      await uploadToVimeo(uploadUrl, selectedVideoFile, setProgress);
 
       setVideoAssetId(videoAssetId);
       setVideoProvider(provider);
@@ -70,73 +89,70 @@ export default function PromoVideoSection() {
 
       await replacePromoVideo(videoAssetId, provider);
 
-      setErrors((prev) => ({ ...prev, video: "" }));
+      toast.success("Video uploaded successfully", { id: "video" });
     } catch (err) {
-      console.error("Video upload error:", err);
-      alert("Video upload failed");
-      setVideoName("");
-      setSelectedVideoFile(null);
+      console.error(err);
+      toast.error("Video upload failed", { id: "video" });
     } finally {
       setUploading(false);
     }
   };
 
-  /* ---------------- FILE SELECT ---------------- */
-  const handleFileSelect = (file) => {
-    if (!file || isSaved) return;
-    setSelectedVideoFile(file);
-    setVideoName(file.name);
-    setErrors((prev) => ({ ...prev, video: "" }));
-  };
-
-  const handleVideoBoxClick = () => {
-    if (uploading || isSaved) return;
-    fileRef.current.click();
-  };
-
   const handleReplaceVideo = () => {
-    if (uploading || isSaved) return;
+    if (!videoAssetId || isSaved || uploading) return;
     fileRef.current.click();
   };
 
-  /* ---------------- REMOVE VIDEO ---------------- */
   const handleRemoveVideo = async () => {
-    if (isSaved) return;
+    if (!videoAssetId || isSaved) return;
+
+    await removePromoVideo();
+
+    setVideoName("");
+    setVideoAssetId(null);
+    setVideoProvider(null);
+    setProgress(0);
+
+    setErrors((p) => ({ ...p, video: "Promo video is required" }));
+    toast.success("Video removed");
+  };
+
+  /* ================= THUMBNAIL ================= */
+
+  const handleThumbnailSelect = (file) => {
+    if (!file || isSaved) return;
+    setSelectedThumbnailFile(file);
+    setThumbnailName(file.name);
+    setErrors((p) => ({ ...p, thumbnail: "" }));
+  };
+
+  const handleThumbnailUpload = async () => {
+    if (!selectedThumbnailFile || isSaved) {
+      setErrors((p) => ({ ...p, thumbnail: "Thumbnail is required" }));
+      return;
+    }
 
     try {
-      await removePromoVideo();
+      setThumbnailUploading(true);
 
-      setVideoName("");
-      setVideoAssetId(null);
-      setVideoProvider(null);
-      setSelectedVideoFile(null);
-      setProgress(0);
+      toast.loading("Uploading thumbnail...", { id: "thumb" });
 
-      setErrors((prev) => ({
-        ...prev,
-        video: "Promo video is required",
-      }));
+      const url = await uploadImageToCloudinary(selectedThumbnailFile);
+
+      setThumbnailUrl(url);
+      setSelectedThumbnailFile(null);
+
+      toast.success("Thumbnail uploaded successfully", { id: "thumb" });
     } catch (err) {
       console.error(err);
-      alert("Failed to remove video");
+      toast.error("Thumbnail upload failed", { id: "thumb" });
+    } finally {
+      setThumbnailUploading(false);
     }
   };
 
-  /* ---------------- THUMBNAIL ---------------- */
-  const handleThumbnailUpload = async (file) => {
-    if (!file || isSaved) return;
+  /* ================= SAVE ================= */
 
-    try {
-      const url = await uploadImageToCloudinary(file);
-      setThumbnailUrl(url);
-      setErrors((prev) => ({ ...prev, thumbnail: "" }));
-    } catch (err) {
-      console.error("Thumbnail upload error:", err);
-      alert("Thumbnail upload failed");
-    }
-  };
-
-  /* ---------------- SAVE ---------------- */
   const handleSave = async () => {
     const newErrors = {
       title: "",
@@ -168,19 +184,23 @@ export default function PromoVideoSection() {
       });
 
       setIsSaved(true);
-      alert("Promo video saved successfully");
+      toast.success("Promo saved successfully");
     } catch (err) {
       console.error(err);
-      alert("Failed to save promo video");
+      toast.error("Failed to save promo video");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleEdit = () => setIsSaved(false);
+  const handleEdit = () => {
+    setIsSaved(false);
+  };
+
+  /* ================= UI (UNCHANGED) ================= */
 
   return (
-    <div className="border border-gray-100 shadow-md rounded-lg p-5 mb-4">
+    <div className="border border-gray-100 shadow-md rounded-lg p-5 mb-4 mt-[10px]">
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2 text-[#1F304A]">
@@ -203,8 +223,7 @@ export default function PromoVideoSection() {
           <div className="flex justify-between gap-6">
             {/* LEFT */}
             <div className="flex-1">
-              {/* Title & Description */}
-              <div className="flex gap-4 mb-6">
+              <div className="flex gap-4 mb-2">
                 <div>
                   <input
                     disabled={isSaved}
@@ -230,7 +249,7 @@ export default function PromoVideoSection() {
                   <input
                     disabled={isSaved}
                     value={description}
-                    maxLength={100}
+                    maxLength={130}
                     onChange={(e) => {
                       setDescription(e.target.value);
                       setErrors((p) => ({ ...p, description: "" }));
@@ -248,137 +267,144 @@ export default function PromoVideoSection() {
                 </div>
               </div>
 
-              {/* Video Section */}
-              <div className="flex gap-6 items-start">
-                <div>
-                  {/* Select Video Box */}
+              {/* VIDEO */}
+              <div className="flex gap-6 items-start mt-[15px]">
+                <div className="flex gap-3">
                   <div
-                    onClick={handleVideoBoxClick}
-                    className={`w-24 h-20 border rounded flex items-center justify-center text-xs cursor-pointer
-                    ${
-                      uploading || isSaved
-                        ? "opacity-60 cursor-not-allowed"
-                        : "text-gray-400 hover:border-blue-400"
-                    }`}
+                    onClick={() =>
+                      !uploading && !isSaved && fileRef.current.click()
+                    }
+                    className="w-24 h-20 border rounded flex items-center justify-center text-xs cursor-pointer text-gray-400"
                   >
                     {videoName ? "Video Selected" : "Select Video"}
                   </div>
 
-                  <p className="text-sm mt-2">
-                    {videoName || "promo-video.mp4"}
-                  </p>
-
-                  {/* Upload Button */}
-                  <button
-                    disabled={
-                      uploading || isSaved || !selectedVideoFile
-                    }
-                    onClick={() => uploadPromo(selectedVideoFile)}
-                    className="text-sm mt-2 disabled:opacity-40"
-                  >
-                    + Upload Video
-                  </button>
-
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="video/*"
-                    hidden
-                    onChange={(e) =>
-                      handleFileSelect(e.target.files[0])
-                    }
-                  />
-
-                  {errors.video && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.video}
+                  <div>
+                    <p className="text-sm mt-2 truncate max-w-[150px]">
+                      {videoName || "promo-video.mp4"}
                     </p>
-                  )}
+
+                    <button
+                      disabled={uploading || isSaved || !selectedVideoFile}
+                      onClick={uploadPromo}
+                      className="text-sm mt-2 disabled:opacity-40"
+                    >
+                      {uploading ? "Uploading..." : "+ Upload Video"}
+                    </button>
+
+                    {errors.video && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.video}
+                      </p>
+                    )}
+
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="video/*"
+                      hidden
+                      onChange={(e) => handleFileSelect(e.target.files[0])}
+                    />
+                  </div>
                 </div>
 
-                {/* Progress + Actions */}
-                <div className="flex-1 text-sm text-gray-600">
+                {/* Progress */}
+                <div className="flex-1">
                   <p className="mb-1">Upload status</p>
-
-                  <div className="relative w-full h-6">
-                    <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
+                  <div className="relative w-full h-[2px] bg-gray-300 mt-6">
                     <div
-                      className="absolute h-[2px] bg-green-400 top-1/2"
+                      className="absolute h-[2px] bg-green-500"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
 
-                  <div className="flex justify-between mt-2">
+                  <div className="flex justify-between mt-3 text-sm">
                     <button
-                      type="button"
-                      disabled={isSaved}
+                      disabled={!videoAssetId || isSaved}
                       onClick={handleReplaceVideo}
-                      className="flex items-center gap-1 text-sm hover:text-blue-600 disabled:opacity-40"
+                      className="flex items-center gap-1 disabled:opacity-40"
                     >
-                      <TbZoomReplace /> Replace Video
+                      <TbZoomReplace /> Replace
                     </button>
 
                     <button
-                      type="button"
                       disabled={!videoAssetId || isSaved}
                       onClick={handleRemoveVideo}
-                      className="flex items-center gap-1 text-sm hover:text-red-600 disabled:opacity-40"
+                      className="flex items-center gap-1 disabled:opacity-40"
                     >
-                      <HiMiniMinus /> Remove Video
+                      <HiMiniMinus /> Remove
                     </button>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* RIGHT - Thumbnail */}
+            {/* THUMBNAIL */}
             <div>
-              <label className="cursor-pointer">
-                <div className="w-40 h-28 bg-gray-300 rounded-lg overflow-hidden flex items-center justify-center">
-                  {thumbnailUrl ? (
-                    <img
-                      src={thumbnailUrl}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <GrGallery size={28} className="text-gray-500" />
-                  )}
-                </div>
+              <div
+                onClick={() => !isSaved && thumbRef.current.click()}
+                className="w-40 h-28 bg-gray-300 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden"
+              >
+                {thumbnailUrl ? (
+                  <img
+                    src={thumbnailUrl}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center text-gray-600">
+                    <GrGallery size={22} className="mx-auto mb-1" />
+                    <p className="text-xs">
+                      {thumbnailName || "No file selected"}
+                    </p>
+                  </div>
+                )}
+              </div>
 
-                <input
-                  ref={thumbRef}
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  disabled={isSaved}
-                  onChange={(e) =>
-                    handleThumbnailUpload(e.target.files[0])
-                  }
-                />
-              </label>
+              <button
+                disabled={
+                  !selectedThumbnailFile || isSaved || thumbnailUploading
+                }
+                onClick={handleThumbnailUpload}
+                className="text-sm mt-2 w-full disabled:opacity-40"
+              >
+                {thumbnailUploading
+                  ? "Uploading..."
+                  : "+ Upload Thumbnail"}
+              </button>
 
               {errors.thumbnail && (
-                <p className="text-red-500 text-xs mt-2">
+                <p className="text-red-500 text-xs mt-1">
                   {errors.thumbnail}
                 </p>
               )}
+
+              <input
+                ref={thumbRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) =>
+                  handleThumbnailSelect(e.target.files[0])
+                }
+              />
             </div>
           </div>
 
           {/* ACTION BUTTONS */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-4 mt-4">
             <button
               onClick={handleEdit}
               disabled={!isSaved}
-              className="px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
+              className="flex items-center px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
             >
-              Edit
+                                <FaPen /> Edit
+              
             </button>
 
             <button
               onClick={handleSave}
               disabled={saving || isSaved}
-              className="px-8 py-2 bg-[#1F304A] text-white rounded-xl disabled:opacity-60"
+              className="px-8 py-2 bg-[#1F304A] text-white rounded-xl"
             >
               {saving ? "Saving..." : "Save"}
             </button>
@@ -388,3 +414,10 @@ export default function PromoVideoSection() {
     </div>
   );
 }
+
+
+
+
+
+
+
