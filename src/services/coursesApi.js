@@ -75,15 +75,15 @@ export const publishCourse = async (courseId) => {
   const res = await axiosInstance.post(`/courses/${courseId}/publish`);
   return res.data;
 };
-
-/* ================= REPLACE PROMO VIDEO ================= */
-/*
-PUT /courses/:courseId
-{
-  videoAssetId,
-  videoProvider
+/* ================= TOGGLE POPULAR ================= */
+export const togglePopularApi = async (courseId, isPopular) => {
+  const res = await axiosInstance.patch(
+    `/admin/courses/${courseId}/popular`,
+    { is_popular: isPopular }
+  );
+  return res.data;
 }
-*/
+
 export const replacePromoVideoApi = async (
   courseId,
   videoAssetId,

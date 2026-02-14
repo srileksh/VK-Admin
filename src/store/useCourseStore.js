@@ -107,6 +107,7 @@ import {
   deleteCourseApi,
   replacePromoVideoApi,
   removePromoVideoApi,
+  togglePopularApi,
 } from "@/services/coursesApi";
 
 const useCourseStore = create((set, get) => ({
@@ -170,6 +171,34 @@ const useCourseStore = create((set, get) => ({
       throw error;
     } finally {
       set({ loading: false });
+    }
+  },
+
+  /* ================= TOGGLE POPULAR ================= */
+  togglePopular: async (courseId, currentValue) => {
+    const newValue = !currentValue;
+
+    // Optimistic update (instant UI update)
+    set({
+      courses: get().courses.map((course) =>
+        course.id === courseId
+          ? { ...course, isPopular: newValue }
+          : course
+      ),
+    });
+
+    try {
+      await togglePopularApi(courseId, newValue);
+    } catch (error) {
+      // Rollback if API fails
+      set({
+        courses: get().courses.map((course) =>
+          course.id === courseId
+            ? { ...course, isPopular: currentValue }
+            : course
+        ),
+      });
+      set({ error });
     }
   },
 
