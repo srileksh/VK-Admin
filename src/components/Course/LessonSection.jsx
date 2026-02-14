@@ -774,6 +774,7 @@ export default function LessonSection({
                       disabled={lesson.isSaved}
                       className="border px-4 py-2 rounded-lg w-[250px]"
                       placeholder="Title"
+                      maxLength={60}
                       value={lesson.lessonTitle}
                       onChange={(e) =>
                         handleUpdateLesson(
@@ -788,6 +789,7 @@ export default function LessonSection({
                       disabled={lesson.isSaved}
                       className="border px-4 py-2 rounded-lg flex-1"
                       placeholder="Description"
+                      maxLength={130}
                       value={lesson.description}
                       onChange={(e) =>
                         handleUpdateLesson(
