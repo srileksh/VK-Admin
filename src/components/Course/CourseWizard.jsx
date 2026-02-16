@@ -1,38 +1,85 @@
 
+// "use client";
+// import { useState } from "react";
+// import CreateCourse from "./CreateCourse";
+// import CourseContent from "./CourseContent";
+// import CreateModules from "./CreateModules";
+
+// export default function CourseWizard({ onClose }) {
+//   const [step, setStep] = useState(1);
+//   const [courseId, setCourseId] = useState(null);
+
+//   return (
+//     <>
+//       {step === 1 && (
+//         <CreateCourse
+//           onCancel={onClose}
+//           onSuccess={(courseId) => {
+//             setCourseId(courseId);
+//             setStep(2);
+//           }}
+//         />
+//       )}
+
+//       {step === 2 && (
+//         <CourseContent
+//         onCancel={onClose}
+//           courseId={courseId}
+//           onBack={() => setStep(1)}
+//           onNext={() => setStep(3)}
+//         />
+//       )}
+
+//      {step === 3 && (
+//         <CreateModules
+//           courseId={courseId}
+//           onCancel={() => setStep(2)}
+//           onFinish={onClose}
+//         />
+//       )}
+//     </>
+//   );
+// }
+
+
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateCourse from "./CreateCourse";
 import CourseContent from "./CourseContent";
 import CreateModules from "./CreateModules";
+import useCourseStore from "@/store/useCourseStore";
 
-export default function CourseWizard({ onClose }) {
+export default function CourseWizard({ onClose, editingIndex }) {
+  const { currentCourse } = useCourseStore();
+
   const [step, setStep] = useState(1);
-  const [courseId, setCourseId] = useState(null);
+
+  /* 🔥 If editing → jump to last step */
+  useEffect(() => {
+    if (editingIndex !== null && currentCourse) {
+      setStep(3);
+    }
+  }, [editingIndex, currentCourse]);
 
   return (
     <>
       {step === 1 && (
         <CreateCourse
           onCancel={onClose}
-          onSuccess={(courseId) => {
-            setCourseId(courseId);
-            setStep(2);
-          }}
+          onSuccess={() => setStep(2)}
         />
       )}
 
       {step === 2 && (
         <CourseContent
-        onCancel={onClose}
-          courseId={courseId}
+          onCancel={onClose}
           onBack={() => setStep(1)}
           onNext={() => setStep(3)}
         />
       )}
 
-     {step === 3 && (
+      {step === 3 && (
         <CreateModules
-          courseId={courseId}
           onCancel={() => setStep(2)}
           onFinish={onClose}
         />
