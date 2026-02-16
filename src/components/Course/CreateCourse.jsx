@@ -330,7 +330,7 @@
 
 
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import useCourseStore from "@/store/useCourseStore";
 import { X } from "lucide-react";
 import { ImArrowUp } from "react-icons/im";
@@ -339,7 +339,8 @@ import { MdAccountCircle } from "react-icons/md";
 import { GrGallery } from "react-icons/gr";
 
 export default function CreateCourse({ onCancel, onSuccess }) {
-  const { createCourse, loading } = useCourseStore();
+  const { createCourse, loading ,currentCourse} = useCourseStore();
+  
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
@@ -347,6 +348,20 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     description: "",
     price: "",
   });
+
+  useEffect(() => {
+  if (currentCourse) {
+    setForm({
+      title: currentCourse.title || "",
+      description: currentCourse.description || "",
+      price: currentCourse.price || "",
+    });
+
+    setThumbnailUrl(currentCourse.thumbnail || "");
+    setFaculty(currentCourse.faculty || []);
+  }
+}, [currentCourse]);
+
 
   const [errors, setErrors] = useState({});
   const [thumbnailUrl, setThumbnailUrl] = useState("");
@@ -431,22 +446,45 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     return Object.keys(newErrors).length === 0;
   };
 
+  // const handleSubmit = async () => {
+  //   if (!validateFields()) return;
+
+  //   const payload = {
+  //     title: form.title,
+  //     description: form.description,
+  //     thumbnail: thumbnailUrl,
+  //     price: Number(form.price),
+  //     duration: 600,
+  //     level: "BEGINNER",
+  //     faculty,
+  //   };
+
+  //   const courseId = await createCourse(payload);
+  //   onSuccess(courseId);
+  // };
+
   const handleSubmit = async () => {
-    if (!validateFields()) return;
+  if (!validateFields()) return;
 
-    const payload = {
-      title: form.title,
-      description: form.description,
-      thumbnail: thumbnailUrl,
-      price: Number(form.price),
-      duration: 600,
-      level: "BEGINNER",
-      faculty,
-    };
-
-    const courseId = await createCourse(payload);
-    onSuccess(courseId);
+  const payload = {
+    title: form.title,
+    description: form.description,
+    thumbnail: thumbnailUrl,
+    price: Number(form.price),
+    duration: 600,
+    level: "BEGINNER",
+    faculty,
   };
+
+  if (currentCourse) {
+    await updateCourse(payload);
+    onSuccess();
+  } else {
+    const id = await createCourse(payload);
+    onSuccess(id);
+  }
+};
+
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-6">
