@@ -99,10 +99,10 @@ export default function PromoVideoSection() {
     }
   };
 
-  const handleReplaceVideo = () => {
-    if (!videoAssetId || isSaved || uploading) return;
-    fileRef.current.click();
-  };
+  // const handleReplaceVideo = () => {
+  //   if (!videoAssetId || isSaved || uploading) return;
+  //   fileRef.current.click();
+  // };
 
   const handleRemoveVideo = async () => {
     if (!videoAssetId || isSaved) return;
@@ -321,8 +321,8 @@ export default function PromoVideoSection() {
 
                   <div className="flex justify-between mt-3 text-sm">
                     <button
-                      disabled={!videoAssetId || isSaved}
-                      onClick={handleReplaceVideo}
+                      // disabled={!videoAssetId || isSaved}
+                      // onClick={handleReplaceVideo}
                       className="flex items-center gap-1 disabled:opacity-40"
                     >
                       <TbZoomReplace /> Replace

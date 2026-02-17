@@ -32,7 +32,7 @@ const useLessonStore = create((set) => ({
       );
 
       /* 3️⃣ Create lesson (API) */
-      await createLesson({
+      const response = await createLesson({
         sectionId,
         videoAssetId,
         title: payload.title,
@@ -42,6 +42,8 @@ const useLessonStore = create((set) => ({
         order: payload.order ?? 0, // 🔥 REQUIRED
         isFree: payload.isFree,
       });
+
+      return response; // 👈 RETURN THE CREATED LESSON
 
     } catch (err) {
       console.error("Lesson creation failed:", err);
@@ -60,6 +62,10 @@ const useLessonStore = create((set) => ({
     await uploadToVimeo(uploadUrl, file);
 
     await updateLesson(lessonId, { videoAssetId });
+  },
+
+  updateLessonDetails: async (lessonId, payload) => {
+    return await updateLesson(lessonId, payload);
   },
 
   removeLesson: async (lessonId) => {
