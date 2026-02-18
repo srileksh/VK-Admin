@@ -174,30 +174,48 @@ const useCourseStore = create((set, get) => ({
     }
   },
 
+  // /* ================= TOGGLE POPULAR ================= */
+  // togglePopular: async (courseId, currentValue) => {
+  //   const newValue = !currentValue;
+
+  //   // Optimistic update (instant UI update)
+  //   set({
+  //     courses: get().courses.map((course) =>
+  //       course.id === courseId
+  //         ? { ...course, isPopular: newValue }
+  //         : course
+  //     ),
+  //   });
+
+  //   try {
+  //     await togglePopularApi(courseId, newValue);
+  //   } catch (error) {
+  //     // Rollback if API fails
+  //     set({
+  //       courses: get().courses.map((course) =>
+  //         course.id === courseId
+  //           ? { ...course, isPopular: currentValue }
+  //           : course
+  //       ),
+  //     });
+  //     set({ error });
+  //   }
+  // },
+
+
   /* ================= TOGGLE POPULAR ================= */
   togglePopular: async (courseId, currentValue) => {
     const newValue = !currentValue;
 
-    // Optimistic update (instant UI update)
     set({
-      courses: get().courses.map((course) =>
-        course.id === courseId
-          ? { ...course, isPopular: newValue }
-          : course
+      courses: get().courses.map((c) =>
+        c.id === courseId ? { ...c, isPopular: newValue } : c
       ),
     });
 
     try {
       await togglePopularApi(courseId, newValue);
     } catch (error) {
-      // Rollback if API fails
-      set({
-        courses: get().courses.map((course) =>
-          course.id === courseId
-            ? { ...course, isPopular: currentValue }
-            : course
-        ),
-      });
       set({ error });
     }
   },
