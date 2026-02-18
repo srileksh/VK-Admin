@@ -79,7 +79,7 @@ export const publishCourse = async (courseId) => {
 export const togglePopularApi = async (courseId, isPopular) => {
   const res = await axiosInstance.patch(
     `/admin/courses/${courseId}/popular`,
-    { is_popular: isPopular }
+    { isPopular }
   );
   return res.data;
 }
