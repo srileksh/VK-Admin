@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import useCourseStore from "@/store/useCourseStore";
 import { X } from "lucide-react";
 import { ImArrowUp } from "react-icons/im";
@@ -8,7 +8,7 @@ import { MdAccountCircle } from "react-icons/md";
 import { GrGallery } from "react-icons/gr";
 
 export default function CreateCourse({ onCancel, onSuccess }) {
-  const { createCourse, loading } = useCourseStore();
+  const { createCourse, loading, currentCourse } = useCourseStore();
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
@@ -29,6 +29,19 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     qualification: "",
     profileImage: "",
   });
+
+  /* 🔥 POPULATE DATA IF EDITING */
+  useEffect(() => {
+    if (currentCourse) {
+      setForm({
+        title: currentCourse.title || "",
+        description: currentCourse.description || "",
+        price: currentCourse.price || "",
+      });
+      setThumbnailUrl(currentCourse.thumbnail || "");
+      setFaculty(currentCourse.faculty || []);
+    }
+  }, [currentCourse]);
 
   const handleThumbnailUpload = async (file) => {
     if (!file) return;
@@ -92,6 +105,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     return Object.keys(newErrors).length === 0;
   };
 
+  /* 🔥 HANDLE SUBMIT (CREATE OR UPDATE) */
   const handleSubmit = async () => {
     if (!validateFields()) return;
 
@@ -100,13 +114,25 @@ export default function CreateCourse({ onCancel, onSuccess }) {
       description: form.description,
       thumbnail: thumbnailUrl,
       price: Number(form.price),
-      duration: 600,
+      duration: 600, // Default duration
       level: "BEGINNER",
       faculty,
     };
 
-    const courseId = await createCourse(payload);
-    onSuccess(courseId);
+    try {
+      if (currentCourse) {
+        // 🔥 UPDATE MODE
+        await updateCourse(payload); // Ensure updateCourse is exposed in store
+        onSuccess(currentCourse.id);
+      } else {
+        // 🔥 CREATE MODE
+        const courseId = await createCourse(payload);
+        onSuccess(courseId);
+      }
+    } catch (error) {
+      console.error("Failed to save course:", error);
+      alert("Failed to save. Please try again.");
+    }
   };
 
   return (
@@ -138,7 +164,6 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                 </label>
                 <textarea
                   rows={4}
-                  
                   className="w-full border border-[#a09f9f] rounded-lg px-4 py-2"
                   value={form.description}
                   onChange={(e) =>
@@ -231,14 +256,15 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                 {/* Faculty List */}
                 {faculty.map((f, index) => (
                   <div key={index} className="relative text-center">
-                    {draftFaculty.profileImage ? (
+                    {f.profileImage ? (
                       <img
-                        src={draftFaculty.profileImage}
-                        className="w-full h-full object-fill"
+                        src={f.profileImage}
+                        className="w-14 h-14 rounded-full object-cover"
                       />
                     ) : (
                       <MdAccountCircle size={50} className="text-gray-400" />
                     )}
+
                     <button
                       onClick={() => removeFaculty(index)}
                       className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"
