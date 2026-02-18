@@ -54,10 +54,18 @@ export default function CourseWizard({ onClose, editingIndex }) {
 
   const [step, setStep] = useState(1);
 
-  /* 🔥 If editing → jump to last step */
+  /* 🔥 Smart Redirection: Check what's missing */
   useEffect(() => {
     if (editingIndex !== null && currentCourse) {
-      setStep(3);
+      const hasContent =
+        currentCourse.learningOutcomes?.length > 0 ||
+        currentCourse.categories?.length > 0;
+
+      if (!hasContent) {
+        setStep(2); // Go to Content step if missing
+      } else {
+        setStep(3); // Go to Modules step if content exists
+      }
     }
   }, [editingIndex, currentCourse]);
 
