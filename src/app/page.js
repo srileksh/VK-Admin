@@ -39,7 +39,7 @@ function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-[#e5dcc9] pt-[50px] p-[25px]">
+    <div className="min-h-screen bg-[#ecf1fe] pt-[50px] p-[25px]">
       <div className="text-center">
         <img src="VK-Logo.png" className="mx-auto" />
         <h1 className="text-[32px] font-bold">Admin Login</h1>
@@ -48,7 +48,7 @@ function Page() {
 
       <form
         onSubmit={handleLogin}
-        className="sm:w-[420px] bg-white mx-auto px-[45px] py-[40px] mt-[30px] rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
+        className="sm:w-[420px] bg-white mx-auto px-[45px] py-[40px] mt-[30px] rounded-[20px] shadow-2xl"
       >
         {/* Phone Number */}
         <label className="text-[14px] font-semibold">Phone Number</label>
