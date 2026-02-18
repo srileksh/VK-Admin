@@ -27,7 +27,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
   const [draftFaculty, setDraftFaculty] = useState({
     name: "",
     qualification: "",
-    profileImage: "",
+    imageUrl: "",
   });
 
   /* 🔥 POPULATE DATA IF EDITING */
@@ -60,7 +60,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     setFacultyUploading(true);
     try {
       const url = await uploadImageToCloudinary(file);
-      setDraftFaculty((prev) => ({ ...prev, profileImage: url }));
+      setDraftFaculty((prev) => ({ ...prev, imageUrl: url }));
     } finally {
       setFacultyUploading(false);
     }
@@ -79,7 +79,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     }
 
     setFaculty([...faculty, draftFaculty]);
-    setDraftFaculty({ name: "", qualification: "", profileImage: "" });
+    setDraftFaculty({ name: "", qualification: "", imageUrl: "" });
     setErrors((p) => ({
       ...p,
       faculty: "",
@@ -256,9 +256,9 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                 {/* Faculty List */}
                 {faculty.map((f, index) => (
                   <div key={index} className="relative text-center">
-                    {f.profileImage ? (
+                    {f.imageUrl ? (
                       <img
-                        src={f.profileImage}
+                        src={f.imageUrl}
                         className="w-14 h-14 rounded-full object-cover"
                       />
                     ) : (
@@ -312,9 +312,9 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                       onClick={() => fileInputRef.current.click()}
                       className="w-18 h-18 rounded-full flex items-center justify-center cursor-pointer overflow-hidden "
                     >
-                      {draftFaculty.profileImage ? (
+                      {draftFaculty.imageUrl ? (
                         <img
-                          src={draftFaculty.profileImage}
+                          src={draftFaculty.imageUrl}
                           className="w-full h-full object-fill"
                         />
                       ) : (
