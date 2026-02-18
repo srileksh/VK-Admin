@@ -7,6 +7,7 @@ import { TbZoomReplace } from "react-icons/tb";
 import { HiMiniMinus } from "react-icons/hi2";
 import { GrGallery } from "react-icons/gr";
 import toast from "react-hot-toast";
+import { MdOutlineFileUpload } from "react-icons/md";
 
 import { initiateVideoUpload } from "@/services/video.service";
 import { uploadToVimeo } from "@/utils/vimeoUpload";
@@ -48,6 +49,16 @@ export default function PromoVideoSection() {
     video: "",
     thumbnail: "",
   });
+
+  const isFormValid = () => {
+  return (
+    title.trim() &&
+    description.trim() &&
+    videoAssetId &&
+    thumbnailUrl
+  );
+};
+
 
   /* ================= VIDEO ================= */
 
@@ -99,10 +110,10 @@ export default function PromoVideoSection() {
     }
   };
 
-  // const handleReplaceVideo = () => {
-  //   if (!videoAssetId || isSaved || uploading) return;
-  //   fileRef.current.click();
-  // };
+  const handleReplaceVideo = () => {
+    if (!videoAssetId || isSaved || uploading) return;
+    fileRef.current.click();
+  };
 
   const handleRemoveVideo = async () => {
     if (!videoAssetId || isSaved) return;
@@ -219,7 +230,7 @@ export default function PromoVideoSection() {
 
       {isOpen && (
         <>
-          <div className="border-b mt-2 mb-4" />
+          <div className="border-b border-gray-400 mt-2 mb-4" />
 
           <div className="flex justify-between gap-6">
             {/* LEFT */}
@@ -235,7 +246,7 @@ export default function PromoVideoSection() {
                       setErrors((p) => ({ ...p, title: "" }));
                     }}
                     placeholder="Title of the video"
-                    className={`border rounded-lg px-4 py-2 w-[250px] ${
+                    className={`border border-gray-400 rounded-lg  px-4 py-2 w-[250px] outline-gray-400 ${
                       errors.title ? "border-red-400" : ""
                     }`}
                   />
@@ -251,14 +262,16 @@ export default function PromoVideoSection() {
                     disabled={isSaved}
                     value={description}
                     maxLength={130}
+                    
                     onChange={(e) => {
                       setDescription(e.target.value);
                       setErrors((p) => ({ ...p, description: "" }));
                     }}
                     placeholder="Short description"
-                    className={`border rounded-lg px-4 py-2 w-full ${
+                    className={`border border-gray-400 rounded-lg px-4 py-2 w-full outline-gray-400${
                       errors.description ? "border-red-400" : ""
                     }`}
+                    
                   />
                   {errors.description && (
                     <p className="text-red-500 text-xs mt-1">
@@ -276,8 +289,7 @@ export default function PromoVideoSection() {
                       !uploading && !isSaved && fileRef.current.click()
                     }
                     className="w-24 h-20 border rounded flex items-center justify-center text-xs cursor-pointer text-gray-400"
-                  >
-                    {videoName ? "Video Selected" : "Select Video"}
+                  >                    {videoName ? "Video Selected" : "Select Video"}
                   </div>
 
                   <div>
@@ -288,9 +300,11 @@ export default function PromoVideoSection() {
                     <button
                       disabled={uploading || isSaved || !selectedVideoFile}
                       onClick={uploadPromo}
-                      className="text-sm mt-2 disabled:opacity-40"
-                    >
-                      {uploading ? "Uploading..." : "+ Upload Video"}
+                      className="border px-3 py-1 bg-[#37af47]  text-white rounded-[14px] disabled:opacity-60 text-sm mt-2 flex justify-center items-center gap-[3px]"
+                    ><MdOutlineFileUpload />
+
+
+                      {uploading ? "Uploading..." : "Upload"}
                     </button>
 
                     {errors.video && (
@@ -321,8 +335,8 @@ export default function PromoVideoSection() {
 
                   <div className="flex justify-between mt-3 text-sm">
                     <button
-                      // disabled={!videoAssetId || isSaved}
-                      // onClick={handleReplaceVideo}
+                      disabled={!videoAssetId || isSaved || uploading}
+                      onClick={handleReplaceVideo}
                       className="flex items-center gap-1 disabled:opacity-40"
                     >
                       <TbZoomReplace /> Replace
@@ -342,7 +356,8 @@ export default function PromoVideoSection() {
 
             {/* THUMBNAIL */}
             <div>
-              <div
+              <div className="flex flex-col justify-center items-center">             
+                <div
                 onClick={() => !isSaved && thumbRef.current.click()}
                 className="w-40 h-28 bg-gray-300 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden"
               >
@@ -366,13 +381,15 @@ export default function PromoVideoSection() {
                   !selectedThumbnailFile || isSaved || thumbnailUploading
                 }
                 onClick={handleThumbnailUpload}
-                className="text-sm mt-2 w-full disabled:opacity-40"
+                className="text-sm mt-2 flex justify-center items-center gap-[4px] border px-3 py-1 bg-[#37af47]  text-white rounded-[14px] disabled:opacity-60"
               >
+                <MdOutlineFileUpload/>
                 {thumbnailUploading
                   ? "Uploading..."
-                  : "+ Upload Thumbnail"}
+                  : "Upload"}
               </button>
-
+</div>
+ 
               {errors.thumbnail && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.thumbnail}
@@ -396,16 +413,16 @@ export default function PromoVideoSection() {
             <button
               onClick={handleEdit}
               disabled={!isSaved}
-              className="flex items-center px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
+              className="flex items-center px-5 py-1 border border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
             >
-                                <FaPen /> Edit
+              Edit
               
             </button>
 
             <button
               onClick={handleSave}
-              disabled={saving || isSaved}
-              className="px-8 py-2 bg-[#1F304A] text-white rounded-xl"
+              disabled={saving || isSaved || !isFormValid()}
+              className="px-4  border py-1 bg-[#37af47]  text-white rounded-[12px] disabled:opacity-50"
             >
               {saving ? "Saving..." : "Save"}
             </button>
