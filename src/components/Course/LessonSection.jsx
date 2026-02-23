@@ -6,6 +6,7 @@ import { TbZoomReplace } from "react-icons/tb";
 import { HiMiniMinus } from "react-icons/hi2";
 import { GrGallery } from "react-icons/gr";
 import { Toaster, toast } from "react-hot-toast";
+import { MdOutlineFileUpload } from "react-icons/md";
 
 import useLessonStore from "@/store/useLessonStore";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
@@ -357,17 +358,20 @@ export default function LessonSection({ sectionId, title }) {
 
                         <button
                           onClick={() => handleUploadVideo(lesson)}
-                          className="text-sm mt-2 disabled:opacity-40"
+                          className="text-sm mt-2 gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60"
                           disabled={
                             uploadingLessonId === lesson.id ||
                             lesson.isSaved ||
                             !lesson.videoFile ||
                             lesson.videoUploaded
                           }
+
                         >
+                                                    <MdOutlineFileUpload/>
+
                           {uploadingLessonId === lesson.id
                             ? "Uploading..."
-                            : "+ Upload Video"}
+                            : "Upload"}
                         </button>
 
                         <input
@@ -459,11 +463,13 @@ export default function LessonSection({ sectionId, title }) {
                       uploadingThumbnailId === lesson.id ||
                       (lesson.thumbnailUrl && !lesson.backendId)
                     }
-                    className="text-center mt-2 disabled:opacity-40"
+                    className="text-center mt-2 gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60 flex justify-center items-center"
                   >
+                                    <MdOutlineFileUpload/>
+                    
                     {uploadingThumbnailId === lesson.id
                       ? "Uploading..."
-                      : "+Upload Thumbnail"}
+                      : "+Upload"}
                   </button>
 
                   <input

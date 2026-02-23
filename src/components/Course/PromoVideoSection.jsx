@@ -8,6 +8,7 @@ import { HiMiniMinus } from "react-icons/hi2";
 import { GrGallery } from "react-icons/gr";
 import toast from "react-hot-toast";
 import { MdOutlineFileUpload } from "react-icons/md";
+import { LiaSave } from "react-icons/lia";
 
 import { initiateVideoUpload } from "@/services/video.service";
 import { uploadToVimeo } from "@/utils/vimeoUpload";
@@ -246,7 +247,7 @@ export default function PromoVideoSection() {
                       setErrors((p) => ({ ...p, title: "" }));
                     }}
                     placeholder="Title of the video"
-                    className={`border border-gray-400 rounded-lg  px-4 py-2 w-[250px] outline-gray-400 ${
+                    className={`border border-gray-400 rounded-lg  px-4 py-2 w-[250px]  outline-[#59c868] ${
                       errors.title ? "border-red-400" : ""
                     }`}
                   />
@@ -300,7 +301,7 @@ export default function PromoVideoSection() {
                     <button
                       disabled={uploading || isSaved || !selectedVideoFile}
                       onClick={uploadPromo}
-                      className="border px-3 py-1 bg-[#37af47]  text-white rounded-[14px] disabled:opacity-60 text-sm mt-2 flex justify-center items-center gap-[3px]"
+                      className="border px-2.5 py-0.5 text-[12px] text-[#37af47] broder-none shadow-2xl border-[#37af47] rounded-[14px] disabled:opacity-60 text-sm mt-2 flex justify-center items-center gap-[2px]"
                     ><MdOutlineFileUpload />
 
 
@@ -326,7 +327,7 @@ export default function PromoVideoSection() {
                 {/* Progress */}
                 <div className="flex-1">
                   <p className="mb-1">Upload status</p>
-                  <div className="relative w-full h-[2px] bg-gray-300 mt-6">
+                  <div className="relative w-full h-[2px] bg-gray-300 mt-4">
                     <div
                       className="absolute h-[2px] bg-green-500"
                       style={{ width: `${progress}%` }}
@@ -381,7 +382,7 @@ export default function PromoVideoSection() {
                   !selectedThumbnailFile || isSaved || thumbnailUploading
                 }
                 onClick={handleThumbnailUpload}
-                className="text-sm mt-2 flex justify-center items-center gap-[4px] border px-3 py-1 bg-[#37af47]  text-white rounded-[14px] disabled:opacity-60"
+                className="text-sm mt-2 flex justify-center items-center gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60"
               >
                 <MdOutlineFileUpload/>
                 {thumbnailUploading
@@ -413,7 +414,7 @@ export default function PromoVideoSection() {
             <button
               onClick={handleEdit}
               disabled={!isSaved}
-              className="flex items-center px-5 py-1 border border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
+              className="flex items-center px-5 py-0.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
             >
               Edit
               
@@ -422,8 +423,9 @@ export default function PromoVideoSection() {
             <button
               onClick={handleSave}
               disabled={saving || isSaved || !isFormValid()}
-              className="px-4  border py-1 bg-[#37af47]  text-white rounded-[12px] disabled:opacity-50"
+              className="px-4  border py-0.5 bg-[#37af47]  text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
             >
+              <p><LiaSave className="text-[22px]"/></p>
               {saving ? "Saving..." : "Save"}
             </button>
           </div>
