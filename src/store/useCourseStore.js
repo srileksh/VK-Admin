@@ -215,6 +215,7 @@ const useCourseStore = create((set, get) => ({
 
     try {
       await togglePopularApi(courseId, newValue);
+      
     } catch (error) {
       set({ error });
     }
