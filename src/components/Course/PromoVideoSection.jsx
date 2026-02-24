@@ -247,7 +247,7 @@ export default function PromoVideoSection() {
                       setErrors((p) => ({ ...p, title: "" }));
                     }}
                     placeholder="Title of the video"
-                    className={`border border-gray-400 rounded-lg  px-4 py-2 w-[250px]  outline-[#59c868] ${
+                    className={`border border-gray-400 rounded-lg  px-4 py-2 w-[250px] outline-gray-400 ${
                       errors.title ? "border-red-400" : ""
                     }`}
                   />

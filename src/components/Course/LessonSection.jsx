@@ -7,6 +7,7 @@ import { HiMiniMinus } from "react-icons/hi2";
 import { GrGallery } from "react-icons/gr";
 import { Toaster, toast } from "react-hot-toast";
 import { MdOutlineFileUpload } from "react-icons/md";
+import { LiaSave } from "react-icons/lia";
 
 import useLessonStore from "@/store/useLessonStore";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
@@ -308,7 +309,7 @@ export default function LessonSection({ sectionId, title }) {
                   <div className="flex gap-4 mb-4">
                     <input
                       disabled={lesson.isSaved}
-                      className="border px-4 py-2 rounded-lg w-[250px]"
+                      className="border border-gray-400 px-4 py-2 rounded-lg w-[250px] outline-gray-400"
                       placeholder="Title"
                       value={lesson.lessonTitle}
                       onChange={(e) =>
@@ -322,7 +323,7 @@ export default function LessonSection({ sectionId, title }) {
 
                     <input
                       disabled={lesson.isSaved}
-                      className="border px-4 py-2 rounded-lg flex-1"
+                      className="border border-gray-400 px-4 py-2 rounded-lg flex-1 outline-gray-400"
                       placeholder="Description"
                       value={lesson.description}
                       onChange={(e) =>
@@ -338,7 +339,7 @@ export default function LessonSection({ sectionId, title }) {
                   {/* Video Section */}
                   <div className="flex gap-6">
                     <div className="flex gap-3">
-                      <div className="w-24 h-20 border flex items-center justify-center text-xs">
+                      <div className="w-24 h-20 border border-gray-400 rounded flex items-center justify-center text-xs">
                         <button
                           onClick={() =>
                             fileRefs.current[lesson.id].click()
@@ -358,7 +359,7 @@ export default function LessonSection({ sectionId, title }) {
 
                         <button
                           onClick={() => handleUploadVideo(lesson)}
-                          className="text-sm mt-2 gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60"
+                          className="text-sm mt-2 gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47] flex justify-center items-center gap-[2px] rounded-[14px] disabled:opacity-60"
                           disabled={
                             uploadingLessonId === lesson.id ||
                             lesson.isSaved ||
@@ -463,13 +464,13 @@ export default function LessonSection({ sectionId, title }) {
                       uploadingThumbnailId === lesson.id ||
                       (lesson.thumbnailUrl && !lesson.backendId)
                     }
-                    className="text-center mt-2 gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60 flex justify-center items-center"
+                    className="text-center mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60 flex justify-center items-center gap-[2px]"
                   >
                                     <MdOutlineFileUpload/>
                     
                     {uploadingThumbnailId === lesson.id
                       ? "Uploading..."
-                      : "+Upload"}
+                      : "Upload"}
                   </button>
 
                   <input
@@ -497,9 +498,9 @@ export default function LessonSection({ sectionId, title }) {
               <button
                 onClick={() => handleEdit(lesson)}
                 disabled={!lesson.isSaved}
-                className="flex items-center px-5 py-2 border-2 border-[#1F304A] rounded-xl text-sm disabled:opacity-50"
+                className="flex items-center px-5 py-1.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
               >
-                <FaPen /> Edit
+              Edit
               </button>
 
               <button
@@ -509,8 +510,10 @@ export default function LessonSection({ sectionId, title }) {
                   lesson.isSaved ||
                   !isLessonComplete(lesson)
                 }
-                className="px-8 py-2 bg-[#1F304A] text-white rounded-xl disabled:opacity-60"
+                className="px-4  border py-0.5 bg-[#37af47]  text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
               >
+                              <p><LiaSave className="text-[22px]"/></p>
+                
                 {lesson.saving
                   ? "Saving..."
                   : lesson.isSaved

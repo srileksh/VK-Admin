@@ -6,6 +6,7 @@ import { ImArrowUp } from "react-icons/im";
 import { uploadImageToCloudinary } from "../../../src/utils/cloudinaryImageUpload";
 import { MdAccountCircle } from "react-icons/md";
 import { GrGallery } from "react-icons/gr";
+import { MdOutlineFileUpload } from "react-icons/md";
 
 export default function CreateCourse({ onCancel, onSuccess }) {
   const { createCourse, loading, currentCourse } = useCourseStore();
@@ -215,13 +216,15 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                       await handleThumbnailUpload(selectedThumbnailFile);
                       setSelectedThumbnailFile(null);
                     }}
-                    className={` px-12 text-sm transition ${
+                    className={`px-5 text-sm transition text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60 flex justify-center items-center gap-[2px] ${
                       selectedThumbnailFile
-                        ? "text-gray-800 font-medium"
-                        : "text-gray-400"
+                        ? "Uploading..."
+                        : "Upload"
                     }`}
                   >
-                    + Upload Thumbnail
+                                                        <MdOutlineFileUpload/>
+                    
+                    Upload Thumbnail
                   </button>
                 </div>
 
@@ -327,17 +330,16 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                       type="file"
                       hidden
                       accept="image/*"
-                      onChange={(e) => uploadFacultyImage(e.target.files[0])}
+                      onChange={(e) =>  uploadFacultyImage(e.target.files[0])} 
                     />
 
                     <button
                       onClick={addFaculty}
                       disabled={facultyUploading}
-                      className="text-sm mt-1 text-gray-600 flex flex-col items-center"
+                      className="text-sm mt-1 flex justify-center items-center text-[12px] border-b  py-0.5 text-[#37af47]  disabled:opacity-60 "
                     >
-                      <ImArrowUp />
-                      Upload
-                    </button>
+                                                        <MdOutlineFileUpload/>Upload
+           </button>
                   </div>
                 </div>
               </div>
