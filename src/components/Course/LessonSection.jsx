@@ -368,7 +368,7 @@ export default function LessonSection({ sectionId, title }) {
                           }
 
                         >
-                                                    <MdOutlineFileUpload/>
+                          <MdOutlineFileUpload/>
 
                           {uploadingLessonId === lesson.id
                             ? "Uploading..."
