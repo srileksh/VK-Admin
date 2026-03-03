@@ -118,48 +118,6 @@ export default function LessonSection({ sectionId, title }) {
   });
 };
 
-  /* VIDEO UPLOAD & CREATE LESSON */
-  // const handleUploadVideo = async (lesson) => {
-  //   if (!lesson.videoFile || !sectionId) return;
-
-  //   const toastId = toast.loading("Uploading & creating lesson...");
-
-  //   try {
-  //     setUploadingLessonId(lesson.id);
-
-  //     // 1. Upload video & Create Lesson
-  //     // Note: We pass the CURRENT thumbnail URL (likely empty if not uploaded yet)
-  //     const createdLesson = await uploadLessonVideo(lesson.videoFile, sectionId, {
-  //       title: lesson.lessonTitle || "Lesson video",
-  //       description: lesson.description || "Lesson description",
-  //       thumbnail: lesson.thumbnailUrl,
-  //       duration,
-  //       order: 0,
-  //       isFree: false,
-  //     });
-
-  //     // 2. Update local state with real Backend ID
-  //     setLessons((prev) =>
-  //       prev.map((l) =>
-  //         l.id === lesson.id
-  //           ? {
-  //             ...l,
-  //             videoUploaded: true,
-  //             backendId: createdLesson.id, // 🔥 SAVE ID
-  //             isSaved: true, // It is saved on creation
-  //           }
-  //           : l
-  //       )
-  //     );
-
-  //     toast.success("Lesson created successfully", { id: toastId });
-  //   } catch (e) {
-  //     console.error(e);
-  //     toast.error("Video upload failed", { id: toastId });
-  //   } finally {
-  //     setUploadingLessonId(null);
-  //   }
-  // };
 
   const handleUploadVideo = async (lesson) => {
   if (!lesson.videoFile || !sectionId) return;
