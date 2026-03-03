@@ -596,6 +596,7 @@ import {
   removePromoVideoApi,
   togglePopularApi,
   publishCourse,
+  
 } from "@/services/coursesApi";
 
 const useCourseStore = create((set, get) => ({
