@@ -44,9 +44,9 @@ export default function Page() {
                 setCourseId(null);
                 setShowWizard(true);
               }}
-              className="px-6 xl:px-10 py-3
+              className="px-4  py-2
               bg-[#1f304a] text-white
-              rounded-xl text-[18px] xl:text-[20px]
+              rounded-xl text-[16px] xl:text-[20px]
               transition-colors duration-300
               hover:bg-[#314279]"
             >
