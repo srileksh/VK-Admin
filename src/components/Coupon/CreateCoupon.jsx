@@ -149,7 +149,7 @@ export default function CreateCoupon({
             value={formData.couponCode}
             onChange={handleChange}
             disabled={isEditMode} // 🔥 prevent editing code
-            className="flex-1 px-3 py-3 text-sm text-[#3F3D3D] outline-none rounded-lg sm:rounded-tr-none disabled:bg-gray-100"
+            className="flex-1 px-3 py-3 text-sm text-[#3F3D3D] outline-none rounded-lg  disabled:bg-gray-100"
           />
           {!isEditMode && (
             <button

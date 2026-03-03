@@ -51,8 +51,19 @@ import useCourseStore from "@/store/useCourseStore";
 
 export default function CourseWizard({ onClose, editingIndex }) {
   const { currentCourse } = useCourseStore();
+  const { selectedCourse } = useCourseStore();
 
   const [step, setStep] = useState(1);
+  useEffect(() => {
+  if (selectedCourse) {
+    setFormData({
+      title: selectedCourse.title || "",
+      description: selectedCourse.description || "",
+      faculty: selectedCourse.faculty || [],
+      learningOutcomes: selectedCourse.learningOutcomes || [],
+    });
+  }
+}, [selectedCourse]);
 
   /* 🔥 Smart Redirection: Check what's missing */
   useEffect(() => {
