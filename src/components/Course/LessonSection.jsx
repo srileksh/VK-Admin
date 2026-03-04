@@ -12,11 +12,15 @@ import { LiaSave } from "react-icons/lia";
 import useLessonStore from "@/store/useLessonStore";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 
-export default function LessonSection({ sectionId, title }) {
+export default function LessonSection({
+  sectionId,
+  title,
+  isOpen,
+  onToggle,
+}) {
   const [lessons, setLessons] = useState([
     {
       id: Date.now(),
-      isOpen: true,
       lessonTitle: "",
       description: "",
       videoName: "",
@@ -27,7 +31,7 @@ export default function LessonSection({ sectionId, title }) {
       isSaved: false,
       saving: false,
       errors: {},
-      backendId: null, // 🔥 Track the real backend ID
+      backendId: null,
     },
   ]);
 
@@ -36,15 +40,14 @@ export default function LessonSection({ sectionId, title }) {
 
   const fileRefs = useRef({});
   const thumbnailRefs = useRef({});
-  const { uploadLessonVideo, updateLessonDetails, progress } = useLessonStore();
+  const { uploadLessonVideo, updateLessonDetails, progress } =
+    useLessonStore();
 
-  /* ADD LESSON */
   const handleAddLesson = () => {
     setLessons((prev) => [
       ...prev,
       {
         id: Date.now(),
-        isOpen: true,
         lessonTitle: "",
         description: "",
         videoName: "",
@@ -70,17 +73,13 @@ export default function LessonSection({ sectionId, title }) {
     );
   };
 
-  /* COMPLETE CHECK */
   const isLessonComplete = (lesson) => {
-    // Only check basic fields for "Save" enablement.
-    // videoUploaded implies backendId should be set mostly, but we use backendId for updates.
     return (
       lesson.lessonTitle.trim() &&
       lesson.description.trim() &&
       lesson.videoUploaded
     );
   };
-
   /* VIDEO SELECT */
   const handleVideoSelect = (lesson, file) => {
     if (!file) return;
@@ -295,71 +294,69 @@ export default function LessonSection({ sectionId, title }) {
     handleUpdateLesson(lesson.id, "isSaved", false);
   };
 
+
   return (
     <>
-      {/* Toast Container */}
       <Toaster position="top-center" reverseOrder={false} />
 
-      {lessons.map((lesson) => (
-        <div
-          key={lesson.id}
-          className="border border-gray-100 shadow-md rounded-lg p-4 sm:p-5 mb-4"
-        >
-          {/* Header */}
-          <div className="flex justify-between items-center border-b pb-2 mb-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">{title}</span>
-              <FaPen className="text-gray-400" />
-            </div>
-
-            <button
-              onClick={() =>
-                handleUpdateLesson(lesson.id, "isOpen", !lesson.isOpen)
-              }
-              className="text-[26px] text-gray-400"
-            >
-              {lesson.isOpen ? <FaCircleMinus /> : <GoPlus />}
-            </button>
+      {/* SECTION HEADER (ONLY ONCE) */}
+      <div className="border border-gray-100 shadow-md rounded-lg p-4 sm:p-5 mb-4">
+        <div className="flex justify-between items-center border-b pb-2 mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{title}</span>
+            <FaPen className="text-gray-400" />
           </div>
 
-          {lesson.isOpen && (
-            <>
-              <label className="text-sm block mb-3">Video title</label>
+          <button
+            onClick={onToggle}
+            className="text-[26px] text-gray-400"
+          >
+            {isOpen ? <FaCircleMinus /> : <GoPlus />}
+          </button>
+        </div>
 
-              <div className="flex flex-col lg:flex-row gap-6">
-                {/* LEFT */}
-                <div className="flex-1">
-                  <div className="flex gap-4 mb-4">
-                    <input
-                      disabled={lesson.isSaved}
-                      className="border border-gray-400 px-4 py-2 rounded-lg w-[250px] outline-gray-400"
-                      placeholder="Title"
-                      value={lesson.lessonTitle}
-                      onChange={(e) =>
-                        handleUpdateLesson(
-                          lesson.id,
-                          "lessonTitle",
-                          e.target.value
-                        )
-                      }
-                    />
+        {/* SECTION CONTENT */}
+        {isOpen && (
+          <>
+            {lessons.map((lesson) => (
+              <div key={lesson.id} className="mb-6">
+                <label className="text-sm block mb-3">
+                  Video title
+                </label>
 
-                    <input
-                      disabled={lesson.isSaved}
-                      className="border border-gray-400 px-4 py-2 rounded-lg flex-1 outline-gray-400"
-                      placeholder="Description"
-                      value={lesson.description}
-                      onChange={(e) =>
-                        handleUpdateLesson(
-                          lesson.id,
-                          "description",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {/* LEFT SIDE */}
+                  <div className="flex-1">
+                    <div className="flex gap-4 mb-4">
+                      <input
+                        disabled={lesson.isSaved}
+                        className="border border-gray-400 px-4 py-2 rounded-lg w-[250px] outline-gray-400"
+                        placeholder="Title"
+                        value={lesson.lessonTitle}
+                        onChange={(e) =>
+                          handleUpdateLesson(
+                            lesson.id,
+                            "lessonTitle",
+                            e.target.value
+                          )
+                        }
+                      />
 
-                  {/* Video Section */}
+                      <input
+                        disabled={lesson.isSaved}
+                        className="border border-gray-400 px-4 py-2 rounded-lg flex-1 outline-gray-400"
+                        placeholder="Description"
+                        value={lesson.description}
+                        onChange={(e) =>
+                          handleUpdateLesson(
+                            lesson.id,
+                            "description",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+                                      {/* Video Section */}
                   <div className="flex gap-6">
                     <div className="flex gap-3">
                       <div className="w-24 h-20 border border-gray-400 rounded flex items-center justify-center text-xs">
@@ -454,32 +451,31 @@ export default function LessonSection({ sectionId, title }) {
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Thumbnail */}
-                <div className="flex flex-col items-center">
-                  <div
+                  </div>
+
+                  {/* THUMBNAIL */}
+                  <div className="flex flex-col items-center">
+                    <div 
                     onClick={() =>
                       !lesson.isSaved &&
                       thumbnailRefs.current[lesson.id].click()
                     }
-                    className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center cursor-pointer overflow-hidden"
-                  >
-                    {lesson.thumbnailUrl ? (
-                      <img
-                        src={lesson.thumbnailUrl}
-                        className="w-full h-full object-cover"
-                        alt="thumb"
-                      />
-                    ) : (
-                      <div className="text-center text-gray-600">
-                        <GrGallery size={22} className="mx-auto mb-1" />
-                        <p className="text-xs">No file selected</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <button
+                    className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center">
+                      {lesson.thumbnailUrl ? (
+                        <img
+                          src={lesson.thumbnailUrl}
+                          className="w-full h-full object-cover"
+                          alt="thumb"
+                        />
+                      ) : (
+                        <div className="text-center text-gray-600">
+                          <GrGallery size={22} className="mx-auto mb-1" />
+                          <p className="text-xs">No file selected</p>
+                        </div>
+                      )}
+                    </div>
+                                      <button
                     onClick={() => handleUploadThumbnail(lesson)}
                     disabled={
                       !lesson.thumbnailFile ||
@@ -510,52 +506,50 @@ export default function LessonSection({ sectionId, title }) {
                       )
                     }
                   />
+
+                  </div>
+                </div>
+
+                {/* ACTION BUTTONS */}
+                
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    disabled={!lesson.isSaved}
+                    className="flex items-center px-5 py-1.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    disabled={
+                      lesson.saving ||
+                      lesson.isSaved ||
+                      !isLessonComplete(lesson)
+                    }
+                    className="px-4 border py-0.5 bg-[#37af47] text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
+                  >
+                    <LiaSave className="text-[22px]" />
+                    Save
+                  </button>
                 </div>
               </div>
-            </>
-          )}
+            ))}
 
-          {/* ACTION BUTTONS */}
-          {lesson.isOpen && (
-            <div className="flex justify-end gap-4 mt-6">
+            <div className="flex justify-center mt-6">
               <button
-                onClick={() => handleEdit(lesson)}
-                disabled={!lesson.isSaved}
-                className="flex items-center px-5 py-1.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
+                onClick={handleAddLesson}
+                className="text-[#CCCBCB] text-[18px] font-semibold border-b-2"
               >
-              Edit
-              </button>
-
-              <button
-                onClick={() => handleSave(lesson)}
-                disabled={
-                  lesson.saving ||
-                  lesson.isSaved ||
-                  !isLessonComplete(lesson)
-                }
-                className="px-4  border py-0.5 bg-[#37af47]  text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
-              >
-                              <p><LiaSave className="text-[22px]"/></p>
-                
-                {lesson.saving
-                  ? "Saving..."
-                  : lesson.isSaved
-                    ? "Saved"
-                    : "Save"}
+                + Add new video
               </button>
             </div>
-          )}
-        </div>
-      ))}
-
-      <div className="flex justify-center mt-6">
-        <button
-          onClick={handleAddLesson}
-          className="text-[#CCCBCB] text-[18px] font-semibold border-b-2"
-        >
-          + Add new video
-        </button>
+          </>
+        )}
       </div>
     </>
   );
 }
+
+
+
+

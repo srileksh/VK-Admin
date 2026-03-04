@@ -49,10 +49,11 @@ export default function CreateModules({ onCancel, onFinish }) {
   /* TOGGLE SECTION (accordion) */
   const handleToggleSection = (id) => {
     setSections((prev) =>
-      prev.map((s) => ({
-        ...s,
-        isOpen: s.id === id ? !s.isOpen : false,
-      })),
+      prev.map((s) =>
+        s.id === id
+          ? { ...s, isOpen: !s.isOpen }
+          : { ...s, isOpen: false }
+      )
     );
   };
 
@@ -151,3 +152,4 @@ const handleFinish = async () => {
     </div>
   );
 }
+
