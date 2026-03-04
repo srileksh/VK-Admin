@@ -64,6 +64,11 @@ export const updateCourseApi = async (courseId, payload) => {
   return res.data;
 };
 
+/* ================= GET COURSE BY ID ================= */
+export const getCourseByIdApi = async (courseId) => {
+  const res = await axiosInstance.get(`/courses/${courseId}`);
+  return res.data;
+};
 /* ================= DELETE COURSE ================= */
 export const deleteCourseApi = async (courseId) => {
   const res = await axiosInstance.delete(`/courses/${courseId}`);
