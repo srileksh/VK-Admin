@@ -208,7 +208,10 @@ export default function LessonSection({
     try {
       setUploadingThumbnailId(lesson.id);
 
-      const url = await uploadImageToCloudinary(lesson.thumbnailFile);
+      const url = await uploadImageToCloudinary(
+        lesson.thumbnailFile,
+        "LESSON_THUMBNAIL"
+      );
 
       // Update local state
       setLessons((prev) =>
@@ -256,7 +259,10 @@ export default function LessonSection({
           // Actually calling handleUploadThumbnail is fine, it just shows nested toasts which is okay-ish,
           // OR we just inline the upload logic here. Better inline for cleaner UX here.
 
-          const url = await uploadImageToCloudinary(lesson.thumbnailFile);
+          const url = await uploadImageToCloudinary(
+            lesson.thumbnailFile,
+            "LESSON_THUMBNAIL"
+          );
           currentThumbnailUrl = url;
 
           // Update state
@@ -549,7 +555,6 @@ export default function LessonSection({
     </>
   );
 }
-
 
 
 
