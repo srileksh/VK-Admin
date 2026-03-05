@@ -150,7 +150,10 @@ export default function PromoVideoSection() {
 
       toast.loading("Uploading thumbnail...", { id: "thumb" });
 
-      const url = await uploadImageToCloudinary(selectedThumbnailFile);
+      const url = await uploadImageToCloudinary(
+        selectedThumbnailFile,
+        "PROMO_IMAGE"
+      );
 
       setThumbnailUrl(url);
       setSelectedThumbnailFile(null);
@@ -434,6 +437,5 @@ export default function PromoVideoSection() {
     </div>
   );
 }
-
 
 

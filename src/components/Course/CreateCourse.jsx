@@ -48,7 +48,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     if (!file) return;
     setThumbnailUploading(true);
     try {
-      const url = await uploadImageToCloudinary(file);
+      const url = await uploadImageToCloudinary(file, "COURSE_THUMBNAIL");
       setThumbnailUrl(url);
       setErrors((p) => ({ ...p, thumbnail: "" }));
     } finally {
@@ -60,7 +60,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     if (!file) return;
     setFacultyUploading(true);
     try {
-      const url = await uploadImageToCloudinary(file);
+      const url = await uploadImageToCloudinary(file, "FACULTY_IMAGE");
       setDraftFaculty((prev) => ({ ...prev, imageUrl: url }));
     } finally {
       setFacultyUploading(false);
