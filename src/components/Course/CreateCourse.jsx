@@ -9,14 +9,31 @@ import { GrGallery } from "react-icons/gr";
 import { MdOutlineFileUpload } from "react-icons/md";
 
 export default function CreateCourse({ onCancel, onSuccess }) {
-  const { createCourse, loading, currentCourse } = useCourseStore();
+  const { createCourse, loading, currentCourse,updateCourse } = useCourseStore();
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
     title: "",
     description: "",
     price: "",
+    thumbnail:"",
+     faculty: [],
   });
+
+  //   // 🔥 THIS IS THE MISSING PART
+  // useEffect(() => {
+  //   if (currentCourse) {
+  //     setForm({
+  //       title: currentCourse.title || "",
+  //       description: currentCourse.description || "",
+  //             thumbnail: currentCourse.thumbnail || "",
+
+  //       faculty: currentCourse.faculty || [],
+  //     });
+  //   }
+  // }, [currentCourse]);
+
+
   const [selectedThumbnailFile, setSelectedThumbnailFile] = useState(null);
 
   const [errors, setErrors] = useState({});
@@ -29,20 +46,42 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     name: "",
     qualification: "",
     imageUrl: "",
+    
   });
 
   /* 🔥 POPULATE DATA IF EDITING */
+  // useEffect(() => {
+  //   if (currentCourse) {
+  //     setForm({
+  //       title: currentCourse.title || "",
+  //       description: currentCourse.description || "",
+  //       price: currentCourse.price || "",
+  //     });
+  //     setThumbnailUrl(currentCourse.thumbnail || "");
+  //     setFaculty(currentCourse.faculty || []);
+  //   }
+  // }, [currentCourse]);
   useEffect(() => {
-    if (currentCourse) {
-      setForm({
-        title: currentCourse.title || "",
-        description: currentCourse.description || "",
-        price: currentCourse.price || "",
-      });
-      setThumbnailUrl(currentCourse.thumbnail || "");
-      setFaculty(currentCourse.faculty || []);
-    }
-  }, [currentCourse]);
+  if (currentCourse) {
+    setForm({
+      title: currentCourse.title || "",
+      description: currentCourse.description || "",
+      price: currentCourse.price || "",
+    });
+
+    setThumbnailUrl(currentCourse.thumbnail || "");
+    setFaculty(currentCourse.faculty || []);
+  } else {
+    // 🔥 RESET FORM WHEN CREATING NEW COURSE
+    setForm({
+      title: "",
+      description: "",
+      price: "",
+    });
+    setThumbnailUrl("");
+    setFaculty([]);
+  }
+}, [currentCourse]);
 
   const handleThumbnailUpload = async (file) => {
     if (!file) return;
