@@ -9,7 +9,7 @@ export default function Page() {
   const [showWizard, setShowWizard] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const { fetchCourseById } = useCourseStore();
-  const { courses, fetchCourses, deleteCourse, setCourseId, togglePopular } =
+  const { courses, fetchCourses,setCurrentCourse, deleteCourse, setCourseId, togglePopular } =
     useCourseStore();
 
   useEffect(() => {
@@ -21,12 +21,27 @@ export default function Page() {
   };
 
   
-  const handleEdit = async (course, index) => {
-    await fetchCourseById(course.id);
-    setEditingIndex(index);
-    setShowWizard(true);
-  };
+  // const handleEdit = async (course, index) => {
+  //   await fetchCourseById(course.id);
+  //   setEditingIndex(index);
+  //   setShowWizard(true);
+  // };
 
+  const handleEdit = async (courseId) => {
+  try {
+    if (course.status === "DRAFT") {
+      // 🔥 directly use existing data
+      setCurrentCourse(courseId);
+    } else {
+      // only fetch for published
+      await fetchCourseById(courseId);
+    }
+
+    setShowWizard(true);
+  } catch (error) {
+    console.error("Failed to load course");
+  }
+};
   return (
     <>
       {!showWizard && (
@@ -113,7 +128,8 @@ export default function Page() {
                   </button>
 
                   <button
-                    onClick={() => handleEdit(course, index)}
+                    // onClick={() => handleEdit(course, index)}
+                    onClick={() => handleEdit(course.id)}
                     className="text-[28px] text-gray-600 hover:text-blue-600"
                   >
                     <MdEditNote />
