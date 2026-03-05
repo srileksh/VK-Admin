@@ -44,6 +44,7 @@
 
 
 
+import axios from "axios";
 import axiosInstance from "./axios";
 
 /* ================= GET ALL COURSES ================= */
@@ -58,17 +59,23 @@ export const createCourseApi = async (payload) => {
   return res.data;
 };
 
-/* ================= UPDATE COURSE ================= */
-export const updateCourseApi = async (courseId, payload) => {
-  const res = await axiosInstance.put(`/courses/${courseId}`, payload);
-  return res.data;
-};
+// /* ================= UPDATE COURSE ================= */
+// export const updateCourseApi = async (courseId, payload) => {
+//   const res = await axiosInstance.put(`/courses/${courseId}`, payload);
+//   return res.data;
+// };
 
-/* ================= GET COURSE BY ID ================= */
-export const getCourseByIdApi = async (courseId) => {
-  const res = await axiosInstance.get(`/courses/${courseId}`);
-  return res.data;
-};
+// /* ================= GET COURSE BY ID ================= */
+// export const getCourseByIdApi = async (courseId) => {
+//   const res = await axiosInstance.get(`/courses/${courseId}`);
+//   return res.data;
+// };
+
+export const getCourseByIdApi = (courseId) =>
+  axiosInstance.get(`/courses/${courseId}`);
+
+export const updateCourseApi = (courseId, payload) =>
+  axiosInstance.put(`/courses/${courseId}`, payload);
 /* ================= DELETE COURSE ================= */
 export const deleteCourseApi = async (courseId) => {
   const res = await axiosInstance.delete(`/courses/${courseId}`);
