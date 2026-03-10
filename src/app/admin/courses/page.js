@@ -27,14 +27,14 @@ export default function Page() {
   //   setShowWizard(true);
   // };
 
-  const handleEdit = async (courseId) => {
+  const handleEdit = async (course) => {
   try {
     if (course.status === "DRAFT") {
       // 🔥 directly use existing data
-      setCurrentCourse(courseId);
+      setCurrentCourse(course);
     } else {
       // only fetch for published
-      await fetchCourseById(courseId);
+      await fetchCourseById(course.id);
     }
 
     setShowWizard(true);
@@ -129,7 +129,7 @@ export default function Page() {
 
                   <button
                     // onClick={() => handleEdit(course, index)}
-                    onClick={() => handleEdit(course.id)}
+                    onClick={() => handleEdit(course)}
                     className="text-[28px] text-gray-600 hover:text-blue-600"
                   >
                     <MdEditNote />
