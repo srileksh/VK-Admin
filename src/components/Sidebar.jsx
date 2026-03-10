@@ -12,6 +12,7 @@ function Sidebar() {
     { name: "Packages", path: "/admin/packages" },
     { name: "Courses", path: "/admin/courses" },
     { name: "Coupons", path: "/admin/coupons" },
+     { name: "Enquiries", path: "/admin/enquiries" },
   ];
   const isActive = (path) => pathname === path;
   return (
