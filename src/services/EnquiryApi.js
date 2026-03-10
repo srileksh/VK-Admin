@@ -1,27 +1,4 @@
-// import axiosInstance from "./axios";
 
-// // Get all enquiries
-// export const getEnquiries = async () => {
-//   const res = await axiosInstance.get("/admin/contact-messages");
-//   return res.data.data;
-// };
-
-// // Get single enquiry
-// export const getEnquiryById = async (id) => {
-//   const res = await axiosInstance.get(`/admin/contact-messages/${id}`);
-//   return res.data.data;
-// };
-
-// // Update enquiry status
-// export const updateEnquiryStatus = async (id, status) => {
-//   const res = await axiosInstance.patch(
-//     `/admin/contact-messages/${id}/status`,
-//     { status }
-//   );
-  
-
-//   return res.data.data;
-// };
 
 import axiosInstance from "./axios";
 
