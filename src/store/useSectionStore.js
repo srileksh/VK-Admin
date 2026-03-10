@@ -16,6 +16,17 @@ const useSectionStore = create((set) => ({
       set({ loading: false });
     }
   },
+    /* UPDATE SECTION */
+  updateSection: async ({ sectionId, title }) => {
+    try {
+      set({ loading: true });
+      const data = await updateSectionApi({ sectionId, title });
+      return data;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
 }));
 
 export default useSectionStore;
