@@ -10,7 +10,7 @@ export const createSectionApi = async ({ courseId, title }) => {
 };
 /* UPDATE SECTION */
 export const updateSectionApi = async ({ sectionId, title }) => {
-  const res = await axiosInstance.patch(`/sections/${sectionId}`, {
+  const res = await axiosInstance.put(`/sections/${sectionId}`, {
     title,
   });
 

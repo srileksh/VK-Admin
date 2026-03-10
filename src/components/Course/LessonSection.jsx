@@ -118,7 +118,6 @@
 //   });
 // };
 
-
 //   const handleUploadVideo = async (lesson) => {
 //   if (!lesson.videoFile || !sectionId) return;
 
@@ -301,7 +300,6 @@
 //     handleUpdateLesson(lesson.id, "isSaved", false);
 //   };
 
-
 //   return (
 //     <>
 //       <Toaster position="top-center" reverseOrder={false} />
@@ -463,7 +461,7 @@
 
 //                   {/* THUMBNAIL */}
 //                   <div className="flex flex-col items-center">
-//                     <div 
+//                     <div
 //                     onClick={() =>
 //                       !lesson.isSaved &&
 //                       thumbnailRefs.current[lesson.id].click()
@@ -493,7 +491,7 @@
 //                     className="text-center mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60 flex justify-center items-center gap-[2px]"
 //                   >
 //                                     <MdOutlineFileUpload/>
-                    
+
 //                     {uploadingThumbnailId === lesson.id
 //                       ? "Uploading..."
 //                       : "Upload"}
@@ -518,7 +516,7 @@
 //                 </div>
 
 //                 {/* ACTION BUTTONS */}
-                
+
 //                 <div className="flex justify-end gap-4 mt-6">
 //                   <button
 //                     disabled={!lesson.isSaved}
@@ -557,7 +555,6 @@
 //   );
 // }
 
-
 "use client";
 import { useRef, useState } from "react";
 import { FaCircleMinus, FaPen } from "react-icons/fa6";
@@ -571,13 +568,9 @@ import { LiaSave } from "react-icons/lia";
 
 import useLessonStore from "@/store/useLessonStore";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
+import useSectionStore from "@/store/useSectionStore";
 
-export default function LessonSection({
-  sectionId,
-  title,
-  isOpen,
-  onToggle,
-}) {
+export default function LessonSection({ sectionId, title, isOpen, onToggle }) {
   const [lessons, setLessons] = useState([
     {
       id: Date.now(),
@@ -598,15 +591,31 @@ export default function LessonSection({
 
   const [uploadingLessonId, setUploadingLessonId] = useState(null);
   const [uploadingThumbnailId, setUploadingThumbnailId] = useState(null);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [sectionTitle, setSectionTitle] = useState(title);
 
+  const { updateSection } = useSectionStore();
+  const handleUpdateSectionTitle = async () => {
+    try {
+      await updateSection({
+        sectionId,
+        title: sectionTitle,
+      });
+
+      toast.success("Section title updated");
+      setEditingTitle(false);
+    } catch (error) {
+      toast.error("Failed to update section");
+    }
+  };
   const fileRefs = useRef({});
   const thumbnailRefs = useRef({});
-  const { uploadLessonVideo,
-    createLessonAction, 
-    updateLessonDetails, 
-    progress, 
-  } =
-    useLessonStore();
+  const {
+    uploadLessonVideo,
+    createLessonAction,
+    updateLessonDetails,
+    progress,
+  } = useLessonStore();
 
   const handleAddLesson = () => {
     setLessons((prev) => [
@@ -617,7 +626,7 @@ export default function LessonSection({
         description: "",
         videoName: "",
         videoFile: null,
-          videoAssetId: null,
+        videoAssetId: null,
 
         thumbnailFile: null,
         thumbnailUrl: "",
@@ -635,8 +644,8 @@ export default function LessonSection({
       prev.map((l) =>
         l.id === id
           ? { ...l, [key]: value, errors: { ...l.errors, [key]: "" } }
-          : l
-      )
+          : l,
+      ),
     );
   };
 
@@ -655,79 +664,72 @@ export default function LessonSection({
       prev.map((l) =>
         l.id === lesson.id
           ? {
-            ...l,
-            videoFile: file,
-            videoName: file.name,
-            videoUploaded: false,
-          }
-          : l
-      )
+              ...l,
+              videoFile: file,
+              videoName: file.name,
+              videoUploaded: false,
+            }
+          : l,
+      ),
     );
   };
   // *******************
 
   const getVideoDuration = (file) => {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    video.preload = "metadata";
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
 
-    video.onloadedmetadata = () => {
-      window.URL.revokeObjectURL(video.src);
-      resolve(Math.floor(video.duration)); // seconds
-    };
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        resolve(Math.floor(video.duration)); // seconds
+      };
 
-    video.onerror = () => {
-      reject("Failed to read video metadata");
-    };
+      video.onerror = () => {
+        reject("Failed to read video metadata");
+      };
 
-    video.src = URL.createObjectURL(file);
-  });
-};
-
+      video.src = URL.createObjectURL(file);
+    });
+  };
 
   const handleUploadVideo = async (lesson) => {
-  if (!lesson.videoFile) return;
+    if (!lesson.videoFile) return;
 
-  const toastId = toast.loading("Uploading video...");
+    const toastId = toast.loading("Uploading video...");
 
-  try {
-    setUploadingLessonId(lesson.id);
+    try {
+      setUploadingLessonId(lesson.id);
 
-    const { videoAssetId } = await uploadLessonVideo(
-      lesson.videoFile
-    );
+      const { videoAssetId } = await uploadLessonVideo(lesson.videoFile);
 
-    setLessons((prev) =>
-      prev.map((l) =>
-        l.id === lesson.id
-          ? {
-              ...l,
-              videoUploaded: true,
-              videoAssetId: videoAssetId,
+      setLessons((prev) =>
+        prev.map((l) =>
+          l.id === lesson.id
+            ? {
+                ...l,
+                videoUploaded: true,
+                videoAssetId: videoAssetId,
+              }
+            : l,
+        ),
+      );
 
-            }
-          : l
-      )
-    );
-
-    toast.success("Video uploaded", { id: toastId });
-  } catch (error) {
-    console.error(error);
-    toast.error("Video upload failed", { id: toastId });
-  } finally {
-    setUploadingLessonId(null);
-  }
-};
-
+      toast.success("Video uploaded", { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error("Video upload failed", { id: toastId });
+    } finally {
+      setUploadingLessonId(null);
+    }
+  };
 
   /* THUMBNAIL SELECT */
   const handleThumbnailSelect = (lesson, file) => {
     if (!file) return;
 
     setLessons((prev) =>
-      prev.map((l) =>
-        l.id === lesson.id ? { ...l, thumbnailFile: file } : l
-      )
+      prev.map((l) => (l.id === lesson.id ? { ...l, thumbnailFile: file } : l)),
     );
   };
 
@@ -742,14 +744,12 @@ export default function LessonSection({
 
       const url = await uploadImageToCloudinary(
         lesson.thumbnailFile,
-        "LESSON_THUMBNAIL"
+        "LESSON_THUMBNAIL",
       );
 
       // Update local state
       setLessons((prev) =>
-        prev.map((l) =>
-          l.id === lesson.id ? { ...l, thumbnailUrl: url } : l
-        )
+        prev.map((l) => (l.id === lesson.id ? { ...l, thumbnailUrl: url } : l)),
       );
 
       // If lesson exists on backend, update it immediately
@@ -760,7 +760,6 @@ export default function LessonSection({
         toast.success("Thumbnail uploaded (save to persist)", { id: toastId });
       }
       return url;
-
     } catch (error) {
       console.error(error);
       toast.error("Thumbnail upload failed", { id: toastId });
@@ -772,77 +771,70 @@ export default function LessonSection({
 
   /* SAVE (UPDATE) */
   const handleSave = async (lesson) => {
-
     const toastId = toast.loading("Saving lesson...");
     handleUpdateLesson(lesson.id, "saving", true);
 
     try {
-          if (!lesson.videoAssetId) {
-      toast.error("Upload video first");
-      return;
-    }
-    const duration = await getVideoDuration(lesson.videoFile);
+      if (!lesson.videoAssetId) {
+        toast.error("Upload video first");
+        return;
+      }
+      const duration = await getVideoDuration(lesson.videoFile);
 
       let currentThumbnailUrl = lesson.thumbnailUrl;
 
       // 🔥 Auto-upload thumbnail if selected but not uploaded (and no URL)
       if (lesson.thumbnailFile && !currentThumbnailUrl) {
+        const url = await uploadImageToCloudinary(
+          lesson.thumbnailFile,
+          "LESSON_THUMBNAIL",
+        );
+        currentThumbnailUrl = url;
 
-          const url = await uploadImageToCloudinary(
-            lesson.thumbnailFile,
-            "LESSON_THUMBNAIL"
-          );
-          currentThumbnailUrl = url;
+        // Update state
+        setLessons((prev) =>
+          prev.map((l) =>
+            l.id === lesson.id ? { ...l, thumbnailUrl: url } : l,
+          ),
+        );
+      }
+      /* CREATE LESSON */
+      const createdLesson = await createLessonAction({
+        sectionId,
+        videoAssetId: lesson.videoAssetId,
+        title: lesson.lessonTitle,
+        description: lesson.description,
+        thumbnail: currentThumbnailUrl,
+        duration: duration,
+        order: 0,
+        isFree: false,
+      });
 
-          // Update state
-          setLessons((prev) =>
-            prev.map((l) =>
-              l.id === lesson.id ? { ...l, thumbnailUrl: url } : l
-            )
-          );
-        } 
-            /* CREATE LESSON */
-    const createdLesson = await createLessonAction({
-      sectionId,
-      videoAssetId: lesson.videoAssetId,
-      title: lesson.lessonTitle,
-      description: lesson.description,
-      thumbnail: currentThumbnailUrl,
-      duration: duration,
-      order: 0,
-      isFree: false,
-    });
+      setLessons((prev) =>
+        prev.map((l) =>
+          l.id === lesson.id
+            ? {
+                ...l,
+                backendId: createdLesson.id,
+                isSaved: true,
+              }
+            : l,
+        ),
+      );
 
+      toast.success("Lesson created successfully", { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save lesson", { id: toastId });
+    } finally {
+      handleUpdateLesson(lesson.id, "saving", false);
+    }
+  };
+  const handleEdit = (lesson) => {
     setLessons((prev) =>
-      prev.map((l) =>
-        l.id === lesson.id
-          ? {
-              ...l,
-              backendId: createdLesson.id,
-              isSaved: true,
-            }
-          : l
-      )
+      prev.map((l) => (l.id === lesson.id ? { ...l, isSaved: false } : l)),
     );
-
-    toast.success("Lesson created successfully", { id: toastId });
-
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to save lesson", { id: toastId });
-  } finally {
-    handleUpdateLesson(lesson.id, "saving", false);
-  }
-};
-const handleEdit = (lesson) => {
-  setLessons((prev) =>
-    prev.map((l) =>
-      l.id === lesson.id
-        ? { ...l, isSaved: false }
-        : l
-    )
-  );
-};
+  };
 
   return (
     <>
@@ -852,16 +844,56 @@ const handleEdit = (lesson) => {
       <div className="border border-gray-100 shadow-md rounded-lg p-4 sm:p-5 mb-4">
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{title}</span>
-            <FaPen className="text-gray-400" />
-          </div>
+            {editingTitle ? (
+              <input
+                value={sectionTitle}
+                onChange={(e) => setSectionTitle(e.target.value)}
+                className="border px-2 py-1 text-sm rounded outline-gray-400"
+              />
+            ) : (
+              <span className="text-sm font-medium">{sectionTitle}</span>
+            )}
+           </div>
 
-          <button
-            onClick={onToggle}
-            className="text-[26px] text-gray-400"
-          >
+        <div className="flex items-center gap-3">
+
+    {/* EDIT BUTTON */}
+    {!editingTitle && (
+      <button
+        onClick={() => setEditingTitle(true)}
+        className="flex items-center gap-1 text-sm border px-3 py-1 rounded text-blue-600 border-blue-600"
+      >
+        <FaPen />
+        Edit
+      </button>
+    )}
+          {/* SAVE BUTTON */}
+    {editingTitle && (
+      <button
+        onClick={handleUpdateSectionTitle}
+        className="flex items-center gap-1 text-sm border px-3 py-1 rounded bg-[#37af47] text-white"
+      >
+        <LiaSave className="text-[18px]" />
+        Save
+      </button>
+    )}
+  
+
+            {/* <FaPen
+              className="text-gray-400 cursor-pointer"
+              onClick={() => {
+                if (editingTitle) {
+                  handleUpdateSectionTitle();
+                } else {
+                  setEditingTitle(true);
+                }
+              }}
+            /> */}
+
+          <button onClick={onToggle} className="text-[26px] text-gray-400">
             {isOpen ? <FaCircleMinus /> : <GoPlus />}
           </button>
+        </div>
         </div>
 
         {/* SECTION CONTENT */}
@@ -869,9 +901,7 @@ const handleEdit = (lesson) => {
           <>
             {lessons.map((lesson) => (
               <div key={lesson.id} className="mb-6">
-                <label className="text-sm block mb-3">
-                  Video title
-                </label>
+                <label className="text-sm block mb-3">Video title</label>
 
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* LEFT SIDE */}
@@ -886,7 +916,7 @@ const handleEdit = (lesson) => {
                           handleUpdateLesson(
                             lesson.id,
                             "lessonTitle",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                       />
@@ -900,117 +930,108 @@ const handleEdit = (lesson) => {
                           handleUpdateLesson(
                             lesson.id,
                             "description",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                       />
                     </div>
-                                      {/* Video Section */}
-                  <div className="flex gap-6">
-                    <div className="flex gap-3">
-                      <div className="w-24 h-20 border border-gray-400 rounded flex items-center justify-center text-xs">
-                        <button
-                          onClick={() =>
-                            fileRefs.current[lesson.id].click()
-                          }
-                          disabled={lesson.isSaved}
-                        >
-                          {lesson.videoFile
-                            ? "Video Selected"
-                            : "Select Video"}
-                        </button>
+                    {/* Video Section */}
+                    <div className="flex gap-6">
+                      <div className="flex gap-3">
+                        <div className="w-24 h-20 border border-gray-400 rounded flex items-center justify-center text-xs">
+                          <button
+                            onClick={() => fileRefs.current[lesson.id].click()}
+                            disabled={lesson.isSaved}
+                          >
+                            {lesson.videoFile
+                              ? "Video Selected"
+                              : "Select Video"}
+                          </button>
+                        </div>
+
+                        <div>
+                          <p className="text-sm truncate max-w-[150px]">
+                            {lesson.videoName || "Lesson-video.mp4"}
+                          </p>
+
+                          <button
+                            onClick={() => handleUploadVideo(lesson)}
+                            className="text-sm mt-2 gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47] flex justify-center items-center gap-[2px] rounded-[14px] disabled:opacity-60"
+                            disabled={
+                              uploadingLessonId === lesson.id ||
+                              lesson.isSaved ||
+                              !lesson.videoFile ||
+                              lesson.videoUploaded
+                            }
+                          >
+                            <MdOutlineFileUpload />
+
+                            {uploadingLessonId === lesson.id
+                              ? "Uploading..."
+                              : "Upload"}
+                          </button>
+
+                          <input
+                            ref={(el) => (fileRefs.current[lesson.id] = el)}
+                            type="file"
+                            hidden
+                            accept="video/*"
+                            onChange={(e) =>
+                              handleVideoSelect(lesson, e.target.files[0])
+                            }
+                          />
+                        </div>
                       </div>
 
-                      <div>
-                        <p className="text-sm truncate max-w-[150px]">
-                          {lesson.videoName || "Lesson-video.mp4"}
-                        </p>
+                      {/* Upload Status Bar */}
+                      <div className="flex-1 text-sm">
+                        <p className="mb-1">Upload status</p>
 
-                        <button
-                          onClick={() => handleUploadVideo(lesson)}
-                          className="text-sm mt-2 gap-[2px] text-[12px] border px-2.5 py-0.5 text-[#37af47] flex justify-center items-center gap-[2px] rounded-[14px] disabled:opacity-60"
-                          disabled={
-                            uploadingLessonId === lesson.id ||
-                            lesson.isSaved ||
-                            !lesson.videoFile ||
-                            lesson.videoUploaded
-                          }
+                        <div className="relative w-full h-6">
+                          <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
+                          <div
+                            className="absolute h-[2px] bg-green-400 top-1/2"
+                            style={{
+                              width:
+                                uploadingLessonId === lesson.id
+                                  ? `${progress}%`
+                                  : lesson.videoUploaded
+                                    ? "100%"
+                                    : "0%",
+                            }}
+                          />
+                        </div>
 
-                        >
-                          <MdOutlineFileUpload/>
+                        <div className="flex justify-between mt-2">
+                          <button
+                            onClick={() => fileRefs.current[lesson.id].click()}
+                            disabled={!lesson.videoUploaded || lesson.isSaved}
+                            className="flex items-center gap-1 disabled:opacity-40"
+                          >
+                            <TbZoomReplace /> Replace
+                          </button>
 
-                          {uploadingLessonId === lesson.id
-                            ? "Uploading..."
-                            : "Upload"}
-                        </button>
-
-                        <input
-                          ref={(el) => (fileRefs.current[lesson.id] = el)}
-                          type="file"
-                          hidden
-                          accept="video/*"
-                          onChange={(e) =>
-                            handleVideoSelect(lesson, e.target.files[0])
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Upload Status Bar */}
-                    <div className="flex-1 text-sm">
-                      <p className="mb-1">Upload status</p>
-
-                      <div className="relative w-full h-6">
-                        <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
-                        <div
-                          className="absolute h-[2px] bg-green-400 top-1/2"
-                          style={{
-                            width:
-                              uploadingLessonId === lesson.id
-                                ? `${progress}%`
-                                : lesson.videoUploaded
-                                  ? "100%"
-                                  : "0%",
-                          }}
-                        />
-                      </div>
-
-                      <div className="flex justify-between mt-2">
-                        <button
-                          onClick={() =>
-                            fileRefs.current[lesson.id].click()
-                          }
-                          disabled={
-                            !lesson.videoUploaded || lesson.isSaved
-                          }
-                          className="flex items-center gap-1 disabled:opacity-40"
-                        >
-                          <TbZoomReplace /> Replace
-                        </button>
-
-                        <button
-                          onClick={() => handleRemoveVideo(lesson)}
-                          disabled={
-                            !lesson.videoUploaded || lesson.isSaved
-                          }
-                          className="flex items-center gap-1 disabled:opacity-40"
-                        >
-                          <HiMiniMinus /> Remove
-                        </button>
+                          <button
+                            onClick={() => handleRemoveVideo(lesson)}
+                            disabled={!lesson.videoUploaded || lesson.isSaved}
+                            className="flex items-center gap-1 disabled:opacity-40"
+                          >
+                            <HiMiniMinus /> Remove
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-
                   </div>
 
                   {/* THUMBNAIL */}
                   <div className="flex flex-col items-center">
-                    <div 
-                    onClick={() =>
-                      !lesson.isSaved &&
-                      thumbnailRefs.current[lesson.id].click()
-                    }
-                    className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center">
+                    <div
+                      onClick={() =>
+                        !lesson.isSaved &&
+                        thumbnailRefs.current[lesson.id].click()
+                      }
+                      className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center"
+                    >
                       {lesson.thumbnailUrl ? (
                         <img
                           src={lesson.thumbnailUrl}
@@ -1024,47 +1045,40 @@ const handleEdit = (lesson) => {
                         </div>
                       )}
                     </div>
-                                      <button
-                    onClick={() => handleUploadThumbnail(lesson)}
-                    disabled={
-                      !lesson.thumbnailFile ||
-                      lesson.isSaved ||
-                      uploadingThumbnailId === lesson.id ||
-                      (lesson.thumbnailUrl && !lesson.backendId)
-                    }
-                    className="text-center mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60 flex justify-center items-center gap-[2px]"
-                  >
-                                    <MdOutlineFileUpload/>
-                    
-                    {uploadingThumbnailId === lesson.id
-                      ? "Uploading..."
-                      : "Upload"}
-                  </button>
+                    <button
+                      onClick={() => handleUploadThumbnail(lesson)}
+                      disabled={
+                        !lesson.thumbnailFile ||
+                        lesson.isSaved ||
+                        uploadingThumbnailId === lesson.id ||
+                        (lesson.thumbnailUrl && !lesson.backendId)
+                      }
+                      className="text-center mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47]  rounded-[14px] disabled:opacity-60 flex justify-center items-center gap-[2px]"
+                    >
+                      <MdOutlineFileUpload />
 
-                  <input
-                    ref={(el) =>
-                      (thumbnailRefs.current[lesson.id] = el)
-                    }
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleThumbnailSelect(
-                        lesson,
-                        e.target.files[0]
-                      )
-                    }
-                  />
+                      {uploadingThumbnailId === lesson.id
+                        ? "Uploading..."
+                        : "Upload"}
+                    </button>
 
+                    <input
+                      ref={(el) => (thumbnailRefs.current[lesson.id] = el)}
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleThumbnailSelect(lesson, e.target.files[0])
+                      }
+                    />
                   </div>
                 </div>
 
                 {/* ACTION BUTTONS */}
-                
+
                 <div className="flex justify-end gap-4 mt-6">
                   <button
                     onClick={() => handleEdit(lesson)}
-
                     disabled={!lesson.isSaved}
                     className="flex items-center px-5 py-1.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
                   >
@@ -1073,7 +1087,6 @@ const handleEdit = (lesson) => {
 
                   <button
                     onClick={() => handleSave(lesson)}
-
                     disabled={
                       lesson.saving ||
                       lesson.isSaved ||
@@ -1102,5 +1115,3 @@ const handleEdit = (lesson) => {
     </>
   );
 }
-
-
