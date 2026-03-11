@@ -14,7 +14,7 @@ export default function CourseContent() {
   const items = Array.from({ length: 3 });
 
   const handleSubmit = () => {
-    router.push("/admin/courses/createmodules");
+    router.push("/courses/createmodules");
   };
 
   return (

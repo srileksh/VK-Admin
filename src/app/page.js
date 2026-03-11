@@ -32,7 +32,7 @@ function Page() {
 
     if (success) {
       toast.success("Login successful");
-      window.location.href = "/admin/dashboard";
+      window.location.href = "/dashboard";
     } else {
       toast.error("Invalid credentials");
     }

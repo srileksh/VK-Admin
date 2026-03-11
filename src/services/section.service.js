@@ -16,3 +16,9 @@ export const updateSectionApi = async ({ sectionId, title }) => {
 
   return res.data.data;
 };
+/* DELETE SECTION */
+export const deleteSectionApi = async (sectionId) => {
+  const res = await axiosInstance.delete(`/sections/${sectionId}`);
+  return res.data;
+};
+

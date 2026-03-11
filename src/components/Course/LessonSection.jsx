@@ -565,12 +565,12 @@ import { GrGallery } from "react-icons/gr";
 import { Toaster, toast } from "react-hot-toast";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { LiaSave } from "react-icons/lia";
-
+import { MdDelete } from "react-icons/md";
 import useLessonStore from "@/store/useLessonStore";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 import useSectionStore from "@/store/useSectionStore";
 
-export default function LessonSection({ sectionId, title, isOpen, onToggle }) {
+export default function LessonSection({ sectionId, title, isOpen, onToggle, onDelete }) {
   const [lessons, setLessons] = useState([
     {
       id: Date.now(),
@@ -594,20 +594,48 @@ export default function LessonSection({ sectionId, title, isOpen, onToggle }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [sectionTitle, setSectionTitle] = useState(title);
 
-  const { updateSection } = useSectionStore();
+  const { updateSection, deleteSection } = useSectionStore();
   const handleUpdateSectionTitle = async () => {
+    if (!sectionTitle.trim()) {
+      toast.error("Section title cannot be empty");
+      return;
+    }
+    const toastId = toast.loading("Updating section...");
     try {
       await updateSection({
         sectionId,
         title: sectionTitle,
       });
 
-      toast.success("Section title updated");
+      toast.success("Section title updated", { id: toastId });
       setEditingTitle(false);
     } catch (error) {
+      console.error(error);
       toast.error("Failed to update section");
     }
   };
+  const handleDeleteSection = async () => {
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this section?",
+    );
+
+    if (!confirmDelete) return;
+
+    const toastId = toast.loading("Deleting section...");
+
+    try {
+      await deleteSection(sectionId);
+
+      toast.success("Section deleted", { id: toastId });
+onDelete();
+      // Optional: refresh page or remove section from parent
+      // window.location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete section", { id: toastId });
+    }
+  };
+
   const fileRefs = useRef({});
   const thumbnailRefs = useRef({});
   const {
@@ -618,6 +646,13 @@ export default function LessonSection({ sectionId, title, isOpen, onToggle }) {
   } = useLessonStore();
 
   const handleAddLesson = () => {
+  const hasUnsaved = lessons.some((l) => !l.isSaved);
+
+  if (hasUnsaved) {
+    toast.error("Save current lesson first");
+    return;
+  }
+
     setLessons((prev) => [
       ...prev,
       {
@@ -853,31 +888,36 @@ export default function LessonSection({ sectionId, title, isOpen, onToggle }) {
             ) : (
               <span className="text-sm font-medium">{sectionTitle}</span>
             )}
-           </div>
+          </div>
 
-        <div className="flex items-center gap-3">
-
-    {/* EDIT BUTTON */}
-    {!editingTitle && (
-      <button
-        onClick={() => setEditingTitle(true)}
-        className="flex items-center gap-1 text-sm border px-3 py-1 rounded text-blue-600 border-blue-600"
-      >
-        <FaPen />
-        Edit
-      </button>
-    )}
-          {/* SAVE BUTTON */}
-    {editingTitle && (
-      <button
-        onClick={handleUpdateSectionTitle}
-        className="flex items-center gap-1 text-sm border px-3 py-1 rounded bg-[#37af47] text-white"
-      >
-        <LiaSave className="text-[18px]" />
-        Save
-      </button>
-    )}
-  
+          <div className="flex items-center gap-3">
+            {/* EDIT BUTTON */}
+            {!editingTitle && (
+              <button
+                onClick={() => setEditingTitle(true)}
+                className="flex items-center gap-1 text-sm border px-3 py-1 rounded text-blue-600 border-blue-600"
+              >
+                <FaPen />
+                Edit
+              </button>
+            )}
+            {/* SAVE BUTTON */}
+            {editingTitle && (
+              <button
+                onClick={handleUpdateSectionTitle}
+                className="flex items-center gap-1 text-sm border px-3 py-1 rounded bg-[#37af47] text-white"
+              >
+                <LiaSave className="text-[18px]" />
+                Save
+              </button>
+            )}
+            <button
+              onClick={handleDeleteSection}
+              className="flex items-center gap-1 text-sm border px-3 py-1 rounded text-red-600 border-red-600"
+            >
+              <MdDelete />
+              Delete
+            </button>
 
             {/* <FaPen
               className="text-gray-400 cursor-pointer"
@@ -890,10 +930,10 @@ export default function LessonSection({ sectionId, title, isOpen, onToggle }) {
               }}
             /> */}
 
-          <button onClick={onToggle} className="text-[26px] text-gray-400">
-            {isOpen ? <FaCircleMinus /> : <GoPlus />}
-          </button>
-        </div>
+            <button onClick={onToggle} className="text-[26px] text-gray-400">
+              {isOpen ? <FaCircleMinus /> : <GoPlus />}
+            </button>
+          </div>
         </div>
 
         {/* SECTION CONTENT */}

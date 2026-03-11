@@ -8,11 +8,11 @@ import { CgProfile } from "react-icons/cg";
 function Sidebar() {
   const pathname = usePathname();
   const menuItems = [
-    { name: "Dashboard", path: "/admin/dashboard" },
-    { name: "Packages", path: "/admin/packages" },
-    { name: "Courses", path: "/admin/courses" },
-    { name: "Coupons", path: "/admin/coupons" },
-     { name: "Enquiries", path: "/admin/enquiries" },
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "Packages", path: "/packages" },
+    { name: "Courses", path: "/courses" },
+    { name: "Coupons", path: "/coupons" },
+     { name: "Enquiries", path: "/enquiries" },
   ];
   const isActive = (path) => pathname === path;
   return (
@@ -21,7 +21,7 @@ function Sidebar() {
       <div>
         {/* <img src="/VK-Logo.png" /> */}
       </div>
-      <Link href="/admin/dashbord" className="mb-6">
+      <Link href="/dashbord" className="mb-6">
         <h1 className="text-3xl font-bold text-white"></h1>
       </Link>
 
