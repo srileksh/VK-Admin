@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axiosInstance from "@/services/axios";
 import { updateSectionApi } from "@/services/section.service";
-
+import { deleteSectionApi } from "@/services/section.service";
 const useSectionStore = create((set) => ({
   loading: false,
 
@@ -27,6 +27,17 @@ const useSectionStore = create((set) => ({
       set({ loading: false });
     }
   },
+    /* DELETE */
+  deleteSection: async (sectionId) => {
+    try {
+      set({ loading: true });
+      await deleteSectionApi(sectionId);
+      return true;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
 
 }));
 

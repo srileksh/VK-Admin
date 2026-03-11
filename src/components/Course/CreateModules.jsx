@@ -45,6 +45,10 @@ export default function CreateModules({ onCancel, onFinish }) {
       alert("Failed to create section");
     }
   };
+  const handleRemoveSection = (id) => {
+  setSections((prev) => prev.filter((s) => s.id !== id));
+};
+
 
   /* TOGGLE SECTION (accordion) */
   const handleToggleSection = (id) => {
@@ -87,6 +91,8 @@ const handleFinish = async () => {
               title={section.title}
               isOpen={section.isOpen}
               onToggle={() => handleToggleSection(section.id)}
+                onDelete={() => handleRemoveSection(section.id)}
+
             />
           ))}
 
