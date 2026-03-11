@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import useAuthStore from "@/store/useAuthStore";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 function Page() {
   const [phone, setPhone] = useState("");
@@ -41,7 +42,9 @@ function Page() {
   return (
     <div className="min-h-screen bg-[#ecf1fe] pt-[50px] p-[25px]">
       <div className="text-center">
-        <img src="VK-Logo.png" className="mx-auto" />
+        <Image src="/VK-Logo.png" alt="Logo" width={120} height={120} />
+
+        {/* <img src="VK-Logo.png" className="mx-auto" /> */}
         <h1 className="text-[32px] font-bold">Admin Login</h1>
         <p>Access the admin dashboard</p>
       </div>
