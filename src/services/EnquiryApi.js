@@ -3,7 +3,7 @@
 import axiosInstance from "./axios";
 
 export const getEnquiries = async ({ page, limit, status, q }) => {
-  const res = await axiosInstance.get("/contact-messages", {
+  const res = await axiosInstance.get("/admin/contact-messages", {
     params: {
       page,
       limit,
@@ -17,7 +17,7 @@ export const getEnquiries = async ({ page, limit, status, q }) => {
 
 export const getEnquiryById = async (id) => {
   const res = await axiosInstance.get(
-    `/contact-messages/${id}`
+    `/admin/contact-messages/${id}`
   );
 
   return res.data.data;
@@ -26,7 +26,7 @@ export const getEnquiryById = async (id) => {
 
 export const updateEnquiryStatus = async (id, status) => {
   const res = await axiosInstance.patch(
-    `/contact-messages/${id}/status`,
+    `/admin/contact-messages/${id}/status`,
     { status }
   );
 
