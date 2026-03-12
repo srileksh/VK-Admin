@@ -42,7 +42,7 @@ function Page() {
   return (
     <div className="min-h-screen bg-[#ecf1fe] pt-[50px] p-[25px]">
       <div className="text-center">
-        <Image src="/VK-Logo.png" alt="Logo" width={120} height={120} className="mx-auto" />
+        <Image src="/vklogo.png" alt="Logo" width={120} height={120} className="mx-auto" />
 
         {/* <img src="VK-Logo.png" className="mx-auto" /> */}
         <h1 className="text-[32px] font-bold">Admin Login</h1>
