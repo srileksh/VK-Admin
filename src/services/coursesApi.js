@@ -3,7 +3,7 @@ import axiosInstance from "./axios";
 
 /* ================= GET ALL COURSES ================= */
 export const getAllCourses = async () => {
-  const res = await axiosInstance.get("/courses");
+  const res = await axiosInstance.get("/admin/courses");
   return res.data;
 };
 
@@ -13,20 +13,9 @@ export const createCourseApi = async (payload) => {
   return res.data;
 };
 
-// /* ================= UPDATE COURSE ================= */
-// export const updateCourseApi = async (courseId, payload) => {
-//   const res = await axiosInstance.put(`/courses/${courseId}`, payload);
-//   return res.data;
-// };
-
-// /* ================= GET COURSE BY ID ================= */
-// export const getCourseByIdApi = async (courseId) => {
-//   const res = await axiosInstance.get(`/courses/${courseId}`);
-//   return res.data;
-// };
 
 export const getCourseByIdApi = (courseId) =>
-  axiosInstance.get(`/courses/${courseId}`);
+  axiosInstance.get(`/admin/courses/${courseId}`);
 
 export const updateCourseApi = (courseId, payload) =>
   axiosInstance.put(`/courses/${courseId}`, payload);
@@ -44,7 +33,7 @@ export const publishCourse = async (courseId) => {
 /* ================= TOGGLE POPULAR ================= */
 export const togglePopularApi = async (courseId, isPopular) => {
   const res = await axiosInstance.patch(
-    `/courses/${courseId}/popular`,
+    `/admin/courses/${courseId}/popular`,
     { isPopular }
   );
   return res.data;
