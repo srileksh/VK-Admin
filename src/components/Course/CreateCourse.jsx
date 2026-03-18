@@ -20,19 +20,6 @@ export default function CreateCourse({ onCancel, onSuccess }) {
      faculty: [],
   });
 
-  //   // 🔥 THIS IS THE MISSING PART
-  // useEffect(() => {
-  //   if (currentCourse) {
-  //     setForm({
-  //       title: currentCourse.title || "",
-  //       description: currentCourse.description || "",
-  //             thumbnail: currentCourse.thumbnail || "",
-
-  //       faculty: currentCourse.faculty || [],
-  //     });
-  //   }
-  // }, [currentCourse]);
-
 
   const [selectedThumbnailFile, setSelectedThumbnailFile] = useState(null);
 
@@ -49,18 +36,6 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     
   });
 
-  /* 🔥 POPULATE DATA IF EDITING */
-  // useEffect(() => {
-  //   if (currentCourse) {
-  //     setForm({
-  //       title: currentCourse.title || "",
-  //       description: currentCourse.description || "",
-  //       price: currentCourse.price || "",
-  //     });
-  //     setThumbnailUrl(currentCourse.thumbnail || "");
-  //     setFaculty(currentCourse.faculty || []);
-  //   }
-  // }, [currentCourse]);
   useEffect(() => {
   if (currentCourse) {
     setForm({
