@@ -55,40 +55,6 @@ fetchCourses: async () => {
     set({ loading: false });
   }
 },
-// fetchCourseById: async (id) => {
-//   if (!id) {
-//     console.error("fetchCourseById called without id");
-//     return;
-//   }
-
-//   try {
-//     set({ loading: true, error: null });
-
-//     const res = await getCourseByIdApi(id);
-
-//     const course = res.data?.data || res.data;
-
-// const normalizedCourse = {
-//   ...course,
-//   faculty: (course.faculty || []).map(f => ({
-//     ...f,
-//     imageUrl: f.imageUrl || f.image || "",
-//   })),
-// };
-
-// set({
-//   currentCourse: normalizedCourse,
-//   courseId: normalizedCourse.id,
-// });
-
-//   } catch (error) {
-//     console.error("Fetch course failed:", error);
-//     set({ error });
-//     throw error;
-//   } finally {
-//     set({ loading: false });
-//   }
-// },
   /* ================= CREATE COURSE ================= */
   createCourse: async (payload) => {
     try {

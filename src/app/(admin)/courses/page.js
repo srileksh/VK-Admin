@@ -21,11 +21,6 @@ export default function Page() {
   };
 
   
-  // const handleEdit = async (course, index) => {
-  //   await fetchCourseById(course.id);
-  //   setEditingIndex(index);
-  //   setShowWizard(true);
-  // };
 
   const handleEdit = async (course) => {
   try {
