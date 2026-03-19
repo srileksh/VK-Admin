@@ -448,41 +448,78 @@ const useCourseStore = create((set, get) => ({
   currentCourse: null,
 
   /* ================= FETCH ALL COURSES ================= */
+// fetchCourses: async () => {
+//   try {
+//     set({ loading: true, error: null });
+
+//     const res = await getAllCourses();
+
+//     set({
+//       courses: res?.data?.courses || []
+//     });
+
+//   } catch (error) {
+//     set({ error });
+//   } finally {
+//     set({ loading: false });
+//   }
+// },
+
+  /* ================= FETCH COURSE BY ID ================= */
+
+//   fetchCourses: async () => {
+//   try {
+//     set({ loading: true, error: null });
+
+//     const res = await getAllCourses();
+
+//     set({
+//       courses: res?.data || []
+//     });
+
+//   } catch (error) {
+//     set({ error });
+//   } finally {
+//     set({ loading: false });
+//   }
+// },
+// fetchCourses: async () => {
+//   try {
+//     set({ loading: true, error: null });
+
+//     const res = await getAllCourses();
+
+//     set({
+//       courses: res?.data?.courses || []
+//     });
+
+//   } catch (error) {
+//     set({ error });
+//   } finally {
+//     set({ loading: false });
+//   }
+// },
 fetchCourses: async () => {
   try {
     set({ loading: true, error: null });
 
     const res = await getAllCourses();
 
+    console.log("COURSES API:", res);
+
     set({
-      courses: res?.data?.courses || []
+      courses: res?.data || []   // ✅ FIXED
     });
 
   } catch (error) {
+    console.error("Fetch error:", error);
     set({ error });
   } finally {
     set({ loading: false });
   }
 },
 
-  /* ================= FETCH COURSE BY ID ================= */
 
-  fetchCourses: async () => {
-  try {
-    set({ loading: true, error: null });
-
-    const res = await getAllCourses();
-
-    set({
-      courses: res?.data || []
-    });
-
-  } catch (error) {
-    set({ error });
-  } finally {
-    set({ loading: false });
-  }
-},
   /* ================= CREATE COURSE ================= */
   createCourse: async (payload) => {
     try {
@@ -602,20 +639,38 @@ fetchCourses: async () => {
     }
   },
 
-  /* ================= DELETE COURSE ================= */
+  // /* ================= DELETE COURSE ================= */
+  // deleteCourse: async (courseId) => {
+  //   try {
+  //     set({ loading: true, error: null });
+
+  //     await deleteCourseApi(courseId);
+  //     await get().fetchCourses();
+
+  //   } catch (error) {
+  //     set({ error });
+  //   } finally {
+  //     set({ loading: false });
+  //   }
+  // },
   deleteCourse: async (courseId) => {
-    try {
-      set({ loading: true, error: null });
+  try {
+    set({ loading: true, error: null });
 
-      await deleteCourseApi(courseId);
-      await get().fetchCourses();
+    await deleteCourseApi(courseId);
 
-    } catch (error) {
-      set({ error });
-    } finally {
-      set({ loading: false });
-    }
-  },
+    // ✅ instant UI update (better UX)
+    set({
+      courses: get().courses.filter((c) => c.id !== courseId),
+    });
+
+  } catch (error) {
+    set({ error });
+    throw error;
+  } finally {
+    set({ loading: false });
+  }
+},
 
   /* ================= HELPERS ================= */
 
