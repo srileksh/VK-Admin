@@ -31,7 +31,7 @@ export default function Page() {
   };
 
   return (
-    <div className="px-8 ">
+    <div className="px-8 mt-[25px]">
       <div className="flex justify-between mb-2 xl:mb-4">
         <h1 className="text-[27px] text-[#1f304a] font-medium">Course Type</h1>
         <button

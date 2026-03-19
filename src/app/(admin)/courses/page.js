@@ -40,7 +40,7 @@ export default function Page() {
   return (
     <>
       {!showWizard && (
-        <div className="px-4 sm:px-6 md:px-8">
+        <div className="mt-[25px] px-4 sm:px-6 md:px-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-[27px] text-[#1f304a] font-medium">Courses</h1>
             <button

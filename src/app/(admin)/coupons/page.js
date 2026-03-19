@@ -24,7 +24,7 @@ function Page() {
 
   return (
     <>
-      <div className="px-4 sm:px-6 md:px-8">
+      <div className="mt-[25px] px-4 sm:px-6 md:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-[27px] text-[#1f304a] font-medium">
