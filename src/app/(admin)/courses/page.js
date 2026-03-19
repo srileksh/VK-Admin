@@ -16,19 +16,44 @@ export default function Page() {
     fetchCourses();
   }, []);
 
-  const handleDelete = async (courseId) => {
-    await deleteCourse(courseId);
-  };
+  // const handleDelete = async (courseId) => {
+  //   await deleteCourse(courseId);
+  // };
+const handleDelete = async (courseId) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this course?");
+  if (!confirmDelete) return;
 
+  try {
+    await deleteCourse(courseId);
+  } catch (error) {
+    console.error("Delete failed", error);
+  }
+};
   
 
-  const handleEdit = async (course) => {
+//   const handleEdit = async (course) => {
+//   try {
+//     if (course.status === "DRAFT") {
+//       // 🔥 directly use existing data
+//       setCurrentCourse(course);
+//     } else {
+//       // only fetch for published
+//       await fetchCourseById(course.id);
+//     }
+
+//     setShowWizard(true);
+//   } catch (error) {
+//     console.error("Failed to load course");
+//   }
+// };
+
+const handleEdit = async (course) => {
   try {
+    setCourseId(course.id); // ✅ ADD THIS
+
     if (course.status === "DRAFT") {
-      // 🔥 directly use existing data
       setCurrentCourse(course);
     } else {
-      // only fetch for published
       await fetchCourseById(course.id);
     }
 
