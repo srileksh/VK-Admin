@@ -54,7 +54,7 @@ export default function EnquiriesPage() {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6  bg-gray-100 min-h-screen">
 
       {/* Top Filter */}
       <div className="flex gap-4 mb-6">

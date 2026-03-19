@@ -236,7 +236,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                         : "Upload"
                     }`}
                   >
-                                                        <MdOutlineFileUpload/>
+                      <MdOutlineFileUpload/>
                     
                     Upload Thumbnail
                   </button>

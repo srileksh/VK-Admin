@@ -4,7 +4,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div><ContactMessages/></div>
+    <div className=''><ContactMessages/></div>
   )
 }
 
