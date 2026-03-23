@@ -218,8 +218,8 @@ export default function PromoVideoSection() {
   return (
     <div className="border border-gray-100 shadow-md rounded-lg p-5 mb-4 mt-[10px]">
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2 text-[#1F304A]">
+      <div className="flex justify-between items-center text-[#1F304A]">
+        <div className="flex items-center gap-2 ">
           <span className="text-sm font-medium">Promo video</span>
           <FaPen />
         </div>
@@ -249,8 +249,8 @@ export default function PromoVideoSection() {
                       setTitle(e.target.value);
                       setErrors((p) => ({ ...p, title: "" }));
                     }}
-                    placeholder="Title of the video"
-                    className={`border border-gray-400 rounded-lg  px-4 py-2 w-[250px] outline-gray-400 ${
+                    placeholder="Title (limit: 40 characters)"
+                    className={`border border-gray-400 rounded-lg text-gray-600  p-2 w-[250px] outline-gray-400 placeholder:text-sm ${
                       errors.title ? "border-red-400" : ""
                     }`}
                   />
@@ -271,8 +271,8 @@ export default function PromoVideoSection() {
                       setDescription(e.target.value);
                       setErrors((p) => ({ ...p, description: "" }));
                     }}
-                    placeholder="Short description"
-                    className={`border border-gray-400 rounded-lg px-4 py-2 w-full outline-gray-400${
+                    placeholder="Description (limit: 130 characters)"
+                    className={`border border-gray-400 rounded-lg text-gray-600  p-2 w-full outline-gray-400  placeholder:text-sm ${
                       errors.description ? "border-red-400" : ""
                     }`}
                     
@@ -337,7 +337,7 @@ export default function PromoVideoSection() {
                     />
                   </div>
 
-                  <div className="flex justify-between mt-3 text-sm">
+                  {/* <div className="flex justify-between mt-3 text-sm">
                     <button
                       disabled={!videoAssetId || isSaved || uploading}
                       onClick={handleReplaceVideo}
@@ -353,7 +353,7 @@ export default function PromoVideoSection() {
                     >
                       <HiMiniMinus /> Remove
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

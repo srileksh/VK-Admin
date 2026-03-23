@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen overflow-y-auto`}
       >
         {children}
-                <Toaster position="top-right" reverseOrder={false} />
+               
 
       </body>
     </html>
