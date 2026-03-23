@@ -80,7 +80,7 @@ const handleFinish = async () => {
         </h2>
 
         <PromoVideoSection />
-        <div className="border border-gray-200 rounded-lg mb-4 shadow-sm p-[12px] font-semibold text-sm text-[#1F304A]">
+        <div className="border border-gray-200 rounded-lg mb-4 shadow-sm p-[12px]  text-sm text-[#1F304A]">
           <div className=" flex items-center gap-[5px]">Lessons<FaPen/></div>
 
           {/* SECTIONS */}
