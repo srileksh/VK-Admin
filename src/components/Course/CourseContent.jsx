@@ -33,29 +33,31 @@ export default function ContentInputs({ onCancel, onNext }) {
     };
 
     loadCategories();
+        console.log("loaded course "  , currentCourse)
+
   }, [fetchCategories]);
 
   /* ================= LOAD EXISTING COURSE DATA (EDIT MODE) ================= */
   useEffect(() => {
-    if (currentCourse) {
-      // 🔥 Load learning outcomes
-      if (currentCourse.learningOutcomes?.length) {
-        setContents(currentCourse.learningOutcomes);
-      }
+  if (!currentCourse || !categories?.length) return;
 
-      // 🔥 Load selected categories (if editing)
-      if (currentCourse.categories?.length) {
-        setSelectedPath(currentCourse.categories);
+  if (currentCourse.learningOutcomes?.length) {
+    setContents(currentCourse.learningOutcomes);
+  }
 
-        const idsObject = {};
-        currentCourse.categories.forEach((cat, index) => {
-          idsObject[index] = cat.id;
-        });
+  if (currentCourse.categoryIds?.length) {
+    const firstCategoryId = currentCourse.categoryIds[0];
 
-        setSelectedIds(idsObject);
-      }
+    const matchedCategory = categories.find(
+      (cat) => cat.id === firstCategoryId
+    );
+
+    if (matchedCategory) {
+      setSelectedIds({ 0: matchedCategory.id });
+      setSelectedPath([matchedCategory]);
     }
-  }, [currentCourse]);
+  }
+}, [currentCourse, categories]);
 
   /* ================= CATEGORY LOGIC ================= */
   const getOptionsByLevel = (level) => {

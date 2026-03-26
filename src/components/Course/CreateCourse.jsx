@@ -38,6 +38,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
 
   useEffect(() => {
   if (currentCourse) {
+    console.log(`Current course details : ${JSON.stringify(currentCourse)}`)
     setForm({
       title: currentCourse.title || "",
       description: currentCourse.description || "",
@@ -164,7 +165,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
               <div>
                 <label className="block font-medium mb-1">Course Title *</label>
                 <input
-                  className="w-full border border-[#a09f9f] rounded-lg px-4 py-2"
+                  className="w-full border border-[#a09f9f] rounded-lg px-4 py-2  outline-gray-400"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                 />
@@ -179,7 +180,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                 </label>
                 <textarea
                   rows={4}
-                  className="w-full border border-[#a09f9f] rounded-lg px-4 py-2"
+                  className="w-full border border-[#a09f9f] rounded-lg px-4 py-2  outline-gray-400"
                   value={form.description}
                   onChange={(e) =>
                     setForm({ ...form, description: e.target.value })
@@ -301,7 +302,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                     <div className="grid gap-3 w-full sm:w-[300px]">
                       <input
                         placeholder="John David"
-                        className="border border-[#a09f9f] rounded-lg px-3 py-2 text-sm"
+                        className="border border-[#a09f9f] rounded-lg  outline-gray-400 px-3 py-2 text-sm"
                         value={draftFaculty.name}
                         onChange={(e) =>
                           setDraftFaculty({
@@ -313,7 +314,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
 
                       <input
                         placeholder="M.com, CAIIB"
-                        className="border border-[#a09f9f] rounded-lg px-3 py-2 text-sm"
+                        className="border border-[#a09f9f]  outline-gray-400 rounded-lg px-3 py-2 text-sm"
                         value={draftFaculty.qualification}
                         onChange={(e) =>
                           setDraftFaculty({
@@ -361,7 +362,7 @@ export default function CreateCourse({ onCancel, onSuccess }) {
               <div className="mt-32">
                 <label className="font-medium ">Total Amount *</label>
                 <input
-                  className="w-full mt-1 border-[#a09f9f] border rounded-lg px-4 py-2 bg-gray-50"
+                  className="w-full mt-1 border-[#a09f9f] border  outline-gray-400 rounded-lg px-4 py-2 bg-gray-50"
                   type="number"
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
