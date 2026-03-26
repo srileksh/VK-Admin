@@ -1,14 +1,3 @@
-// import axiosInstance from "@/services/axios";
-
-// export const getActivePromoApi = async () => {
-//   const res = await axiosInstance.get("/promos/active");
-//   return res.data;
-// };
-
-// export const createPromoApi = async (payload) => {
-//   const res = await axiosInstance.post("/promos", payload);
-//   return res.data;
-// };
 import axiosInstance from "@/services/axios";
 
 export const getActivePromoApi = async () => {

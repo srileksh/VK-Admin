@@ -1,5 +1,3 @@
- 
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -10,7 +8,7 @@ import useCouponStore from "@/store/useCouponStore";
 
 function Page() {
   const [openPopup, setOpenPopup] = useState(false);
-  const { coupons, fetchCoupons ,updateCoupon } = useCouponStore();
+  const { coupons, fetchCoupons, updateCoupon } = useCouponStore();
   const [selectedCoupon, setSelectedCoupon] = useState(null);
 
   useEffect(() => {
@@ -27,9 +25,7 @@ function Page() {
       <div className="mt-[25px] px-4 sm:px-6 md:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-[27px] text-[#1f304a] font-medium">
-            Coupons
-          </h1>
+          <h1 className="text-[27px] text-[#1f304a] font-medium">Coupons</h1>
           <button
             onClick={() => setOpenPopup(true)}
             className="px-4  py-2
@@ -102,16 +98,15 @@ function Page() {
                     <RiDeleteBin5Line />
                   </button>
 
-                 
-<button
-  onClick={() => {
-    setSelectedCoupon(coupon);
-    setOpenPopup(true);
-  }}
-  className="text-[28px] text-gray-600 hover:text-blue-600"
->
-  <MdEditNote />
-</button>
+                  <button
+                    onClick={() => {
+                      setSelectedCoupon(coupon);
+                      setOpenPopup(true);
+                    }}
+                    className="text-[28px] text-gray-600 hover:text-blue-600"
+                  >
+                    <MdEditNote />
+                  </button>
                 </div>
               </div>
             ))
@@ -119,16 +114,15 @@ function Page() {
         </div>
       </div>
 
-
       <CreateCoupon
-  isOpen={openPopup}
-  couponData={selectedCoupon}
-  onClose={() => {
-    setOpenPopup(false);
-    setSelectedCoupon(null);
-    fetchCoupons();
-  }}
-/>
+        isOpen={openPopup}
+        couponData={selectedCoupon}
+        onClose={() => {
+          setOpenPopup(false);
+          setSelectedCoupon(null);
+          fetchCoupons();
+        }}
+      />
     </>
   );
 }
