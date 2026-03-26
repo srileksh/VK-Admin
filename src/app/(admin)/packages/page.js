@@ -8,10 +8,7 @@ export default function Page() {
   const [showPopup, setShowPopup] = useState(false);
 
   const addPackage = (name) => {
-    setPackages([
-      ...packages,
-      { id: Date.now(), name, subPackages: [] },
-    ]);
+    setPackages([...packages, { id: Date.now(), name, subPackages: [] }]);
   };
 
   const addSubPackage = (parentId, name) => {
@@ -20,13 +17,10 @@ export default function Page() {
         pkg.id === parentId
           ? {
               ...pkg,
-              subPackages: [
-                ...pkg.subPackages,
-                { id: Date.now(), name },
-              ],
+              subPackages: [...pkg.subPackages, { id: Date.now(), name }],
             }
-          : pkg
-      )
+          : pkg,
+      ),
     );
   };
 
@@ -42,9 +36,9 @@ export default function Page() {
         </button>
       </div>
 
-     <div className="overflow-scroll">
-       <PackageItem packages={packages} addSubPackage={addSubPackage} />
-     </div>
+      <div className="overflow-scroll">
+        <PackageItem packages={packages} addSubPackage={addSubPackage} />
+      </div>
 
       {showPopup && (
         <CreatePackageModal

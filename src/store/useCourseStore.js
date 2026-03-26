@@ -20,57 +20,6 @@ const useCourseStore = create((set, get) => ({
   currentCourse: null,
 
   /* ================= FETCH ALL COURSES ================= */
-// fetchCourses: async () => {
-//   try {
-//     set({ loading: true, error: null });
-
-//     const res = await getAllCourses();
-
-//     set({
-//       courses: res?.data?.courses || []
-//     });
-
-//   } catch (error) {
-//     set({ error });
-//   } finally {
-//     set({ loading: false });
-//   }
-// },
-
-  /* ================= FETCH COURSE BY ID ================= */
-
-//   fetchCourses: async () => {
-//   try {
-//     set({ loading: true, error: null });
-
-//     const res = await getAllCourses();
-
-//     set({
-//       courses: res?.data || []
-//     });
-
-//   } catch (error) {
-//     set({ error });
-//   } finally {
-//     set({ loading: false });
-//   }
-// },
-// fetchCourses: async () => {
-//   try {
-//     set({ loading: true, error: null });
-
-//     const res = await getAllCourses();
-
-//     set({
-//       courses: res?.data?.courses || []
-//     });
-
-//   } catch (error) {
-//     set({ error });
-//   } finally {
-//     set({ loading: false });
-//   }
-// },
 fetchCourses: async () => {
   try {
     set({ loading: true, error: null });

@@ -1,5 +1,3 @@
-
-
 "use client";
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
@@ -29,16 +27,12 @@ export default function CreateCoupon({
       setFormData({
         couponCode: couponData.code || "",
         offerType:
-          couponData.discountType === "PERCENT"
-            ? "percentage"
-            : "flat",
+          couponData.discountType === "PERCENT" ? "percentage" : "flat",
         rate:
           couponData.discountType === "PERCENT"
             ? couponData.discountPct
             : couponData.discountAmount,
-        expiry: couponData.expiresAt
-          ? couponData.expiresAt.split("T")[0]
-          : "",
+        expiry: couponData.expiresAt ? couponData.expiresAt.split("T")[0] : "",
         package: "",
         users: "",
       });
@@ -107,7 +101,7 @@ export default function CreateCoupon({
 
     for (let i = 0; i < 6; i++) {
       randomPart += characters.charAt(
-        Math.floor(Math.random() * characters.length)
+        Math.floor(Math.random() * characters.length),
       );
     }
 
@@ -120,7 +114,6 @@ export default function CreateCoupon({
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white w-full max-w-lg rounded-xl shadow-lg relative px-6 py-5 sm:px-10 max-h-[90vh] overflow-y-auto">
-
         {/* Header */}
         <div className="flex justify-between items-center mb-4 sm:mb-6">
           <h2 className="text-lg sm:text-xl font-semibold text-[#555555]">
@@ -215,7 +208,7 @@ export default function CreateCoupon({
           />
         </div>
         {/* ########################## */}
-         {/* Package
+        {/* Package
          <label className="text-sm sm:text-md font-medium text-[#555555]">
            Package
          </label>
@@ -268,8 +261,8 @@ export default function CreateCoupon({
                 ? "Updating..."
                 : "Creating..."
               : isEditMode
-              ? "Update"
-              : "Create"}
+                ? "Update"
+                : "Create"}
           </button>
         </div>
       </div>

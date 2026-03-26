@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -63,15 +62,10 @@ export default function CourseContent() {
 
           {/* RIGHT SECTION */}
           <div className="w-[50%] flex flex-col items-start">
-            <h1 className="font-semibold text-[16px] mb-3">
-              Select package
-            </h1>
+            <h1 className="font-semibold text-[16px] mb-3">Select package</h1>
 
             {items.map((_, id) => (
-              <div
-                key={id}
-                className="relative flex items-center mb-3 w-[85%]"
-              >
+              <div key={id} className="relative flex items-center mb-3 w-[85%]">
                 <select
                   className="w-full p-[10px] pr-[40px] rounded-[10px] border border-[#bbbfbf] bg-white appearance-none"
                   defaultValue=""
