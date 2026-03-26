@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import useAuthStore from "@/store/useAuthStore";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import toast from "react-hot-toast";
+import toast , {Toaster} from "react-hot-toast";
 import Image from "next/image";
 
 function Page() {

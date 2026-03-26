@@ -20,6 +20,7 @@ const useAuthStore = create(
             user: data.data.user,
             accessToken: data.data.accessToken,
             loading: false,
+            error: null,
           });
 
           return true;
@@ -34,7 +35,7 @@ const useAuthStore = create(
 
       logout: async () => {
         try {
-          await logoutApi(); // 🔹 backend logout
+          await logoutApi();
         } catch (error) {
           console.error("Logout error", error);
         } finally {
@@ -42,12 +43,17 @@ const useAuthStore = create(
             user: null,
             accessToken: null,
             error: null,
+            loading: false,
           });
         }
       },
     }),
     {
       name: "auth-storage",
+      partialize: (state) => ({
+        user: state.user,
+        accessToken: state.accessToken,
+      }),
     }
   )
 );
