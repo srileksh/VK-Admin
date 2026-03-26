@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { MdEditNote } from "react-icons/md";
-import { RiDeleteBin5Line } from "react-icons/ri";
+// import { RiDeleteBin5Line } from "react-icons/ri";
 import CreateCoupon from "@/components/Coupon/CreateCoupon";
 import useCouponStore from "@/store/useCouponStore";
 
@@ -94,9 +94,9 @@ function Page() {
 
                 {/* Actions */}
                 <div className="flex gap-4">
-                  <button className="text-[22px] text-gray-600 hover:text-red-600">
+                  {/* <button className="text-[22px] text-gray-600 hover:text-red-600">
                     <RiDeleteBin5Line />
-                  </button>
+                  </button> */}
 
                   <button
                     onClick={() => {
