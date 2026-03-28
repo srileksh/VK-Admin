@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PromoVideoSection from "./PromoVideoSection";
 import LessonSection from "./LessonSection";
 import { GoPlus } from "react-icons/go";
@@ -9,12 +9,26 @@ import { publishCourse } from "@/services/coursesApi";
 import { FaPen } from "react-icons/fa";
 
 export default function CreateModules({ onCancel, onFinish }) {
-  const { courseId ,publishCourseAction } = useCourseStore();
+  const { courseId, publishCourseAction, currentCourse } = useCourseStore();
   const { createSection } = useSectionStore();
 
   const [sections, setSections] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [sectionTitle, setSectionTitle] = useState("");
+
+  /* ================= PREFILL SECTIONS ON EDIT ================= */
+  useEffect(() => {
+    if (!currentCourse?.sections?.length) return;
+
+    setSections(
+      currentCourse.sections.map((s) => ({
+        id: s.id,
+        title: s.title,
+        isOpen: false,
+        lessons: s.lessons || [],   // pass existing lessons down
+      }))
+    );
+  }, [currentCourse]);
 
   
 
@@ -90,8 +104,8 @@ const handleFinish = async () => {
               title={section.title}
               isOpen={section.isOpen}
               onToggle={() => handleToggleSection(section.id)}
-                onDelete={() => handleRemoveSection(section.id)}
-
+              onDelete={() => handleRemoveSection(section.id)}
+              initialLessons={section.lessons || []}
             />
           ))}
 

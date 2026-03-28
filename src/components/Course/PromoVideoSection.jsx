@@ -1,5 +1,5 @@
 "use client"
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { FaCircleMinus } from "react-icons/fa6";
 import { FaPen } from "react-icons/fa";
 import { GoPlus } from "react-icons/go";
@@ -14,10 +14,10 @@ import { initiateVideoUpload } from "@/services/video.service";
 import { uploadToVimeo } from "@/utils/vimeoUpload";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 import useCourseStore from "@/store/useCourseStore";
-import { createPromoApi } from "@/services/promoApi";
+import { createPromoApi, updatePromoApi } from "@/services/promoApi";
 
 export default function PromoVideoSection() {
-  const { courseId, replacePromoVideo, removePromoVideo } = useCourseStore();
+  const { courseId, replacePromoVideo, removePromoVideo, currentCourse } = useCourseStore();
 
   const [isOpen, setIsOpen] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -40,6 +40,22 @@ export default function PromoVideoSection() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+  const [existingPromoId, setExistingPromoId] = useState(null);
+
+  /* ================= PREFILL ON EDIT ================= */
+  useEffect(() => {
+    const promo = currentCourse?.promos?.[0];
+    if (!promo) return;
+
+    setExistingPromoId(promo.id);
+    setTitle(promo.title || "");
+    setDescription(promo.description || "");
+    setThumbnailUrl(promo.imageUrl || "");
+    setVideoAssetId(promo.videoAssetId || null);
+    setVideoProvider(promo.videoProvider || null);
+    setVideoName(promo.videoAssetId ? promo.videoAssetId : "");
+    setIsSaved(true);
+  }, [currentCourse]);
 
   const fileRef = useRef(null);
   const thumbRef = useRef(null);
@@ -191,25 +207,27 @@ export default function PromoVideoSection() {
     try {
       setSaving(true);
 
-      // await axiosInstance.post("/admin/promos", {
-      //   title: title.trim(),
-      //   description: description.trim(),
-      //   videoAssetId,
-      //   videoProvider,
-      //   imageUrl: thumbnailUrl,
-      //   courseId,
-      //   order: 0,
-      // });
-
-      await createPromoApi({
-  title: title.trim(),
-  description: description.trim(),
-  videoAssetId,
-  videoProvider,
-  imageUrl: thumbnailUrl,
-  courseId,
-  order: 0,
-});
+      if (existingPromoId) {
+        await updatePromoApi(existingPromoId, {
+          title: title.trim(),
+          description: description.trim(),
+          videoAssetId,
+          videoProvider,
+          imageUrl: thumbnailUrl,
+        });
+      } else {
+        const res = await createPromoApi({
+          title: title.trim(),
+          description: description.trim(),
+          videoAssetId,
+          videoProvider,
+          imageUrl: thumbnailUrl,
+          courseId,
+          order: 0,
+        });
+        const newPromoId = res?.data?.id || res?.id;
+        if (newPromoId) setExistingPromoId(newPromoId);
+      }
 
       setIsSaved(true);
       toast.success("Promo saved successfully");
