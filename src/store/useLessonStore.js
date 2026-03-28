@@ -3,6 +3,7 @@ import { initiateVideoUpload } from "@/services/video.service";
 import { uploadToVimeo } from "@/utils/vimeoUpload";
 import {
   createLesson,
+  getLessonById,
   updateLesson,
   deleteLesson,
 } from "@/services/lesson.service";
@@ -52,6 +53,16 @@ createLessonAction: async (payload) => {
 
   updateLessonDetails: async (lessonId, payload) => {
     return await updateLesson(lessonId, payload);
+  },
+
+  /* PUT /lessons/:lessonId — used by LessonItem on edit */
+  updateLessonAction: async (lessonId, payload) => {
+    return await updateLesson(lessonId, payload);
+  },
+
+  /* GET /lessons/:lessonId */
+  getLessonAction: async (lessonId) => {
+    return await getLessonById(lessonId);
   },
 
   removeLesson: async (lessonId) => {
