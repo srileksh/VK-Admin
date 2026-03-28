@@ -7,6 +7,7 @@ import { uploadImageToCloudinary } from "../../../src/utils/cloudinaryImageUploa
 import { MdAccountCircle } from "react-icons/md";
 import { GrGallery } from "react-icons/gr";
 import { MdOutlineFileUpload } from "react-icons/md";
+import toast from "react-hot-toast";
 
 export default function CreateCourse({ onCancel, onSuccess }) {
   const { createCourse, loading, currentCourse,updateCourse } = useCourseStore();
@@ -71,38 +72,82 @@ export default function CreateCourse({ onCancel, onSuccess }) {
     }
   };
 
+  // const uploadFacultyImage = async (file) => {
+  //   if (!file) return;
+  //   setFacultyUploading(true);
+  //   try {
+  //     const url = await uploadImageToCloudinary(file, "FACULTY_IMAGE");
+  //     setDraftFaculty((prev) => ({ ...prev, imageUrl: url }));
+  //   } finally {
+  //     setFacultyUploading(false);
+  //   }
+  // };
   const uploadFacultyImage = async (file) => {
-    if (!file) return;
-    setFacultyUploading(true);
-    try {
-      const url = await uploadImageToCloudinary(file, "FACULTY_IMAGE");
-      setDraftFaculty((prev) => ({ ...prev, imageUrl: url }));
-    } finally {
-      setFacultyUploading(false);
-    }
-  };
+  if (!file) return;
+  setFacultyUploading(true);
+  try {
+    const url = await uploadImageToCloudinary(file, "FACULTY_IMAGE");
+    setDraftFaculty((prev) => ({ ...prev, imageUrl: url }));
 
+    // ✅ TOAST HERE
+    toast.success("Image uploaded successfully");
+  } finally {
+    setFacultyUploading(false);
+  }
+};
+
+  // const addFaculty = () => {
+  //   const newErrors = {};
+  //   if (!draftFaculty.name.trim())
+  //     newErrors.facultyName = "This field is mandatory";
+  //   if (!draftFaculty.qualification.trim())
+  //     newErrors.facultyQualification = "This field is mandatory";
+
+  //   if (Object.keys(newErrors).length) {
+  //     setErrors((p) => ({ ...p, ...newErrors }));
+  //     return;
+  //   }
+
+  //   setFaculty([...faculty, draftFaculty]);
+  //   setDraftFaculty({ name: "", qualification: "", imageUrl: "" });
+  //   setErrors((p) => ({
+  //     ...p,
+  //     faculty: "",
+  //     facultyName: "",
+  //     facultyQualification: "",
+  //   }));
+  // };
   const addFaculty = () => {
-    const newErrors = {};
-    if (!draftFaculty.name.trim())
-      newErrors.facultyName = "This field is mandatory";
-    if (!draftFaculty.qualification.trim())
-      newErrors.facultyQualification = "This field is mandatory";
+  const newErrors = {};
 
-    if (Object.keys(newErrors).length) {
-      setErrors((p) => ({ ...p, ...newErrors }));
-      return;
-    }
+  if (!draftFaculty.name.trim())
+    newErrors.facultyName = "This field is mandatory";
 
-    setFaculty([...faculty, draftFaculty]);
-    setDraftFaculty({ name: "", qualification: "", imageUrl: "" });
-    setErrors((p) => ({
-      ...p,
-      faculty: "",
-      facultyName: "",
-      facultyQualification: "",
-    }));
-  };
+  if (!draftFaculty.qualification.trim())
+    newErrors.facultyQualification = "This field is mandatory";
+
+  if (!draftFaculty.imageUrl)
+    newErrors.facultyImage = "Upload image first";
+
+  if (Object.keys(newErrors).length) {
+    setErrors((p) => ({ ...p, ...newErrors }));
+    return;
+  }
+
+  setFaculty([...faculty, draftFaculty]);
+
+  // ✅ SUCCESS TOAST
+  toast.success("Faculty added successfully 🎉");
+
+  setDraftFaculty({ name: "", qualification: "", imageUrl: "" });
+
+  setErrors((p) => ({
+    ...p,
+    faculty: "",
+    facultyName: "",
+    facultyQualification: "",
+  }));
+};
 
   const removeFaculty = (index) => {
     setFaculty(faculty.filter((_, i) => i !== index));
