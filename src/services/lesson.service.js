@@ -6,6 +6,11 @@ export const createLesson = async (payload) => {
   return res.data.data;
 };
 
+export const getLessonById = async (lessonId) => {
+  const res = await axiosInstance.get(`/lessons/${lessonId}`);
+  return res.data.data;
+};
+
 export const updateLesson = async (lessonId, payload) => {
   const res = await axiosInstance.put(`/lessons/${lessonId}`, payload);
   return res.data.data;
