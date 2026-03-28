@@ -100,16 +100,14 @@ export default function Page() {
   const handleEdit = async (course) => {
     try {
       setCourseId(course.id);
-
-      if (course.status === "DRAFT") {
-        setCurrentCourse(course);
-      } else {
-        await fetchCourseById(course.id);
-      }
+      
+      // Always fetch full details (including promos/sections) 
+      // instead of using the shallow data from the list
+      await fetchCourseById(course.id);
 
       setShowWizard(true);
     } catch (error) {
-      console.error("Failed to load course");
+      console.error("Failed to load course", error);
     }
   };
 
