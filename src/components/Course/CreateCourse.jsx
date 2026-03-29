@@ -126,8 +126,8 @@ export default function CreateCourse({ onCancel, onSuccess }) {
   if (!draftFaculty.qualification.trim())
     newErrors.facultyQualification = "This field is mandatory";
 
-  if (!draftFaculty.imageUrl)
-    newErrors.facultyImage = "Upload image first";
+  // if (!draftFaculty.imageUrl)
+  //   newErrors.facultyImage = "Upload image first";
 
   if (Object.keys(newErrors).length) {
     setErrors((p) => ({ ...p, ...newErrors }));
