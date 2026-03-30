@@ -326,7 +326,7 @@
 // }
 
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import PromoVideoSection from "./PromoVideoSection";
 import LessonSection from "./LessonSection";
 import { GoPlus } from "react-icons/go";
@@ -336,7 +336,7 @@ import usePromoStore from "@/store/usePromoStore";
 import { FaPen } from "react-icons/fa";
 
 export default function CreateModules({ onCancel, onFinish }) {
-  const { courseId, publishCourseAction } = useCourseStore();
+  const { courseId, publishCourseAction, currentCourse } = useCourseStore();
   const { createSection } = useSectionStore();
   const { fetchActivePromo } = usePromoStore();
 
@@ -345,14 +345,21 @@ export default function CreateModules({ onCancel, onFinish }) {
   const [sectionTitle, setSectionTitle] = useState("");
   const [promoId, setPromoId] = useState(null);
 
+  /* ================= PREFILL SECTIONS ON EDIT ================= */
   useEffect(() => {
-    const loadPromo = async () => {
-      const promo = await fetchActivePromo();
-      setPromoId(promo?.id || null);
-    };
+    if (!currentCourse?.sections?.length) return;
 
-    loadPromo();
-  }, [fetchActivePromo]);
+    setSections(
+      currentCourse.sections.map((s) => ({
+        id: s.id,
+        title: s.title,
+        isOpen: false,
+        lessons: s.lessons || [],   // pass existing lessons down
+      }))
+    );
+  }, [currentCourse]);
+
+  
 
   const handleCreateSection = async () => {
     if (!sectionTitle.trim()) return;
@@ -393,14 +400,19 @@ export default function CreateModules({ onCancel, onFinish }) {
     );
   };
 
-  const handleFinish = async () => {
-    try {
+ 
+const handleFinish = async () => {
+  try {
+    // If the course is already published, we don't need to publish it again
+    if (currentCourse?.status !== "PUBLISHED") {
       await publishCourseAction(courseId);
-      onFinish();
-    } catch {
-      alert("Failed to finish course");
     }
-  };
+    onFinish();
+  } catch {
+    alert("Failed to finish course");
+  }
+};
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
@@ -424,6 +436,7 @@ export default function CreateModules({ onCancel, onFinish }) {
               isOpen={section.isOpen}
               onToggle={() => handleToggleSection(section.id)}
               onDelete={() => handleRemoveSection(section.id)}
+              initialLessons={section.lessons || []}
             />
           ))}
 

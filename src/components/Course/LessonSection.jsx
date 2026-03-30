@@ -228,11 +228,11 @@
 // }
 
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import SectionCard from "./SectionCard";
 import LessonItem from "./LessonItem";
-import useLessonStore from "@/store/useLessonStore";
+import { getLessonById } from "@/services/lesson.service";
 
 export default function LessonSection({
   sectionId,
@@ -240,54 +240,65 @@ export default function LessonSection({
   isOpen,
   onToggle,
   onDelete,
-  lessonIds = [],
+  initialLessons = [],
 }) {
-  const { getLessonByIdAction } = useLessonStore();
+  const emptyLesson = () => ({
+    id: Date.now(),
+    lessonTitle: "",
+    description: "",
+    videoName: "",
+    videoFile: null,
+    videoAssetId: null,
+    thumbnailFile: null,
+    thumbnailUrl: "",
+    videoUploaded: false,
+    isSaved: false,
+    saving: false,
+    errors: {},
+    backendId: null,
+    duration: 0,
+  });
 
-  const [lessons, setLessons] = useState([]);
-  const [fetchingLessons, setFetchingLessons] = useState(false);
+  const [lessons, setLessons] = useState([emptyLesson()]);
 
+  /* ================= PREFILL LESSONS FROM API ================= */
   useEffect(() => {
-    const fetchLessons = async () => {
-      if (!isOpen || !lessonIds.length) return;
+    if (!initialLessons.length) return;
 
+    const prefill = async () => {
       try {
-        setFetchingLessons(true);
-
-        const lessonResponses = await Promise.all(
-          lessonIds.map((lessonId) => getLessonByIdAction(lessonId))
+        // Fetch each lesson in full (GET /lessons/:lessonId) to get
+        // description + videoAssetId which section/course API omits
+        const fullLessons = await Promise.all(
+          initialLessons.map((l) => getLessonById(l.id))
         );
 
-        const mappedLessons = lessonResponses.map((item, index) => ({
-          id: item.id || `${Date.now()}-${index}`,
-          lessonTitle: item.title || "",
-          description: item.description || "",
-          videoName: item.videoName || "",
-          videoFile: null,
-          videoAssetId: item.videoAssetId || null,
-          thumbnailFile: null,
-          thumbnailUrl: item.thumbnail || "",
-          videoUploaded: !!item.videoAssetId,
-          isSaved: true,
-          saving: false,
-          errors: {},
-          backendId: item.id,
-          duration: item.duration || 0,
-          order: item.order || index,
-          isFree: item.isFree || false,
-        }));
-
-        setLessons(mappedLessons);
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to fetch lessons");
-      } finally {
-        setFetchingLessons(false);
+        setLessons(
+          fullLessons.map((l) => ({
+            id: l.id,
+            lessonTitle: l.title || "",
+            description: l.description || "",
+            videoName: l.videoAssetId || "",
+            videoFile: null,
+            videoAssetId: l.videoAssetId || null,
+            thumbnailFile: null,
+            thumbnailUrl: l.thumbnail || "",
+            videoUploaded: !!l.videoAssetId,
+            isSaved: true,
+            saving: false,
+            errors: {},
+            backendId: l.id,
+            duration: l.duration || 0,
+          }))
+        );
+      } catch (err) {
+        console.error("Failed to prefill lessons:", err);
+        toast.error("Failed to load lessons");
       }
     };
 
-    fetchLessons();
-  }, [isOpen, lessonIds, getLessonByIdAction]);
+    prefill();
+  }, [sectionId, initialLessons.length]);
 
   const handleAddLesson = () => {
     const hasUnsaved = lessons.some((l) => !l.isSaved);
@@ -297,24 +308,7 @@ export default function LessonSection({
       return;
     }
 
-    setLessons((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        lessonTitle: "",
-        description: "",
-        videoName: "",
-        videoFile: null,
-        videoAssetId: null,
-        thumbnailFile: null,
-        thumbnailUrl: "",
-        videoUploaded: false,
-        isSaved: false,
-        saving: false,
-        errors: {},
-        backendId: null,
-      },
-    ]);
+    setLessons((prev) => [...prev, emptyLesson()]);
   };
 
   const handleUpdateLesson = (id, key, value) => {

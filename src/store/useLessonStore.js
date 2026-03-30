@@ -172,6 +172,11 @@ const useLessonStore = create((set) => ({
     return await updateLesson(lessonId, payload);
   },
 
+  /* PUT /lessons/:lessonId — used by LessonItem on edit */
+  updateLessonAction: async (lessonId, payload) => {
+    return await updateLesson(lessonId, payload);
+  },
+
   /* GET /lessons/:lessonId */
   getLessonAction: async (lessonId) => {
     return await getLessonById(lessonId);
