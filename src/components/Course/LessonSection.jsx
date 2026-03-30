@@ -260,13 +260,20 @@ export default function LessonSection({
   });
 
   const [lessons, setLessons] = useState([emptyLesson()]);
+  const [fetchingLessons, setFetchingLessons] = useState(false);
 
   /* ================= PREFILL LESSONS FROM API ================= */
   useEffect(() => {
-    if (!initialLessons.length) return;
+    if (!initialLessons.length) {
+      setFetchingLessons(false);
+      setLessons([emptyLesson()]);
+      return;
+    }
 
     const prefill = async () => {
       try {
+        setFetchingLessons(true);
+
         // Fetch each lesson in full (GET /lessons/:lessonId) to get
         // description + videoAssetId which section/course API omits
         const fullLessons = await Promise.all(
@@ -294,11 +301,13 @@ export default function LessonSection({
       } catch (err) {
         console.error("Failed to prefill lessons:", err);
         toast.error("Failed to load lessons");
+      } finally {
+        setFetchingLessons(false);
       }
     };
 
     prefill();
-  }, [sectionId, initialLessons.length]);
+  }, [sectionId, initialLessons]);
 
   const handleAddLesson = () => {
     const hasUnsaved = lessons.some((l) => !l.isSaved);
