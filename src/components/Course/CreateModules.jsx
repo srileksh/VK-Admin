@@ -77,7 +77,10 @@ export default function CreateModules({ onCancel, onFinish }) {
  
 const handleFinish = async () => {
   try {
-    await publishCourseAction(courseId);
+    // If the course is already published, we don't need to publish it again
+    if (currentCourse?.status !== "PUBLISHED") {
+      await publishCourseAction(courseId);
+    }
     onFinish();
   } catch {
     alert("Failed to finish course");
