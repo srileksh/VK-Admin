@@ -1,5 +1,6 @@
-"use client"
-import { useRef, useState, useEffect } from "react";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { FaCircleMinus } from "react-icons/fa6";
 import { FaPen } from "react-icons/fa";
 import { GoPlus } from "react-icons/go";
@@ -12,18 +13,17 @@ import { initiateVideoUpload } from "@/services/video.service";
 import { uploadToVimeo } from "@/utils/vimeoUpload";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 import useCourseStore from "@/store/useCourseStore";
-import { createPromoApi, updatePromoApi } from "@/services/promoApi";
+import usePromoStore from "@/store/usePromoStore";
 
-export default function PromoVideoSection() {
-  const { courseId, replacePromoVideo, removePromoVideo, currentCourse } = useCourseStore();
+export default function PromoVideoSection({ promoId = null }) {
+  const { courseId, replacePromoVideo, currentCourse } = useCourseStore();
+  const { fetchPromoById, savePromo, updatePromo, loading } = usePromoStore();
 
   const [isOpen, setIsOpen] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState(0);
-
-  const [existingPromoId, setExistingPromoId] = useState(null);
 
   const [videoName, setVideoName] = useState("");
   const [selectedVideoFile, setSelectedVideoFile] = useState(null);
@@ -78,7 +78,7 @@ export default function PromoVideoSection() {
       setVideoAssetId(promo.videoAssetId || null);
       setVideoProvider(promo.videoProvider || null);
       setThumbnailUrl(promo.imageUrl || "");
-      setVideoName(promo.videoName || "Uploaded promo video");
+      setVideoName(promo.videoAssetId || "Uploaded promo video");
       setThumbnailName(promo.imageUrl ? "Uploaded thumbnail" : "");
       setIsSaved(true);
     };
@@ -192,31 +192,35 @@ export default function PromoVideoSection() {
     try {
       setSaving(true);
 
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        videoAssetId,
+        videoProvider,
+        imageUrl: thumbnailUrl,
+        courseId,
+        order: 0,
+      };
+
+      let result;
+
       if (existingPromoId) {
-        await updatePromoApi(existingPromoId, {
-          title: title.trim(),
-          description: description.trim(),
-          videoAssetId,
-          videoProvider,
-          imageUrl: thumbnailUrl,
-        });
+        result = await updatePromo(existingPromoId, payload);
       } else {
-        const res = await createPromoApi({
-          title: title.trim(),
-          description: description.trim(),
-          videoAssetId,
-          videoProvider,
-          imageUrl: thumbnailUrl,
-          courseId,
-          order: 0,
-        });
-        const newPromoId = res?.data?.id || res?.id;
-        if (newPromoId) setExistingPromoId(newPromoId);
+        result = await savePromo(payload);
       }
 
+      if (!result.success) {
+        toast.error(result.error || "Failed to save promo video");
+        return;
+      }
+
+      const savedPromo = result.data;
       setExistingPromoId(savedPromo?.id || existingPromoId);
       setIsSaved(true);
-      toast.success(existingPromoId ? "Promo updated successfully" : "Promo saved successfully");
+      toast.success(
+        existingPromoId ? "Promo updated successfully" : "Promo saved successfully"
+      );
     } catch (err) {
       console.error(err);
       toast.error("Failed to save promo video");
