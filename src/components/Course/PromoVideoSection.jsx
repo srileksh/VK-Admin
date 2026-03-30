@@ -492,6 +492,22 @@ export default function PromoVideoSection({ promoId = null }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+  const [existingPromoId, setExistingPromoId] = useState(null);
+
+  /* ================= PREFILL ON EDIT ================= */
+  useEffect(() => {
+    const promo = currentCourse?.promos?.[0];
+    if (!promo) return;
+
+    setExistingPromoId(promo.id);
+    setTitle(promo.title || "");
+    setDescription(promo.description || "");
+    setThumbnailUrl(promo.imageUrl || "");
+    setVideoAssetId(promo.videoAssetId || null);
+    setVideoProvider(promo.videoProvider || null);
+    setVideoName(promo.videoAssetId ? promo.videoAssetId : "");
+    setIsSaved(true);
+  }, [currentCourse]);
 
   const fileRef = useRef(null);
   const thumbRef = useRef(null);

@@ -167,6 +167,16 @@ const useLessonStore = create((set) => ({
     }
   },
 
+  /* PUT /lessons/:lessonId — used by LessonItem on edit */
+  updateLessonAction: async (lessonId, payload) => {
+    return await updateLesson(lessonId, payload);
+  },
+
+  /* GET /lessons/:lessonId */
+  getLessonAction: async (lessonId) => {
+    return await getLessonById(lessonId);
+  },
+
   removeLesson: async (lessonId) => {
     try {
       set({ loading: true, error: null });

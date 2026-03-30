@@ -72,7 +72,7 @@ export const getPromoByIdApi = async (promoId) => {
 };
 
 export const updatePromoApi = async (promoId, payload) => {
-  const res = await axiosInstance.patch(`/admin/promos/${promoId}`, payload);
+  const res = await axiosInstance.put(`/admin/promos/${promoId}`, payload);
   return res.data;
 };
 
