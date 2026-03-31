@@ -125,9 +125,9 @@ export default function Page() {
                 useCourseStore.getState().resetCourse();
                 setShowWizard(true);
               }}
-              className="rounded-xl bg-[#1f304a] px-4 py-2 text-[16px] text-white transition-colors duration-300 hover:bg-[#314279] xl:text-[20px]"
+              className="rounded-xl bg-[#1f304a] px-4 py-1 text-[16px] text-white transition-colors duration-300 hover:bg-[#314279] xl:text-[20px] font-medium"
             >
-              Create new Course
+              <span className="text-[20px]">+</span> New Course
             </button>
           </div>
 
