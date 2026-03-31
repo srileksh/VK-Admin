@@ -448,7 +448,7 @@ const handleFinish = async () => {
                 onChange={(e) => setSectionTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreateSection()}
                 placeholder="Section title"
-                className="flex-1 border-b-2 border-gray-300 px-4 py-2 outline-none"
+                className="flex-1 border-b-2 outline-none border-gray-300 px-4 py-2"
               />
 
               <button

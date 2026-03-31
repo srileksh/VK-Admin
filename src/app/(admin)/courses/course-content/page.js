@@ -67,7 +67,7 @@ export default function CourseContent() {
             {items.map((_, id) => (
               <div key={id} className="relative flex items-center mb-3 w-[85%]">
                 <select
-                  className="w-full p-[10px] pr-[40px] rounded-[10px] border border-[#bbbfbf] bg-white appearance-none"
+                  className="w-full p-[10px] pr-[40px] rounded-[10px] border border-[#bbbfbf] outline-gray-400 bg-white appearance-none"
                   defaultValue=""
                 >
                   <option value="" disabled>

@@ -125,9 +125,9 @@ export default function Page() {
                 useCourseStore.getState().resetCourse();
                 setShowWizard(true);
               }}
-              className="rounded-xl bg-[#1f304a] px-4 py-1 text-[16px] text-white transition-colors duration-300 hover:bg-[#314279] xl:text-[20px] font-medium"
+              className="rounded-xl bg-[#1f304a] px-4 py-2 text-[16px] text-white transition-colors duration-300 hover:bg-[#314279] xl:text-[18px] font-medium"
             >
-              <span className="text-[20px]">+</span> New Course
+              Add New Course
             </button>
           </div>
 
@@ -138,7 +138,7 @@ export default function Page() {
               return (
                 <div
                   key={course.id}
-                  className="mt-5 grid grid-cols-1 place-items-center gap-2 rounded-[15px] border border-[#A9BEE2] bg-[#E3EAF8] p-4 text-center shadow-[0_4px_10px_rgba(0,0,0,0.12),_0_10px_25px_rgba(169,190,226,0.35)] sm:grid-cols-2 sm:p-5 lg:grid-cols-6"
+                  className="mt-5 grid grid-cols-1 place-items-center gap-2 rounded-[15px] border border-[#A9BEE2] bg-[#E3EAF8] p-4 text-center sm:grid-cols-2 sm:p-5 lg:grid-cols-6"
                 >
                   <div>
                     <p className="text-xs text-gray-500">Course title</p>

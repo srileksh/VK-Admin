@@ -23,13 +23,17 @@ const useAuthStore = create(
             error: null,
           });
 
-          return true;
+          return { success: true, message: data.message || "Login successful" };
         } catch (err) {
+          const message =
+            err.response?.data?.message || "Invalid credentials";
+
           set({
-            error: err.response?.data?.message || "Login failed",
+            error: message,
             loading: false,
           });
-          return false;
+
+          return { success: false, message };
         }
       },
 
