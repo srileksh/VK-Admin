@@ -2,7 +2,6 @@ import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import toast from "react-hot-toast";
 
-
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true,
@@ -14,31 +13,44 @@ const axiosInstance = axios.create({
 
 let isRedirecting = false;
 
-// Attach token
 axiosInstance.interceptors.request.use((config) => {
   const { accessToken } = useAuthStore.getState();
+
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
   return config;
 });
 
-// 🚨 GLOBAL 401 HANDLER
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
+    const requestUrl = error.config?.url || "";
     const { logout } = useAuthStore.getState();
 
-    if (status === 401 && !isRedirecting) {
+    const isLoginRequest = requestUrl.includes("/auth/login");
+
+    // login failure should stay on login page
+    if (isLoginRequest) {
+      return Promise.reject(error);
+    }
+
+    // protected route auth failure
+    if ((status === 401 || status === 403) && !isRedirecting) {
       isRedirecting = true;
 
-      logout();
+      await logout();
 
       if (typeof window !== "undefined") {
-        toast.error("Session timed out. Please login again.");
-        window.location.href = "/";
+        toast.error("Session expired or unauthorized. Please login again.");
+        window.location.href = "/admin";
       }
+
+      setTimeout(() => {
+        isRedirecting = false;
+      }, 1000);
     }
 
     return Promise.reject(error);
@@ -46,8 +58,3 @@ axiosInstance.interceptors.response.use(
 );
 
 export default axiosInstance;
-
-
-
-
-

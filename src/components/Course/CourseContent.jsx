@@ -103,7 +103,7 @@ export default function ContentInputs({ onCancel, onNext }) {
 
     return (
       <select
-        className="w-full p-3 mb-3 border rounded-lg text-sm"
+        className="w-full p-3 mb-3 border outline-gray-400 rounded-lg text-sm"
         value={selectedIds[level] || ""}
         onChange={(e) => handleSelect(level, e.target.value)}
       >
@@ -146,7 +146,7 @@ export default function ContentInputs({ onCancel, onNext }) {
                 {contents.map((value, index) => (
                   <div key={index} className="flex gap-2 mb-3">
                     <input
-                      className="p-3 rounded-lg w-[85%] border border-gray-400"
+                      className="p-3 rounded-lg w-[85%] border border-gray-400 outline-gray-400"
                       placeholder={`Type content ${index + 1}`}
                       value={value}
                       onChange={(e) => {
