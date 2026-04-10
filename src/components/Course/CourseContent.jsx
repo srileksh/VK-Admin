@@ -148,6 +148,7 @@ export default function ContentInputs({ onCancel, onNext }) {
                     <input
                       className="p-3 rounded-lg w-[85%] border border-gray-400 outline-gray-400"
                       placeholder={`Type content ${index + 1}`}
+                      maxLength={100}
                       value={value}
                       onChange={(e) => {
                         const updated = [...contents];
