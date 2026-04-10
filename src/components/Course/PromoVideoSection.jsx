@@ -92,10 +92,30 @@ export default function PromoVideoSection({ promoId = null }) {
 
   const handleFileSelect = (file) => {
     if (!file || isSaved) return;
+
+      const video = document.createElement("video");
+  video.preload = "metadata";
+
+  video.onloadedmetadata = () => {
+    window.URL.revokeObjectURL(video.src);
+
+    if (video.duration > 300) {
+      setErrors((p) => ({
+        ...p,
+        video: "Video must be less than or equal to 5 minutes",
+      }));
+      setSelectedVideoFile(null);
+      setVideoName("");
+      return;
+    }
+
+
     setSelectedVideoFile(file);
     setVideoName(file.name);
     setErrors((p) => ({ ...p, video: "" }));
   };
+    video.src = URL.createObjectURL(file);
+};
 
   const uploadPromo = async () => {
     if (!selectedVideoFile || isSaved) {

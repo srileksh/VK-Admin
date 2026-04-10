@@ -753,7 +753,43 @@ export default function CreateCourse({ onCancel, onSuccess }) {
 
                 <div className="w-full">
                   <div className="flex flex-col sm:flex-row gap-3 items-center mt-4 px-6 md:px-0 lg:px-2.5">
-                    <div className="grid gap-3 w-full sm:w-[300px]">
+
+                    <div className="relative w-20 h-20 rounded-full overflow-hidden border border-[#a09f9f] bg-gray-50 flex items-center justify-center">
+                      {draftFaculty.imageUrl ? (
+                        <img
+                          src={draftFaculty.imageUrl}
+                          alt="Faculty"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <MdAccountCircle size={90} className="text-gray-400" />
+                      )}
+
+                      {facultyUploading && (
+                        <div className="absolute inset-0 bg-black/45 flex items-center justify-center z-20">
+                          <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      )}
+
+                      {!facultyUploading && (
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 text-[8px] px-1 py-1 rounded-full bg-white/95 border border-gray-300 text-[#37af47] shadow-sm hover:bg-green-50 transition"
+                        >
+                          {draftFaculty.imageUrl ? "Change Image" : "Select Image"}
+                        </button>
+                      )}
+                    </div>
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={(e) => uploadFacultyImage(e.target.files[0])}
+                    />
+                                        <div className="grid gap-3 w-full sm:w-[300px]">
                       <input
                         placeholder="John David"
                         className="border border-[#a09f9f] rounded-lg outline-gray-400 px-3 py-2 text-sm"
@@ -779,48 +815,13 @@ export default function CreateCourse({ onCancel, onSuccess }) {
                       />
                     </div>
 
-                    <div className="relative w-24 h-24 rounded-full overflow-hidden border border-[#a09f9f] bg-gray-50 flex items-center justify-center">
-                      {draftFaculty.imageUrl ? (
-                        <img
-                          src={draftFaculty.imageUrl}
-                          alt="Faculty"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <MdAccountCircle size={90} className="text-gray-400" />
-                      )}
-
-                      {facultyUploading && (
-                        <div className="absolute inset-0 bg-black/45 flex items-center justify-center z-20">
-                          <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                        </div>
-                      )}
-
-                      {!facultyUploading && (
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="absolute bottom-1 left-1/2 -translate-x-1/2 z-10 text-[10px] px-2 py-1 rounded-full bg-white/95 border border-gray-300 text-[#37af47] shadow-sm hover:bg-green-50 transition"
-                        >
-                          {draftFaculty.imageUrl ? "Change Image" : "Select Image"}
-                        </button>
-                      )}
-                    </div>
-
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={(e) => uploadFacultyImage(e.target.files[0])}
-                    />
 
                     <button
                       onClick={addFaculty}
                       disabled={facultyUploading}
-                      className="text-sm mt-1 flex justify-center items-center font-medium text-[12px] border px-2 rounded-xl py-0.5 text-[#37af47] disabled:opacity-60"
+                      className="text-[15px] mt-1 flex justify-center items-center font-medium border px-4 rounded-xl py-1 text-[#37af47] disabled:opacity-60"
                     >
-                      <MdOutlineFileUpload className="font-medium" />
+                      <MdOutlineFileUpload className="font-medium text-[18px]" />
                       Add
                     </button>
                   </div>
