@@ -122,17 +122,29 @@ const useLessonStore = create((set) => ({
     }
   },
 
+  // updateLessonAction: async (lessonId, payload) => {
+  //   try {
+  //     set({ loading: true, error: null });
+  //     return await updateLesson(lessonId, payload);
+  //   } catch (err) {
+  //     set({ error: err?.response?.data?.message || "Lesson update failed" });
+  //     throw err;
+  //   } finally {
+  //     set({ loading: false });
+  //   }
+  // },
+
   updateLessonAction: async (lessonId, payload) => {
-    try {
-      set({ loading: true, error: null });
-      return await updateLesson(lessonId, payload);
-    } catch (err) {
-      set({ error: err?.response?.data?.message || "Lesson update failed" });
-      throw err;
-    } finally {
-      set({ loading: false });
-    }
-  },
+  try {
+    set({ loading: true, error: null });
+    return await updateLesson(lessonId, payload);
+  } catch (err) {
+    set({ error: err?.response?.data?.message || "Lesson update failed" });
+    throw err;
+  } finally {
+    set({ loading: false });
+  }
+},
 
   replaceLessonVideo: async (lessonId, file) => {
     try {
@@ -168,14 +180,14 @@ const useLessonStore = create((set) => ({
   },
 
   /* PUT /lessons/:lessonId — used by LessonItem on edit */
-  updateLessonAction: async (lessonId, payload) => {
-    return await updateLesson(lessonId, payload);
-  },
+  // updateLessonAction: async (lessonId, payload) => {
+  //   return await updateLesson(lessonId, payload);
+  // },
 
-  /* PUT /lessons/:lessonId — used by LessonItem on edit */
-  updateLessonAction: async (lessonId, payload) => {
-    return await updateLesson(lessonId, payload);
-  },
+  // /* PUT /lessons/:lessonId — used by LessonItem on edit */
+  // updateLessonAction: async (lessonId, payload) => {
+  //   return await updateLesson(lessonId, payload);
+  // },
 
   /* GET /lessons/:lessonId */
   getLessonAction: async (lessonId) => {
