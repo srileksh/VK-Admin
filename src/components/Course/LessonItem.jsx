@@ -199,7 +199,7 @@ export default function LessonItem({
   const handleEdit = () => {
     onReplaceLesson(lesson.id, {
       isSaved: false,
-    });
+    }); 
   };
 
   const handleDelete = async () => {
