@@ -9,7 +9,11 @@ import toast from "react-hot-toast";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { LiaSave } from "react-icons/lia";
 
-import { initiateVideoUpload } from "@/services/video.service";
+// import { initiateVideoUpload } from "@/services/video.service";
+import {
+  initiateVideoUpload,
+  getVideoStatusApi,
+} from "@/services/video.service";
 import { uploadToVimeo } from "@/utils/vimeoUpload";
 import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 import useCourseStore from "@/store/useCourseStore";
@@ -38,7 +42,8 @@ export default function PromoVideoSection({ promoId = null }) {
   const [description, setDescription] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [existingPromoId, setExistingPromoId] = useState(null);
-
+  const [videoStatus, setVideoStatus] = useState(null);
+  const [checkingStatus, setCheckingStatus] = useState(false);
   /* ================= PREFILL ON EDIT ================= */
   useEffect(() => {
     const promo = currentCourse?.promos?.[0];
@@ -87,35 +92,67 @@ export default function PromoVideoSection({ promoId = null }) {
   }, [promoId, fetchPromoById]);
 
   const isFormValid = () => {
-    return title.trim() && description.trim() && videoAssetId && thumbnailUrl;
+    return (
+      title.trim() &&
+      description.trim() &&
+      videoAssetId &&
+      thumbnailUrl &&
+      videoStatus === "READY"
+    );
+  };
+  const checkVideoStatus = async (id = videoAssetId) => {
+    if (!id) return null;
+
+    try {
+      setCheckingStatus(true);
+
+      const data = await getVideoStatusApi(id);
+
+      setVideoStatus(data.status);
+
+      if (data.status === "READY") {
+        toast.success("Video is ready for playback");
+      } else {
+        toast.error(`Video is still ${data.status}`);
+      }
+
+      return data.status;
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to check video status",
+      );
+      return null;
+    } finally {
+      setCheckingStatus(false);
+    }
   };
 
   const handleFileSelect = (file) => {
     if (!file || isSaved) return;
 
-      const video = document.createElement("video");
-  video.preload = "metadata";
+    const video = document.createElement("video");
+    video.preload = "metadata";
 
-  video.onloadedmetadata = () => {
-    window.URL.revokeObjectURL(video.src);
+    video.onloadedmetadata = () => {
+      window.URL.revokeObjectURL(video.src);
 
-    if (video.duration > 300) {
-      setErrors((p) => ({
-        ...p,
-        video: "Video must be less than or equal to 5 minutes",
-      }));
-      setSelectedVideoFile(null);
-      setVideoName("");
-      return;
-    }
+      if (video.duration > 300) {
+        setErrors((p) => ({
+          ...p,
+          video: "Video must be less than or equal to 5 minutes",
+        }));
+        setSelectedVideoFile(null);
+        setVideoName("");
+        return;
+      }
 
-
-    setSelectedVideoFile(file);
-    setVideoName(file.name);
-    setErrors((p) => ({ ...p, video: "" }));
-  };
+      setSelectedVideoFile(file);
+      setVideoName(file.name);
+      setErrors((p) => ({ ...p, video: "" }));
+    };
     video.src = URL.createObjectURL(file);
-};
+  };
 
   const uploadPromo = async () => {
     if (!selectedVideoFile || isSaved) {
@@ -143,13 +180,26 @@ export default function PromoVideoSection({ promoId = null }) {
 
       await uploadToVimeo(uploadUrl, selectedVideoFile, setProgress);
 
+      // setVideoAssetId(videoAssetId);
+      // setVideoProvider(provider);
+      // setSelectedVideoFile(null);
+
+      // await replacePromoVideo(videoAssetId, provider);
+
+      // toast.success("Video uploaded successfully", { id: "video" });
       setVideoAssetId(videoAssetId);
       setVideoProvider(provider);
       setSelectedVideoFile(null);
+      setVideoStatus("PROCESSING");
 
       await replacePromoVideo(videoAssetId, provider);
 
-      toast.success("Video uploaded successfully", { id: "video" });
+      toast.success("Video uploaded successfully. Processing started.", {
+        id: "video",
+      });
+
+      // Call backend status endpoint immediately after upload
+      await checkVideoStatus(videoAssetId);
     } catch (err) {
       console.error(err);
       toast.error("Video upload failed", { id: "video" });
@@ -178,7 +228,7 @@ export default function PromoVideoSection({ promoId = null }) {
 
       const url = await uploadImageToCloudinary(
         selectedThumbnailFile,
-        "PROMO_IMAGE"
+        "PROMO_IMAGE",
       );
 
       setThumbnailUrl(url);
@@ -192,6 +242,62 @@ export default function PromoVideoSection({ promoId = null }) {
       setThumbnailUploading(false);
     }
   };
+
+  // const handleSave = async () => {
+  //   const newErrors = {
+  //     title: "",
+  //     description: "",
+  //     video: "",
+  //     thumbnail: "",
+  //   };
+
+  //   if (!title.trim()) newErrors.title = "Title is required";
+  //   if (!description.trim()) newErrors.description = "Description is required";
+  //   if (!videoAssetId) newErrors.video = "Promo video is required";
+  //   if (!thumbnailUrl) newErrors.thumbnail = "Thumbnail is required";
+
+  //   setErrors(newErrors);
+  //   if (Object.values(newErrors).some((err) => err)) return;
+
+  //   try {
+  //     setSaving(true);
+
+  //     const payload = {
+  //       title: title.trim(),
+  //       description: description.trim(),
+  //       videoAssetId,
+  //       videoProvider,
+  //       imageUrl: thumbnailUrl,
+  //       courseId,
+  //       order: 0,
+  //     };
+
+  //     let result;
+
+  //     if (existingPromoId) {
+  //       result = await updatePromo(existingPromoId, payload);
+  //     } else {
+  //       result = await savePromo(payload);
+  //     }
+
+  //     if (!result.success) {
+  //       toast.error(result.error || "Failed to save promo video");
+  //       return;
+  //     }
+
+  //     const savedPromo = result.data;
+  //     setExistingPromoId(savedPromo?.id || existingPromoId);
+  //     setIsSaved(true);
+  //     toast.success(
+  //       existingPromoId ? "Promo updated successfully" : "Promo saved successfully"
+  //     );
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error("Failed to save promo video");
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // };
 
   const handleSave = async () => {
     const newErrors = {
@@ -208,6 +314,15 @@ export default function PromoVideoSection({ promoId = null }) {
 
     setErrors(newErrors);
     if (Object.values(newErrors).some((err) => err)) return;
+
+    const latestStatus = await checkVideoStatus(videoAssetId);
+
+    if (latestStatus !== "READY") {
+      toast.error(
+        "Video is not ready yet. Please check status again after processing.",
+      );
+      return;
+    }
 
     try {
       setSaving(true);
@@ -238,8 +353,11 @@ export default function PromoVideoSection({ promoId = null }) {
       const savedPromo = result.data;
       setExistingPromoId(savedPromo?.id || existingPromoId);
       setIsSaved(true);
+
       toast.success(
-        existingPromoId ? "Promo updated successfully" : "Promo saved successfully"
+        existingPromoId
+          ? "Promo updated successfully"
+          : "Promo saved successfully",
       );
     } catch (err) {
       console.error(err);
@@ -248,7 +366,6 @@ export default function PromoVideoSection({ promoId = null }) {
       setSaving(false);
     }
   };
-
   const handleEdit = () => {
     setIsSaved(false);
   };
@@ -295,7 +412,9 @@ export default function PromoVideoSection({ promoId = null }) {
                         }`}
                       />
                       {errors.title && (
-                        <p className="mt-1 text-xs text-red-500">{errors.title}</p>
+                        <p className="mt-1 text-xs text-red-500">
+                          {errors.title}
+                        </p>
                       )}
                     </div>
 
@@ -347,7 +466,9 @@ export default function PromoVideoSection({ promoId = null }) {
                         </button>
 
                         {errors.video && (
-                          <p className="mt-1 text-xs text-red-500">{errors.video}</p>
+                          <p className="mt-1 text-xs text-red-500">
+                            {errors.video}
+                          </p>
                         )}
 
                         <input
@@ -367,6 +488,25 @@ export default function PromoVideoSection({ promoId = null }) {
                           className="absolute h-[2px] bg-green-500"
                           style={{ width: `${progress}%` }}
                         />
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <p className="text-xs text-gray-500">
+                          Video status:{" "}
+                          <span className="font-semibold text-[#1F304A]">
+                            {videoStatus || "Not uploaded"}
+                          </span>
+                        </p>
+
+                        {videoAssetId && !isSaved && (
+                          <button
+                            type="button"
+                            onClick={() => checkVideoStatus(videoAssetId)}
+                            disabled={checkingStatus}
+                            className="rounded-md border border-gray-400 px-3 py-1 text-xs text-gray-600 disabled:opacity-50"
+                          >
+                            {checkingStatus ? "Checking..." : "Check status"}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -407,7 +547,9 @@ export default function PromoVideoSection({ promoId = null }) {
                   </div>
 
                   {errors.thumbnail && (
-                    <p className="mt-1 text-xs text-red-500">{errors.thumbnail}</p>
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.thumbnail}
+                    </p>
                   )}
 
                   <input
@@ -429,13 +571,29 @@ export default function PromoVideoSection({ promoId = null }) {
                   Edit
                 </button>
 
-                <button
+                {/* <button
                   onClick={handleSave}
                   disabled={saving || isSaved || !isFormValid()}
                   className="flex items-center justify-center gap-[2px] rounded-[12px] border bg-[#37af47] px-4 py-0.5 text-white disabled:opacity-50"
                 >
                   <LiaSave className="text-[22px]" />
                   {saving ? "Saving..." : existingPromoId ? "Update" : "Save"}
+                </button> */}
+                <button
+                  onClick={handleSave}
+                  disabled={
+                    saving || checkingStatus || isSaved || !isFormValid()
+                  }
+                  className="flex items-center justify-center gap-[2px] rounded-[12px] border bg-[#37af47] px-4 py-0.5 text-white disabled:opacity-50"
+                >
+                  <LiaSave className="text-[22px]" />
+                  {saving
+                    ? "Saving..."
+                    : videoStatus && videoStatus !== "READY"
+                      ? "Video Processing"
+                      : existingPromoId
+                        ? "Update"
+                        : "Save"}
                 </button>
               </div>
             </>
