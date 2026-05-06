@@ -18,7 +18,7 @@ import { uploadImageToCloudinary } from "@/utils/cloudinaryImageUpload";
 import useCourseStore from "@/store/useCourseStore";
 import usePromoStore from "@/store/usePromoStore";
 
-export default function PromoVideoSection({ promoId = null }) {
+export default function PromoVideoSection({ promoId = null, moduleBusy = false }) {
   const { courseId, replacePromoVideo, currentCourse } = useCourseStore();
   const { fetchPromoById, savePromo, updatePromo, loading } = usePromoStore();
 
@@ -44,6 +44,12 @@ export default function PromoVideoSection({ promoId = null }) {
   const [videoStatus, setVideoStatus] = useState(null);
   const [pollingStatus, setPollingStatus] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
+  const videoBusy = uploading || pollingStatus || checkingStatus;
+  const actionsLocked = videoBusy || moduleBusy || thumbnailUploading || saving;
+  const titleInputId = "promo-video-title";
+  const descriptionInputId = "promo-video-description";
+  const videoInputId = "promo-video-file";
+  const thumbnailInputId = "promo-thumbnail-file";
   /* ================= PREFILL ON EDIT ================= */
   useEffect(() => {
     const promo = currentCourse?.promos?.[0];
@@ -56,6 +62,8 @@ export default function PromoVideoSection({ promoId = null }) {
     setVideoAssetId(promo.videoAssetId || null);
     setVideoProvider(promo.videoProvider || null);
     setVideoName(promo.videoAssetId ? promo.videoAssetId : "");
+    setVideoStatus(promo.videoAssetId ? "READY" : null);
+    setProgress(promo.videoAssetId ? 100 : 0);
     setIsSaved(true);
   }, [currentCourse]);
 
@@ -85,6 +93,8 @@ export default function PromoVideoSection({ promoId = null }) {
       setThumbnailUrl(promo.imageUrl || "");
       setVideoName(promo.videoAssetId || "Uploaded promo video");
       setThumbnailName(promo.imageUrl ? "Uploaded thumbnail" : "");
+      setVideoStatus(promo.videoAssetId ? "READY" : null);
+      setProgress(promo.videoAssetId ? 100 : 0);
       setIsSaved(true);
     };
 
@@ -100,7 +110,7 @@ export default function PromoVideoSection({ promoId = null }) {
       videoStatus === "READY"
     );
   };
-  const checkVideoStatus = async (id = videoAssetId) => {
+  const checkVideoStatus = async (id = videoAssetId, showToast = true) => {
     if (!id) return null;
 
     try {
@@ -110,10 +120,12 @@ export default function PromoVideoSection({ promoId = null }) {
 
       setVideoStatus(data.status);
 
-      if (data.status === "READY") {
-        toast.success("Video is ready for playback");
-      } else {
-        toast.error(`Video is still ${data.status}`);
+      if (showToast) {
+        if (data.status === "READY") {
+          toast.success("Video is ready for playback");
+        } else {
+          toast.error(`Video is still ${data.status}`);
+        }
       }
 
       return data.status;
@@ -169,7 +181,7 @@ export default function PromoVideoSection({ promoId = null }) {
   };
 
   const handleFileSelect = (file) => {
-    if (!file || isSaved) return;
+    if (!file || isSaved || actionsLocked) return;
 
     const video = document.createElement("video");
     video.preload = "metadata";
@@ -189,12 +201,18 @@ export default function PromoVideoSection({ promoId = null }) {
 
       setSelectedVideoFile(file);
       setVideoName(file.name);
+      setVideoAssetId(null);
+      setVideoProvider(null);
+      setVideoStatus(null);
+      setProgress(0);
       setErrors((p) => ({ ...p, video: "" }));
     };
     video.src = URL.createObjectURL(file);
   };
 
   const uploadPromo = async () => {
+    if (actionsLocked) return;
+
     if (!selectedVideoFile || isSaved) {
       setErrors((p) => ({ ...p, video: "Promo video is required" }));
       return;
@@ -219,6 +237,8 @@ export default function PromoVideoSection({ promoId = null }) {
       const { uploadUrl, videoAssetId, provider } = response;
 
       await uploadToVimeo(uploadUrl, selectedVideoFile, setProgress);
+      setUploading(false);
+      setProgress(100);
 
       // setVideoAssetId(videoAssetId);
       // setVideoProvider(provider);
@@ -231,6 +251,7 @@ export default function PromoVideoSection({ promoId = null }) {
       setVideoProvider(provider);
       setSelectedVideoFile(null);
       setVideoStatus("PROCESSING");
+      setPollingStatus(true);
 
       await replacePromoVideo(videoAssetId, provider);
 
@@ -244,6 +265,7 @@ export default function PromoVideoSection({ promoId = null }) {
       await pollVideoStatusUntilReady(videoAssetId);
     } catch (err) {
       console.error(err);
+      setPollingStatus(false);
       toast.error("Video upload failed", { id: "video" });
     } finally {
       setUploading(false);
@@ -251,13 +273,18 @@ export default function PromoVideoSection({ promoId = null }) {
   };
 
   const handleThumbnailSelect = (file) => {
-    if (!file || isSaved) return;
+    if (!file || isSaved || actionsLocked) return;
     setSelectedThumbnailFile(file);
     setThumbnailName(file.name);
     setErrors((p) => ({ ...p, thumbnail: "" }));
   };
 
   const handleThumbnailUpload = async () => {
+    if (actionsLocked) {
+      toast.error("Please wait until video upload is completed");
+      return;
+    }
+
     if (!selectedThumbnailFile || isSaved) {
       setErrors((p) => ({ ...p, thumbnail: "Thumbnail is required" }));
       return;
@@ -342,6 +369,8 @@ export default function PromoVideoSection({ promoId = null }) {
   // };
 
   const handleSave = async () => {
+    if (actionsLocked || isSaved) return;
+
     const newErrors = {
       title: "",
       description: "",
@@ -357,7 +386,7 @@ export default function PromoVideoSection({ promoId = null }) {
     setErrors(newErrors);
     if (Object.values(newErrors).some((err) => err)) return;
 
-    const latestStatus = await checkVideoStatus(videoAssetId);
+    const latestStatus = await checkVideoStatus(videoAssetId, false);
 
     if (latestStatus !== "READY") {
       toast.error(
@@ -409,6 +438,8 @@ export default function PromoVideoSection({ promoId = null }) {
     }
   };
   const handleEdit = () => {
+    if (actionsLocked) return;
+
     setIsSaved(false);
   };
 
@@ -421,6 +452,7 @@ export default function PromoVideoSection({ promoId = null }) {
         </div>
 
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="text-2xl text-gray-400 hover:text-gray-700"
         >
@@ -440,7 +472,13 @@ export default function PromoVideoSection({ promoId = null }) {
                 <div className="flex-1">
                   <div className="mb-2 flex gap-4">
                     <div>
+                      <label htmlFor={titleInputId} className="sr-only">
+                        Promo video title
+                      </label>
                       <input
+                        id={titleInputId}
+                        name="promoTitle"
+                        type="text"
                         disabled={isSaved}
                         value={title}
                         maxLength={40}
@@ -461,7 +499,13 @@ export default function PromoVideoSection({ promoId = null }) {
                     </div>
 
                     <div className="flex-1">
+                      <label htmlFor={descriptionInputId} className="sr-only">
+                        Promo video description
+                      </label>
                       <input
+                        id={descriptionInputId}
+                        name="promoDescription"
+                        type="text"
                         disabled={isSaved}
                         value={description}
                         maxLength={130}
@@ -486,7 +530,7 @@ export default function PromoVideoSection({ promoId = null }) {
                     <div className="flex gap-3">
                       <div
                         onClick={() =>
-                          !uploading && !isSaved && fileRef.current.click()
+                          !actionsLocked && !isSaved && fileRef.current.click()
                         }
                         className="flex h-20 w-24 cursor-pointer items-center justify-center rounded border text-xs text-gray-400"
                       >
@@ -499,12 +543,21 @@ export default function PromoVideoSection({ promoId = null }) {
                         </p>
 
                         <button
-                          disabled={uploading || isSaved || !selectedVideoFile}
+                          type="button"
+                          disabled={
+                            actionsLocked || isSaved || !selectedVideoFile
+                          }
                           onClick={uploadPromo}
                           className="mt-2 flex items-center justify-center gap-[2px] rounded-[14px] border border-[#37af47] px-2.5 py-0.5 text-[12px] text-[#37af47] shadow-2xl disabled:opacity-60"
                         >
                           <MdOutlineFileUpload />
-                          {uploading ? "Uploading..." : "Upload"}
+                          {uploading
+                            ? "Uploading..."
+                            : pollingStatus
+                              ? "Processing..."
+                              : videoStatus === "READY"
+                                ? "Uploaded"
+                                : "Upload"}
                         </button>
 
                         {errors.video && (
@@ -513,7 +566,12 @@ export default function PromoVideoSection({ promoId = null }) {
                           </p>
                         )}
 
+                        <label htmlFor={videoInputId} className="sr-only">
+                          Promo video file
+                        </label>
                         <input
+                          id={videoInputId}
+                          name="promoVideoFile"
                           ref={fileRef}
                           type="file"
                           accept="video/*"
@@ -544,8 +602,8 @@ export default function PromoVideoSection({ promoId = null }) {
                         {videoAssetId && !isSaved && (
                           <button
                             type="button"
-                            onClick={() => checkVideoStatus(videoAssetId)}
-                            disabled={checkingStatus || pollingStatus}
+                            onClick={() => pollVideoStatusUntilReady(videoAssetId)}
+                            disabled={actionsLocked}
                             className="rounded-md border border-gray-400 px-3 py-1 text-xs text-gray-600 disabled:opacity-50"
                           >
                             {checkingStatus || pollingStatus
@@ -561,7 +619,9 @@ export default function PromoVideoSection({ promoId = null }) {
                 <div>
                   <div className="flex flex-col items-center justify-center">
                     <div
-                      onClick={() => !isSaved && thumbRef.current.click()}
+                      onClick={() =>
+                        !isSaved && !actionsLocked && thumbRef.current.click()
+                      }
                       className="flex h-28 w-40 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gray-300"
                     >
                       {thumbnailUrl ? (
@@ -581,8 +641,12 @@ export default function PromoVideoSection({ promoId = null }) {
                     </div>
 
                     <button
+                      type="button"
                       disabled={
-                        !selectedThumbnailFile || isSaved || thumbnailUploading
+                        !selectedThumbnailFile ||
+                        isSaved ||
+                        thumbnailUploading ||
+                        actionsLocked
                       }
                       onClick={handleThumbnailUpload}
                       className="mt-2 flex items-center justify-center gap-[2px] rounded-[14px] border px-2.5 py-0.5 text-[12px] text-[#37af47] disabled:opacity-60"
@@ -598,7 +662,12 @@ export default function PromoVideoSection({ promoId = null }) {
                     </p>
                   )}
 
+                  <label htmlFor={thumbnailInputId} className="sr-only">
+                    Promo thumbnail file
+                  </label>
                   <input
+                    id={thumbnailInputId}
+                    name="promoThumbnailFile"
                     ref={thumbRef}
                     type="file"
                     accept="image/*"
@@ -610,8 +679,9 @@ export default function PromoVideoSection({ promoId = null }) {
 
               <div className="mt-4 flex justify-end gap-4">
                 <button
+                  type="button"
                   onClick={handleEdit}
-                  disabled={!isSaved}
+                  disabled={!isSaved || actionsLocked}
                   className="rounded-[12px] border border-[#37af47] px-5 py-0.5 text-sm text-[#37af47] shadow-2xl shadow-[#37af47] disabled:opacity-50"
                 >
                   Edit
@@ -642,11 +712,11 @@ export default function PromoVideoSection({ promoId = null }) {
                         : "Save"}
                 </button> */}
                 <button
+                  type="button"
                   onClick={handleSave}
                   disabled={
                     saving ||
-                    checkingStatus ||
-                    pollingStatus ||
+                    actionsLocked ||
                     isSaved ||
                     !isFormValid()
                   }
@@ -655,7 +725,9 @@ export default function PromoVideoSection({ promoId = null }) {
                   <LiaSave className="text-[22px]" />
                   {saving
                     ? "Saving..."
-                    : pollingStatus
+                    : uploading
+                      ? "Uploading Video"
+                      : pollingStatus
                       ? "Checking Video"
                       : videoStatus && videoStatus !== "READY"
                         ? "Video Processing"

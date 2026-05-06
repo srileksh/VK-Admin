@@ -12,8 +12,8 @@ export default function LessonSection({
   onToggle,
   onDelete,
   initialLessons = [],
-    onBusyChange,
-
+  onBusyChange,
+  moduleBusy = false,
 }) {
   // const emptyLesson = () => ({
   //   id: Date.now(),
@@ -55,6 +55,10 @@ export default function LessonSection({
   });
   const [lessons, setLessons] = useState([emptyLesson()]);
   const [fetchingLessons, setFetchingLessons] = useState(false);
+  const sectionBusy = lessons.some(
+    (lesson) => lesson.uploadingVideo || lesson.pollingStatus || lesson.saving,
+  );
+  const sectionActionsLocked = moduleBusy || sectionBusy;
 
   /* ================= PREFILL LESSONS FROM API ================= */
   useEffect(() => {
@@ -137,7 +141,7 @@ export default function LessonSection({
   //   setLessons((prev) => [...prev, emptyLesson()]);
   // };
   const handleAddLesson = () => {
-    if (sectionBusy) {
+    if (sectionActionsLocked) {
       toast.error("Please wait until the video upload is completed");
       return;
     }
@@ -151,16 +155,10 @@ export default function LessonSection({
 
     setLessons((prev) => [...prev, emptyLesson()]);
   };
-const sectionBusy = lessons.some(
-  (lesson) =>
-    lesson.uploadingVideo ||
-    lesson.pollingStatus ||
-    lesson.saving
-);
 
-useEffect(() => {
-  onBusyChange?.(sectionBusy);
-}, [sectionBusy, onBusyChange]);
+  useEffect(() => {
+    onBusyChange?.(sectionBusy);
+  }, [sectionBusy, onBusyChange]);
   const handleUpdateLesson = (id, key, value) => {
     setLessons((prev) =>
       prev.map((lesson) =>
@@ -194,6 +192,7 @@ useEffect(() => {
       isOpen={isOpen}
       onToggle={onToggle}
       onDelete={onDelete}
+      actionsDisabled={sectionActionsLocked}
     >
       {fetchingLessons ? (
         <p className="text-sm text-gray-500">Loading lessons...</p>
@@ -207,6 +206,7 @@ useEffect(() => {
               onUpdateLesson={handleUpdateLesson}
               onReplaceLesson={handleReplaceLesson}
               onDeleteLesson={handleDeleteLesson}
+              moduleBusy={moduleBusy}
             />
           ))}
 
@@ -218,8 +218,9 @@ useEffect(() => {
               + Add new video
             </button> */}
             <button
+              type="button"
               onClick={handleAddLesson}
-              disabled={sectionBusy}
+              disabled={sectionActionsLocked}
               className="border-b-2 text-[18px] font-semibold text-[#CCCBCB] disabled:cursor-not-allowed disabled:opacity-50"
             >
               + Add new video
