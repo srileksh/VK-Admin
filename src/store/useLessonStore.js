@@ -88,12 +88,32 @@ checkLessonVideoStatus: async (videoAssetId) => {
   //   }
   // },
 
-  updateLessonAction: async (lessonId, payload) => {
+//   updateLessonAction: async (lessonId, payload) => {
+//   try {
+//     set({ loading: true, error: null });
+//     return await updateLesson(lessonId, payload);
+//   } catch (err) {
+//     set({ error: err?.response?.data?.message || "Lesson update failed" });
+//     throw err;
+//   } finally {
+//     set({ loading: false });
+//   }
+// },
+uploadLessonVideo: async (file) => {
   try {
-    set({ loading: true, error: null });
-    return await updateLesson(lessonId, payload);
+    set({ loading: true, progress: 0, error: null });
+
+    const { uploadUrl, videoAssetId, provider } = await initiateVideoUpload({
+      purpose: "LESSON",
+      size: file.size,
+    });
+
+    await uploadToVimeo(uploadUrl, file, (p) => set({ progress: p }));
+
+    return { videoAssetId, provider };
   } catch (err) {
-    set({ error: err?.response?.data?.message || "Lesson update failed" });
+    console.error("Video upload failed:", err);
+    set({ error: err?.response?.data?.message || "Video upload failed" });
     throw err;
   } finally {
     set({ loading: false });
