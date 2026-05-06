@@ -28,6 +28,8 @@ export default function LessonSection({
     errors: {},
     backendId: null,
     duration: 0,
+    videoStatus: null,
+    pollingStatus: false,
   });
 
   const [lessons, setLessons] = useState([emptyLesson()]);
@@ -48,7 +50,7 @@ export default function LessonSection({
         // Fetch each lesson in full (GET /lessons/:lessonId) to get
         // description + videoAssetId which section/course API omits
         const fullLessons = await Promise.all(
-          initialLessons.map((l) => getLessonById(l.id))
+          initialLessons.map((l) => getLessonById(l.id)),
         );
 
         setLessons(
@@ -67,7 +69,9 @@ export default function LessonSection({
             errors: {},
             backendId: l.id,
             duration: l.duration || 0,
-          }))
+            videoStatus: l.videoAssetId ? "READY" : null,
+            pollingStatus: false,
+          })),
         );
       } catch (err) {
         console.error("Failed to prefill lessons:", err);
@@ -100,16 +104,16 @@ export default function LessonSection({
               [key]: value,
               errors: { ...lesson.errors, [key]: "" },
             }
-          : lesson
-      )
+          : lesson,
+      ),
     );
   };
 
   const handleReplaceLesson = (id, updater) => {
     setLessons((prev) =>
       prev.map((lesson) =>
-        lesson.id === id ? { ...lesson, ...updater } : lesson
-      )
+        lesson.id === id ? { ...lesson, ...updater } : lesson,
+      ),
     );
   };
 
@@ -153,9 +157,3 @@ export default function LessonSection({
     </SectionCard>
   );
 }
-
-
-
-
-
-

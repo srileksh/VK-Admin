@@ -21,19 +21,36 @@ export default function LessonItem({
   const fileRef = useRef(null);
   const thumbnailRef = useRef(null);
 
+  // const {
+  //   uploadLessonVideo,
+  //   createLessonAction,
+  //   updateLessonAction,
+  //   removeLesson,
+  //   progress,
+  // } = useLessonStore();
   const {
     uploadLessonVideo,
+    checkLessonVideoStatus,
     createLessonAction,
     updateLessonAction,
     removeLesson,
     progress,
   } = useLessonStore();
 
+  // const isLessonComplete = (lesson) => {
+  //   return (
+  //     lesson.lessonTitle.trim() &&
+  //     lesson.description.trim() &&
+  //     lesson.videoUploaded
+  //   );
+  // };
+
   const isLessonComplete = (lesson) => {
     return (
       lesson.lessonTitle.trim() &&
       lesson.description.trim() &&
-      lesson.videoUploaded
+      lesson.videoUploaded &&
+      lesson.videoStatus === "READY"
     );
   };
 
@@ -62,6 +79,81 @@ export default function LessonItem({
     });
   };
 
+  const pollLessonVideoStatusUntilReady = async (videoAssetId) => {
+    if (!videoAssetId) return null;
+
+    const maxAttempts = 60; // 5 minutes if interval is 5 sec
+    const intervalMs = 5000;
+
+    onReplaceLesson(lesson.id, {
+      videoStatus: "PROCESSING",
+      pollingStatus: true,
+    });
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const status = await checkLessonVideoStatus(videoAssetId);
+
+        onReplaceLesson(lesson.id, {
+          videoStatus: status,
+        });
+
+        if (status === "READY") {
+          onReplaceLesson(lesson.id, {
+            videoStatus: "READY",
+            pollingStatus: false,
+            videoUploaded: true,
+          });
+
+          toast.success("Lesson video is ready for playback");
+          return "READY";
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, intervalMs));
+      } catch (error) {
+        console.error("Lesson video status polling failed:", error);
+
+        onReplaceLesson(lesson.id, {
+          pollingStatus: false,
+        });
+
+        toast.error("Failed to check lesson video status");
+        return null;
+      }
+    }
+
+    onReplaceLesson(lesson.id, {
+      pollingStatus: false,
+    });
+
+    toast.error("Lesson video is still processing. Please check again later.");
+    return null;
+  };
+
+  // const handleUploadVideo = async () => {
+  //   if (!lesson.videoFile) return;
+
+  //   const toastId = toast.loading("Uploading video...");
+
+  //   try {
+  //     setUploadingVideo(true);
+
+  //     const { videoAssetId } = await uploadLessonVideo(lesson.videoFile);
+
+  //     onReplaceLesson(lesson.id, {
+  //       videoUploaded: true,
+  //       videoAssetId,
+  //     });
+
+  //     toast.success("Video uploaded", { id: toastId });
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Video upload failed", { id: toastId });
+  //   } finally {
+  //     setUploadingVideo(false);
+  //   }
+  // };
+
   const handleUploadVideo = async () => {
     if (!lesson.videoFile) return;
 
@@ -73,13 +165,23 @@ export default function LessonItem({
       const { videoAssetId } = await uploadLessonVideo(lesson.videoFile);
 
       onReplaceLesson(lesson.id, {
-        videoUploaded: true,
         videoAssetId,
+        videoUploaded: false,
+        videoStatus: "PROCESSING",
+        pollingStatus: true,
       });
 
-      toast.success("Video uploaded", { id: toastId });
+      toast.success("Video uploaded. Processing started.", { id: toastId });
+
+      await pollLessonVideoStatusUntilReady(videoAssetId);
     } catch (error) {
       console.error(error);
+
+      onReplaceLesson(lesson.id, {
+        pollingStatus: false,
+        videoStatus: null,
+      });
+
       toast.error("Video upload failed", { id: toastId });
     } finally {
       setUploadingVideo(false);
@@ -104,7 +206,7 @@ export default function LessonItem({
 
       const url = await uploadImageToCloudinary(
         lesson.thumbnailFile,
-        "LESSON_THUMBNAIL"
+        "LESSON_THUMBNAIL",
       );
 
       onReplaceLesson(lesson.id, {
@@ -127,7 +229,7 @@ export default function LessonItem({
 
   const handleSave = async () => {
     const toastId = toast.loading(
-      lesson.backendId ? "Updating lesson..." : "Saving lesson..."
+      lesson.backendId ? "Updating lesson..." : "Saving lesson...",
     );
 
     onUpdateLesson(lesson.id, "saving", true);
@@ -147,7 +249,7 @@ export default function LessonItem({
       if (lesson.thumbnailFile && !currentThumbnailUrl) {
         const url = await uploadImageToCloudinary(
           lesson.thumbnailFile,
-          "LESSON_THUMBNAIL"
+          "LESSON_THUMBNAIL",
         );
         currentThumbnailUrl = url;
 
@@ -168,7 +270,10 @@ export default function LessonItem({
       };
 
       if (lesson.backendId) {
-        const updatedLesson = await updateLessonAction(lesson.backendId, payload);
+        const updatedLesson = await updateLessonAction(
+          lesson.backendId,
+          payload,
+        );
 
         onReplaceLesson(lesson.id, {
           backendId: updatedLesson.id || lesson.backendId,
@@ -199,7 +304,7 @@ export default function LessonItem({
   const handleEdit = () => {
     onReplaceLesson(lesson.id, {
       isSaved: false,
-    }); 
+    });
   };
 
   const handleDelete = async () => {
@@ -299,10 +404,33 @@ export default function LessonItem({
                     width: uploadingVideo
                       ? `${progress}%`
                       : lesson.videoUploaded
-                      ? "100%"
-                      : "0%",
+                        ? "100%"
+                        : "0%",
                   }}
                 />
+                <div className="mt-7 flex items-center gap-3 text-xs">
+                  <span className="text-gray-500">
+                    Video status:{" "}
+                    <strong className="text-[#1F304A]">
+                      {lesson.pollingStatus
+                        ? `Checking... ${lesson.videoStatus || "PROCESSING"}`
+                        : lesson.videoStatus || "Not uploaded"}
+                    </strong>
+                  </span>
+
+                  {lesson.videoAssetId && !lesson.isSaved && (
+                    <button
+                      type="button"
+                      disabled={lesson.pollingStatus}
+                      onClick={() =>
+                        pollLessonVideoStatusUntilReady(lesson.videoAssetId)
+                      }
+                      className="rounded border border-gray-400 px-2 py-1 text-gray-600 disabled:opacity-50"
+                    >
+                      {lesson.pollingStatus ? "Checking..." : "Check status"}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -371,11 +499,27 @@ export default function LessonItem({
 
         <button
           onClick={handleSave}
-          disabled={lesson.saving || lesson.isSaved || !isLessonComplete(lesson)}
+          // disabled={lesson.saving || lesson.isSaved || !isLessonComplete(lesson)}
+          disabled={
+            lesson.saving ||
+            lesson.isSaved ||
+            lesson.pollingStatus ||
+            !isLessonComplete(lesson)
+          }
           className="px-4 border py-0.5 bg-[#37af47] text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
         >
           <LiaSave className="text-[22px]" />
-          {lesson.backendId ? "Update" : "Save"}
+          {/* {lesson.backendId ? "Update" : "Save"} */}
+
+          {lesson.saving
+            ? "Saving..."
+            : lesson.pollingStatus
+              ? "Checking Video"
+              : lesson.videoStatus && lesson.videoStatus !== "READY"
+                ? "Video Processing"
+                : lesson.backendId
+                  ? "Update"
+                  : "Save"}
         </button>
       </div>
     </div>
