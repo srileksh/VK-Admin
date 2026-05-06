@@ -42,6 +42,7 @@ export default function PromoVideoSection({ promoId = null }) {
   const [isSaved, setIsSaved] = useState(false);
   const [existingPromoId, setExistingPromoId] = useState(null);
   const [videoStatus, setVideoStatus] = useState(null);
+  const [pollingStatus, setPollingStatus] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
   /* ================= PREFILL ON EDIT ================= */
   useEffect(() => {
@@ -126,6 +127,46 @@ export default function PromoVideoSection({ promoId = null }) {
       setCheckingStatus(false);
     }
   };
+  const pollVideoStatusUntilReady = async (id) => {
+    if (!id) return null;
+
+    setPollingStatus(true);
+
+    const maxAttempts = 60; // 60 attempts x 5 sec = 5 minutes
+    const intervalMs = 5000;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const data = await getVideoStatusApi(id);
+        const status = data?.status;
+
+        setVideoStatus(status);
+
+        if (status === "READY") {
+          setPollingStatus(false);
+          toast.success("Video is ready for playback");
+          return "READY";
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, intervalMs));
+      } catch (error) {
+        console.error("Video status polling failed:", error);
+
+        setPollingStatus(false);
+        toast.error(
+          error?.response?.data?.message || "Failed to check video status",
+        );
+
+        return null;
+      }
+    }
+
+    setPollingStatus(false);
+    toast.error(
+      "Video is still processing. Please check again after some time.",
+    );
+    return null;
+  };
 
   const handleFileSelect = (file) => {
     if (!file || isSaved) return;
@@ -198,7 +239,9 @@ export default function PromoVideoSection({ promoId = null }) {
       });
 
       // Call backend status endpoint immediately after upload
-      await checkVideoStatus(videoAssetId);
+      // await checkVideoStatus(videoAssetId);
+      // Start polling backend until Vimeo processing becomes READY
+      await pollVideoStatusUntilReady(videoAssetId);
     } catch (err) {
       console.error(err);
       toast.error("Video upload failed", { id: "video" });
@@ -492,18 +535,22 @@ export default function PromoVideoSection({ promoId = null }) {
                         <p className="text-xs text-gray-500">
                           Video status:{" "}
                           <span className="font-semibold text-[#1F304A]">
-                            {videoStatus || "Not uploaded"}
+                            {/* {videoStatus || "Not uploaded"} */}
+                            {pollingStatus
+                              ? `Checking... ${videoStatus || "PROCESSING"}`
+                              : videoStatus || "Not uploaded"}
                           </span>
                         </p>
-
                         {videoAssetId && !isSaved && (
                           <button
                             type="button"
                             onClick={() => checkVideoStatus(videoAssetId)}
-                            disabled={checkingStatus}
+                            disabled={checkingStatus || pollingStatus}
                             className="rounded-md border border-gray-400 px-3 py-1 text-xs text-gray-600 disabled:opacity-50"
                           >
-                            {checkingStatus ? "Checking..." : "Check status"}
+                            {checkingStatus || pollingStatus
+                              ? "Checking..."
+                              : "Check status"}
                           </button>
                         )}
                       </div>
@@ -578,7 +625,7 @@ export default function PromoVideoSection({ promoId = null }) {
                   <LiaSave className="text-[22px]" />
                   {saving ? "Saving..." : existingPromoId ? "Update" : "Save"}
                 </button> */}
-                <button
+                {/* <button
                   onClick={handleSave}
                   disabled={
                     saving || checkingStatus || isSaved || !isFormValid()
@@ -593,6 +640,28 @@ export default function PromoVideoSection({ promoId = null }) {
                       : existingPromoId
                         ? "Update"
                         : "Save"}
+                </button> */}
+                <button
+                  onClick={handleSave}
+                  disabled={
+                    saving ||
+                    checkingStatus ||
+                    pollingStatus ||
+                    isSaved ||
+                    !isFormValid()
+                  }
+                  className="flex items-center justify-center gap-[2px] rounded-[12px] border bg-[#37af47] px-4 py-0.5 text-white disabled:opacity-50"
+                >
+                  <LiaSave className="text-[22px]" />
+                  {saving
+                    ? "Saving..."
+                    : pollingStatus
+                      ? "Checking Video"
+                      : videoStatus && videoStatus !== "READY"
+                        ? "Video Processing"
+                        : existingPromoId
+                          ? "Update"
+                          : "Save"}
                 </button>
               </div>
             </>
