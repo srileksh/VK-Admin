@@ -12,7 +12,37 @@ export default function LessonSection({
   onToggle,
   onDelete,
   initialLessons = [],
+    onBusyChange,
+
 }) {
+  // const emptyLesson = () => ({
+  //   id: Date.now(),
+  //   lessonTitle: "",
+  //   description: "",
+  //   videoName: "",
+  //   videoFile: null,
+  //   videoAssetId: null,
+  //   thumbnailFile: null,
+  //   thumbnailUrl: "",
+  //   videoUploaded: false,
+  //   isSaved: false,
+  //   saving: false,
+  //   errors: {},
+  //   backendId: null,
+  //   duration: 0,
+  //   videoStatus: null,
+  //   pollingStatus: false,
+  // });
+const sectionBusy = lessons.some(
+  (lesson) =>
+    lesson.uploadingVideo ||
+    lesson.pollingStatus ||
+    lesson.saving
+);
+
+useEffect(() => {
+  onBusyChange?.(sectionBusy);
+}, [sectionBusy, onBusyChange]);
   const emptyLesson = () => ({
     id: Date.now(),
     lessonTitle: "",
@@ -30,8 +60,8 @@ export default function LessonSection({
     duration: 0,
     videoStatus: null,
     pollingStatus: false,
+    uploadingVideo: false,
   });
-
   const [lessons, setLessons] = useState([emptyLesson()]);
   const [fetchingLessons, setFetchingLessons] = useState(false);
 
@@ -53,6 +83,26 @@ export default function LessonSection({
           initialLessons.map((l) => getLessonById(l.id)),
         );
 
+        // setLessons(
+        //   fullLessons.map((l) => ({
+        //     id: l.id,
+        //     lessonTitle: l.title || "",
+        //     description: l.description || "",
+        //     videoName: l.videoAssetId || "",
+        //     videoFile: null,
+        //     videoAssetId: l.videoAssetId || null,
+        //     thumbnailFile: null,
+        //     thumbnailUrl: l.thumbnail || "",
+        //     videoUploaded: !!l.videoAssetId,
+        //     isSaved: true,
+        //     saving: false,
+        //     errors: {},
+        //     backendId: l.id,
+        //     duration: l.duration || 0,
+        //     videoStatus: l.videoAssetId ? "READY" : null,
+        //     pollingStatus: false,
+        //   })),
+        // );
         setLessons(
           fullLessons.map((l) => ({
             id: l.id,
@@ -71,6 +121,7 @@ export default function LessonSection({
             duration: l.duration || 0,
             videoStatus: l.videoAssetId ? "READY" : null,
             pollingStatus: false,
+            uploadingVideo: false,
           })),
         );
       } catch (err) {
@@ -84,7 +135,22 @@ export default function LessonSection({
     prefill();
   }, [sectionId, initialLessons]);
 
+  // const handleAddLesson = () => {
+  //   const hasUnsaved = lessons.some((l) => !l.isSaved);
+
+  //   if (hasUnsaved) {
+  //     toast.error("Save current lesson first");
+  //     return;
+  //   }
+
+  //   setLessons((prev) => [...prev, emptyLesson()]);
+  // };
   const handleAddLesson = () => {
+    if (sectionBusy) {
+      toast.error("Please wait until the video upload is completed");
+      return;
+    }
+
     const hasUnsaved = lessons.some((l) => !l.isSaved);
 
     if (hasUnsaved) {
@@ -145,9 +211,16 @@ export default function LessonSection({
           ))}
 
           <div className="mt-6 flex justify-center">
-            <button
+            {/* <button
               onClick={handleAddLesson}
               className="border-b-2 text-[18px] font-semibold text-[#CCCBCB]"
+            >
+              + Add new video
+            </button> */}
+            <button
+              onClick={handleAddLesson}
+              disabled={sectionBusy}
+              className="border-b-2 text-[18px] font-semibold text-[#CCCBCB] disabled:cursor-not-allowed disabled:opacity-50"
             >
               + Add new video
             </button>

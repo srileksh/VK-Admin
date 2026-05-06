@@ -339,7 +339,7 @@ export default function CreateModules({ onCancel, onFinish }) {
   const { courseId, publishCourseAction, currentCourse } = useCourseStore();
   const { createSection } = useSectionStore();
   const { fetchActivePromo } = usePromoStore();
-
+const [moduleBusy, setModuleBusy] = useState(false);
   const [sections, setSections] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [sectionTitle, setSectionTitle] = useState("");
@@ -429,15 +429,25 @@ const handleFinish = async () => {
           </div>
 
           {sections.map((section) => (
+            // <LessonSection
+            //   key={section.id}
+            //   sectionId={section.id}
+            //   title={section.title}
+            //   isOpen={section.isOpen}
+            //   onToggle={() => handleToggleSection(section.id)}
+            //   onDelete={() => handleRemoveSection(section.id)}
+            //   initialLessons={section.lessons || []}
+            // />
             <LessonSection
-              key={section.id}
-              sectionId={section.id}
-              title={section.title}
-              isOpen={section.isOpen}
-              onToggle={() => handleToggleSection(section.id)}
-              onDelete={() => handleRemoveSection(section.id)}
-              initialLessons={section.lessons || []}
-            />
+  key={section.id}
+  sectionId={section.id}
+  title={section.title}
+  isOpen={section.isOpen}
+  onToggle={() => handleToggleSection(section.id)}
+  onDelete={() => handleRemoveSection(section.id)}
+  initialLessons={section.lessons || []}
+  onBusyChange={setModuleBusy}
+/>
           ))}
 
           {isAdding && (
@@ -451,12 +461,19 @@ const handleFinish = async () => {
                 className="flex-1 border-b-2 outline-none border-gray-300 px-4 py-2"
               />
 
-              <button
+              {/* <button
                 onClick={handleCreateSection}
                 className="rounded-lg bg-gray-700 px-5 py-2 text-white"
               >
                 Create
-              </button>
+              </button> */}
+              <button
+  onClick={handleCreateSection}
+  disabled={moduleBusy}
+  className="rounded-lg bg-gray-700 px-5 py-2 text-white disabled:opacity-50"
+>
+  Create
+</button>
 
               <button
                 onClick={() => {
@@ -471,12 +488,19 @@ const handleFinish = async () => {
           )}
 
           <div className="mb-6 mt-6 flex justify-end">
-            <button
+            {/* <button
               onClick={() => setIsAdding(true)}
               className="flex items-center gap-1 rounded-lg p-3 shadow-md"
             >
               <GoPlus /> Add new section
-            </button>
+            </button> */}
+            <button
+  onClick={() => setIsAdding(true)}
+  disabled={moduleBusy}
+  className="flex items-center gap-1 rounded-lg p-3 shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+>
+  <GoPlus /> Add new section
+</button>
           </div>
         </div>
 
@@ -488,12 +512,19 @@ const handleFinish = async () => {
             Cancel
           </button>
 
-          <button
+          {/* <button
             onClick={handleFinish}
             className="rounded-xl bg-gray-700 px-10 py-2 text-white"
           >
             Finish
-          </button>
+          </button> */}
+          <button
+  onClick={handleFinish}
+  disabled={moduleBusy}
+  className="rounded-xl bg-gray-700 px-10 py-2 text-white disabled:opacity-50"
+>
+  Finish
+</button>
         </div>
       </div>
     </div>
