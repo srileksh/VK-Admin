@@ -15,6 +15,7 @@ export default function SectionCard({
   onToggle,
   onDelete,
   children,
+  actionsDisabled = false,
 }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [sectionTitle, setSectionTitle] = useState(title || "");
@@ -47,6 +48,11 @@ export default function SectionCard({
   }, [sectionId, getSectionById]);
 
   const handleUpdateSectionTitle = async () => {
+    if (actionsDisabled) {
+      toast.error("Please wait until the video upload is completed");
+      return;
+    }
+
     if (!sectionTitle.trim()) {
       toast.error("Section title cannot be empty");
       return;
@@ -75,7 +81,7 @@ export default function SectionCard({
   };
 
   const handleDeleteSection = async () => {
-    if (deleting) return;
+    if (deleting || actionsDisabled) return;
 
     const confirmDelete = confirm(
       "Are you sure you want to delete this section?"
@@ -107,11 +113,19 @@ export default function SectionCard({
           {fetching ? (
             <span className="text-sm text-gray-500">Loading section...</span>
           ) : editingTitle ? (
-            <input
-              value={sectionTitle}
-              onChange={(e) => setSectionTitle(e.target.value)}
-              className="rounded border px-2 py-1 text-sm outline-gray-400"
-            />
+            <>
+              <label htmlFor={`section-title-${sectionId}`} className="sr-only">
+                Section title
+              </label>
+              <input
+                id={`section-title-${sectionId}`}
+                name="sectionTitle"
+                type="text"
+                value={sectionTitle}
+                onChange={(e) => setSectionTitle(e.target.value)}
+                className="rounded border px-2 py-1 text-sm outline-gray-400"
+              />
+            </>
           ) : (
             <span className="text-sm font-medium">
               {sectionData?.title || sectionTitle || "Untitled Section"}
@@ -122,8 +136,10 @@ export default function SectionCard({
         <div className="flex items-center gap-3">
           {!editingTitle && !fetching && (
             <button
+              type="button"
               onClick={() => setEditingTitle(true)}
-              className="flex items-center gap-1 rounded border border-blue-600 px-3 py-1 text-sm text-blue-600"
+              disabled={actionsDisabled}
+              className="flex items-center gap-1 rounded border border-blue-600 px-3 py-1 text-sm text-blue-600 disabled:opacity-50"
             >
               <FaPen />
               Edit
@@ -132,8 +148,10 @@ export default function SectionCard({
 
           {editingTitle && (
             <button
+              type="button"
               onClick={handleUpdateSectionTitle}
-              className="flex items-center gap-1 rounded border bg-[#37af47] px-3 py-1 text-sm text-white"
+              disabled={actionsDisabled}
+              className="flex items-center gap-1 rounded border bg-[#37af47] px-3 py-1 text-sm text-white disabled:opacity-50"
             >
               <LiaSave className="text-[18px]" />
               Save
@@ -141,15 +159,21 @@ export default function SectionCard({
           )}
 
           <button
+            type="button"
             onClick={handleDeleteSection}
-            disabled={deleting}
+            disabled={deleting || actionsDisabled}
             className="flex items-center gap-1 rounded border border-red-600 px-3 py-1 text-sm text-red-600 disabled:opacity-50"
           >
             <MdDelete />
             {deleting ? "Deleting..." : "Delete"}
           </button>
 
-          <button onClick={onToggle} className="text-[26px] text-gray-400">
+          <button
+            type="button"
+            onClick={onToggle}
+            disabled={actionsDisabled}
+            className="text-[26px] text-gray-400 disabled:opacity-50"
+          >
             {isOpen ? <FaCircleMinus /> : <GoPlus />}
           </button>
         </div>

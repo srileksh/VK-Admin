@@ -13,6 +13,7 @@ export default function LessonItem({
   onUpdateLesson,
   onReplaceLesson,
   onDeleteLesson,
+  moduleBusy = false,
 }) {
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
@@ -43,11 +44,16 @@ export default function LessonItem({
     updateLessonAction,
     removeLesson,
   } = useLessonStore();
+  const titleInputId = `lesson-title-${lesson.id}`;
+  const descriptionInputId = `lesson-description-${lesson.id}`;
+  const videoInputId = `lesson-video-file-${lesson.id}`;
+  const thumbnailInputId = `lesson-thumbnail-file-${lesson.id}`;
   const lessonBusy =
     uploadingVideo ||
     lesson.uploadingVideo ||
     lesson.pollingStatus ||
     lesson.saving;
+  const actionsLocked = lessonBusy || moduleBusy || uploadingThumbnail || deleting;
   // const isLessonComplete = (lesson) => {
   //   return (
   //     lesson.lessonTitle.trim() &&
@@ -75,13 +81,14 @@ export default function LessonItem({
   };
 
   const handleVideoSelect = (file) => {
-    if (!file || lessonBusy || lesson.isSaved) return;
+    if (!file || actionsLocked || lesson.isSaved) return;
 
     setVideoProgress(0);
 
     onReplaceLesson(lesson.id, {
       videoFile: file,
       videoName: file.name,
+      videoAssetId: null,
       videoUploaded: false,
       videoStatus: null,
       pollingStatus: false,
@@ -215,7 +222,7 @@ export default function LessonItem({
   // };
 
   const handleUploadVideo = async () => {
-    if (!lesson.videoFile || lessonBusy) return;
+    if (!lesson.videoFile || actionsLocked) return;
 
     const toastId = toast.loading("Uploading video...");
 
@@ -234,6 +241,9 @@ export default function LessonItem({
         lesson.videoFile,
         setVideoProgress,
       );
+
+      setUploadingVideo(false);
+      setVideoProgress(100);
 
       onReplaceLesson(lesson.id, {
         videoAssetId,
@@ -265,14 +275,21 @@ export default function LessonItem({
       });
     }
   };
-const handleThumbnailSelect = (file) => {
-  if (!file || lessonBusy || lesson.isSaved) return;
+  const handleThumbnailSelect = (file) => {
+    if (!file || actionsLocked || lesson.isSaved) return;
 
-  onReplaceLesson(lesson.id, {
-    thumbnailFile: file,
-  });
-};  const handleUploadThumbnail = async () => {
+    onReplaceLesson(lesson.id, {
+      thumbnailFile: file,
+    });
+  };
+
+  const handleUploadThumbnail = async () => {
     if (!lesson.thumbnailFile) return;
+
+    if (actionsLocked || lesson.isSaved) {
+      toast.error("Please wait until the video upload is completed");
+      return;
+    }
 
     const toastId = toast.loading("Uploading thumbnail...");
 
@@ -303,6 +320,8 @@ const handleThumbnailSelect = (file) => {
   };
 
   const handleSave = async () => {
+    if (actionsLocked || lesson.isSaved || !isLessonComplete(lesson)) return;
+
     const toastId = toast.loading(
       lesson.backendId ? "Updating lesson..." : "Saving lesson...",
     );
@@ -390,12 +409,19 @@ const handleThumbnailSelect = (file) => {
   };
 
   const handleEdit = () => {
+    if (actionsLocked) return;
+
     onReplaceLesson(lesson.id, {
       isSaved: false,
     });
   };
 
   const handleDelete = async () => {
+    if (actionsLocked) {
+      toast.error("Please wait until the video upload is completed");
+      return;
+    }
+
     try {
       setDeleting(true);
 
@@ -415,12 +441,17 @@ const handleThumbnailSelect = (file) => {
 
   return (
     <div className="mb-6">
-      <label className="text-sm block mb-3">Video title</label>
+      <label htmlFor={titleInputId} className="text-sm block mb-3">
+        Video title
+      </label>
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
           <div className="flex gap-4 mb-4">
             <input
+              id={titleInputId}
+              name="lessonTitle"
+              type="text"
               disabled={lesson.isSaved}
               className="border border-gray-400 px-4 py-2 rounded-lg w-[250px] outline-gray-400"
               placeholder="Title"
@@ -430,7 +461,13 @@ const handleThumbnailSelect = (file) => {
               }
             />
 
+            <label htmlFor={descriptionInputId} className="sr-only">
+              Lesson description
+            </label>
             <input
+              id={descriptionInputId}
+              name="lessonDescription"
+              type="text"
               disabled={lesson.isSaved}
               className="border border-gray-400 px-4 py-2 rounded-lg flex-1 outline-gray-400"
               placeholder="Description"
@@ -446,8 +483,9 @@ const handleThumbnailSelect = (file) => {
             <div className="flex gap-3">
               <div className="w-24 h-20 border border-gray-400 rounded flex items-center justify-center text-xs">
 <button
+  type="button"
   onClick={() => fileRef.current?.click()}
-  disabled={lesson.isSaved || lessonBusy}
+  disabled={lesson.isSaved || actionsLocked}
 >                  {lesson.videoFile ? "Video Selected" : "Select Video"}
                 </button>
               </div>
@@ -458,10 +496,11 @@ const handleThumbnailSelect = (file) => {
                 </p>
 
                 <button
+                  type="button"
                   onClick={handleUploadVideo}
                   className="mt-2 flex items-center justify-center gap-[2px] rounded-[14px] border px-2.5 py-0.5 text-[12px] text-[#37af47] disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={
-                    lessonBusy ||
+                    actionsLocked ||
                     lesson.isSaved ||
                     !lesson.videoFile ||
                     lesson.videoStatus === "READY"
@@ -476,7 +515,12 @@ const handleThumbnailSelect = (file) => {
                         ? "Uploaded"
                         : "Upload"}
                 </button>
+                <label htmlFor={videoInputId} className="sr-only">
+                  Lesson video file
+                </label>
                 <input
+                  id={videoInputId}
+                  name="lessonVideoFile"
                   ref={fileRef}
                   type="file"
                   hidden
@@ -527,7 +571,7 @@ const handleThumbnailSelect = (file) => {
 
                 {lesson.videoAssetId &&
                   !lesson.isSaved &&
-                  !lessonBusy &&
+                  !actionsLocked &&
                   lesson.videoStatus !== "READY" && (
                     <button
                       type="button"
@@ -548,7 +592,7 @@ const handleThumbnailSelect = (file) => {
           <div
             // onClick={() => !lesson.isSaved && thumbnailRef.current?.click()}
             onClick={() =>
-              !lesson.isSaved && !lessonBusy && thumbnailRef.current?.click()
+              !lesson.isSaved && !actionsLocked && thumbnailRef.current?.click()
             }
             className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center overflow-hidden"
           >
@@ -567,12 +611,13 @@ const handleThumbnailSelect = (file) => {
           </div>
 
           <button
+            type="button"
             onClick={handleUploadThumbnail}
             disabled={
               !lesson.thumbnailFile ||
               lesson.isSaved ||
               uploadingThumbnail ||
-              lessonBusy ||
+              actionsLocked ||
               (lesson.thumbnailUrl && !lesson.backendId)
             }
             className="text-center mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47] rounded-[14px] disabled:opacity-60 flex justify-center items-center gap-[2px]"
@@ -580,7 +625,12 @@ const handleThumbnailSelect = (file) => {
             <MdOutlineFileUpload />
             {uploadingThumbnail ? "Uploading..." : "Upload"}
           </button>
+          <label htmlFor={thumbnailInputId} className="sr-only">
+            Lesson thumbnail file
+          </label>
           <input
+            id={thumbnailInputId}
+            name="lessonThumbnailFile"
             ref={thumbnailRef}
             type="file"
             hidden
@@ -592,25 +642,28 @@ const handleThumbnailSelect = (file) => {
 
       <div className="flex justify-end gap-4 mt-6">
 <button
+  type="button"
   onClick={handleDelete}
-  disabled={deleting || lessonBusy}
+  disabled={deleting || actionsLocked}
   className="flex items-center gap-1 px-4 py-1.5 border border-red-500 text-red-500 rounded-[12px] text-sm disabled:opacity-50"
 >          <MdDeleteOutline />
           {deleting ? "Deleting..." : "Delete"}
         </button>
 
 <button
+  type="button"
   onClick={handleEdit}
-  disabled={!lesson.isSaved || lessonBusy}
+  disabled={!lesson.isSaved || actionsLocked}
   className="flex items-center px-5 py-1.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
 >          Edit
         </button>
 <button
+  type="button"
   onClick={handleSave}
   disabled={
     lesson.saving ||
     lesson.isSaved ||
-    lessonBusy ||
+    actionsLocked ||
     !isLessonComplete(lesson)
   }
   className="px-4 border py-0.5 bg-[#37af47] text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
