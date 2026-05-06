@@ -33,16 +33,7 @@ export default function LessonSection({
   //   videoStatus: null,
   //   pollingStatus: false,
   // });
-const sectionBusy = lessons.some(
-  (lesson) =>
-    lesson.uploadingVideo ||
-    lesson.pollingStatus ||
-    lesson.saving
-);
 
-useEffect(() => {
-  onBusyChange?.(sectionBusy);
-}, [sectionBusy, onBusyChange]);
   const emptyLesson = () => ({
     id: Date.now(),
     lessonTitle: "",
@@ -160,7 +151,16 @@ useEffect(() => {
 
     setLessons((prev) => [...prev, emptyLesson()]);
   };
+const sectionBusy = lessons.some(
+  (lesson) =>
+    lesson.uploadingVideo ||
+    lesson.pollingStatus ||
+    lesson.saving
+);
 
+useEffect(() => {
+  onBusyChange?.(sectionBusy);
+}, [sectionBusy, onBusyChange]);
   const handleUpdateLesson = (id, key, value) => {
     setLessons((prev) =>
       prev.map((lesson) =>

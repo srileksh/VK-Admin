@@ -95,8 +95,6 @@ export default function LessonItem({
     });
   };
 
-
-
   // const handleUploadVideo = async () => {
   //   if (!lesson.videoFile) return;
 
@@ -434,7 +432,8 @@ export default function LessonItem({
             />
           </div>
 
-          <div className="flex gap-6">
+          {/* <div className="flex gap-6"> */}
+          <div className="grid grid-cols-[260px_1fr] gap-8">
             <div className="flex gap-3">
               <div className="w-24 h-20 border border-gray-400 rounded flex items-center justify-center text-xs">
                 <button
@@ -453,24 +452,24 @@ export default function LessonItem({
                 <button
                   onClick={handleUploadVideo}
                   className="text-sm mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47] flex justify-center items-center gap-[2px] rounded-[14px] disabled:opacity-60"
-                  // disabled={
-                  //   uploadingVideo ||
-                  //   lesson.isSaved ||
-                  //   !lesson.videoFile ||
-                  //   lesson.videoUploaded
-                  // }
-
                   disabled={
                     uploadingVideo ||
                     lesson.uploadingVideo ||
                     lesson.pollingStatus ||
                     lesson.isSaved ||
                     !lesson.videoFile ||
-                    lesson.videoUploaded
+                    lesson.videoStatus === "READY"
                   }
                 >
                   <MdOutlineFileUpload />
-                  {uploadingVideo ? "Uploading..." : "Upload"}
+                  {/* {uploadingVideo ? "Uploading..." : "Upload"} */}
+                  {uploadingVideo || lesson.uploadingVideo
+                    ? "Uploading..."
+                    : lesson.pollingStatus
+                      ? "Processing..."
+                      : lesson.videoStatus === "READY"
+                        ? "Uploaded"
+                        : "Upload"}
                 </button>
 
                 <input
@@ -484,72 +483,55 @@ export default function LessonItem({
             </div>
 
             <div className="flex-1 text-sm">
-              <p className="mb-1">Upload status</p>
+              <p className="mb-2 text-sm text-[#1F304A]">Upload status</p>
 
-              <div className="relative w-full h-6">
-                <div className="absolute w-full h-[2px] bg-gray-300 top-1/2" />
+              <div className="relative h-[4px] w-full overflow-hidden rounded-full bg-gray-300">
                 <div
-                  className="absolute h-[2px] bg-green-400 top-1/2"
+                  className="absolute left-0 top-0 h-full rounded-full bg-green-500 transition-all duration-300"
                   style={{
                     width: uploadingVideo
                       ? `${progress}%`
-                      : lesson.videoUploaded
+                      : lesson.videoStatus === "READY"
                         ? "100%"
-                        : "0%",
+                        : lesson.videoAssetId
+                          ? "65%"
+                          : "0%",
                   }}
                 />
-                <div className="mt-1 flex items-center gap-3 text-xs">
-                  <span className="text-gray-500">
-                    Video status:{" "}
-                    <strong
-                      className={
-                        lesson.videoStatus === "READY"
-                          ? "text-green-600"
-                          : "text-[#1F304A]"
-                      }
-                    >
-                      {lesson.pollingStatus
-                        ? `Checking... ${lesson.videoStatus || "PROCESSING"}`
-                        : lesson.videoStatus || "Not uploaded"}
-                    </strong>
-                  </span>
+              </div>
 
-                  {lesson.videoAssetId && !lesson.isSaved && (
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
+                <span className="text-gray-500">
+                  Video status:{" "}
+                  <strong
+                    className={
+                      lesson.videoStatus === "READY"
+                        ? "text-green-600"
+                        : lesson.videoStatus === "PROCESSING"
+                          ? "text-orange-500"
+                          : "text-[#1F304A]"
+                    }
+                  >
+                    {lesson.pollingStatus
+                      ? `Checking... ${lesson.videoStatus || "PROCESSING"}`
+                      : lesson.videoStatus || "Not uploaded"}
+                  </strong>
+                </span>
+
+                {lesson.videoAssetId &&
+                  !lesson.isSaved &&
+                  lesson.videoStatus !== "READY" && (
                     <button
                       type="button"
                       disabled={lesson.pollingStatus || lesson.uploadingVideo}
                       onClick={() =>
                         pollLessonVideoStatusUntilReady(lesson.videoAssetId)
                       }
-                      className="rounded border border-gray-400 px-2 py-1 text-gray-600 disabled:opacity-50"
+                      className="rounded border border-gray-400 px-2 py-1 text-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {lesson.pollingStatus ? "Checking..." : "Check status"}
                     </button>
                   )}
-                </div>
-                <div className="mt-7 flex items-center gap-3 text-xs">
-                  <span className="text-gray-500">
-                    Video status:{" "}
-                    <strong className="text-[#1F304A]">
-                      {lesson.pollingStatus
-                        ? `Checking... ${lesson.videoStatus || "PROCESSING"}`
-                        : lesson.videoStatus || "Not uploaded"}
-                    </strong>
-                  </span>
-
-                  {lesson.videoAssetId && !lesson.isSaved && (
-                    <button
-                      type="button"
-                      disabled={lesson.pollingStatus}
-                      onClick={() =>
-                        pollLessonVideoStatusUntilReady(lesson.videoAssetId)
-                      }
-                      className="rounded border border-gray-400 px-2 py-1 text-gray-600 disabled:opacity-50"
-                    >
-                      {lesson.pollingStatus ? "Checking..." : "Check status"}
-                    </button>
-                  )}
-                </div>
               </div>
             </div>
           </div>
@@ -633,43 +615,30 @@ export default function LessonItem({
         >
           Edit
         </button>
-
-        <button
-          onClick={handleSave}
-          // disabled={lesson.saving || lesson.isSaved || !isLessonComplete(lesson)}
-          disabled={
-            lesson.saving ||
-            lesson.isSaved ||
-            lesson.uploadingVideo ||
-            lesson.pollingStatus ||
-            !isLessonComplete(lesson)
-          }
-          className="px-4 border py-0.5 bg-[#37af47] text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
-        >
-          <LiaSave className="text-[22px]" />
-          {/* {lesson.backendId ? "Update" : "Save"} */}
-
-          {/* {lesson.saving
-            ? "Saving..."
-            : lesson.pollingStatus
-              ? "Checking Video"
-              : lesson.videoStatus && lesson.videoStatus !== "READY"
-                ? "Video Processing"
-                : lesson.backendId
-                  ? "Update"
-                  : "Save"} */}
-          {lesson.saving
-            ? "Saving..."
-            : lesson.uploadingVideo
-              ? "Uploading Video"
-              : lesson.pollingStatus
-                ? "Checking Video"
-                : lesson.videoStatus && lesson.videoStatus !== "READY"
-                  ? "Video Processing"
-                  : lesson.backendId
-                    ? "Update"
-                    : "Save"}
-        </button>
+<button
+  onClick={handleSave}
+  disabled={
+    lesson.saving ||
+    lesson.isSaved ||
+    lesson.uploadingVideo ||
+    lesson.pollingStatus ||
+    !isLessonComplete(lesson)
+  }
+  className="flex items-center justify-center gap-[2px] rounded-[12px] border bg-[#37af47] px-4 py-0.5 text-white disabled:cursor-not-allowed disabled:opacity-50"
+>
+  <LiaSave className="text-[22px]" />
+  {lesson.saving
+    ? "Saving..."
+    : lesson.uploadingVideo
+      ? "Uploading Video"
+      : lesson.pollingStatus
+        ? "Checking Video"
+        : lesson.videoStatus && lesson.videoStatus !== "READY"
+          ? "Video Processing"
+          : lesson.backendId
+            ? "Update"
+            : "Save"}
+</button>
       </div>
     </div>
   );
