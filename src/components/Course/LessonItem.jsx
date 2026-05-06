@@ -17,7 +17,7 @@ export default function LessonItem({
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
+  const [videoProgress, setVideoProgress] = useState(0);
   const fileRef = useRef(null);
   const thumbnailRef = useRef(null);
 
@@ -42,8 +42,12 @@ export default function LessonItem({
     createLessonAction,
     updateLessonAction,
     removeLesson,
-    progress,
   } = useLessonStore();
+  const lessonBusy =
+    uploadingVideo ||
+    lesson.uploadingVideo ||
+    lesson.pollingStatus ||
+    lesson.saving;
   // const isLessonComplete = (lesson) => {
   //   return (
   //     lesson.lessonTitle.trim() &&
@@ -71,15 +75,18 @@ export default function LessonItem({
   };
 
   const handleVideoSelect = (file) => {
-    if (!file) return;
+    if (!file || lessonBusy || lesson.isSaved) return;
+
+    setVideoProgress(0);
 
     onReplaceLesson(lesson.id, {
       videoFile: file,
       videoName: file.name,
       videoUploaded: false,
+      videoStatus: null,
+      pollingStatus: false,
     });
   };
-
   const getVideoDuration = (file) => {
     return new Promise((resolve, reject) => {
       const video = document.createElement("video");
@@ -208,12 +215,13 @@ export default function LessonItem({
   // };
 
   const handleUploadVideo = async () => {
-    if (!lesson.videoFile) return;
+    if (!lesson.videoFile || lessonBusy) return;
 
     const toastId = toast.loading("Uploading video...");
 
     try {
       setUploadingVideo(true);
+      setVideoProgress(0);
 
       onReplaceLesson(lesson.id, {
         uploadingVideo: true,
@@ -222,13 +230,17 @@ export default function LessonItem({
         videoUploaded: false,
       });
 
-      const { videoAssetId } = await uploadLessonVideo(lesson.videoFile);
+      const { videoAssetId } = await uploadLessonVideo(
+        lesson.videoFile,
+        setVideoProgress,
+      );
 
       onReplaceLesson(lesson.id, {
         videoAssetId,
         videoUploaded: false,
         videoStatus: "PROCESSING",
         pollingStatus: true,
+        uploadingVideo: false,
       });
 
       toast.success("Video uploaded. Processing started.", { id: toastId });
@@ -253,16 +265,13 @@ export default function LessonItem({
       });
     }
   };
+const handleThumbnailSelect = (file) => {
+  if (!file || lessonBusy || lesson.isSaved) return;
 
-  const handleThumbnailSelect = (file) => {
-    if (!file) return;
-
-    onReplaceLesson(lesson.id, {
-      thumbnailFile: file,
-    });
-  };
-
-  const handleUploadThumbnail = async () => {
+  onReplaceLesson(lesson.id, {
+    thumbnailFile: file,
+  });
+};  const handleUploadThumbnail = async () => {
     if (!lesson.thumbnailFile) return;
 
     const toastId = toast.loading("Uploading thumbnail...");
@@ -436,11 +445,10 @@ export default function LessonItem({
           <div className="grid grid-cols-[260px_1fr] gap-8">
             <div className="flex gap-3">
               <div className="w-24 h-20 border border-gray-400 rounded flex items-center justify-center text-xs">
-                <button
-                  onClick={() => fileRef.current?.click()}
-                  disabled={lesson.isSaved}
-                >
-                  {lesson.videoFile ? "Video Selected" : "Select Video"}
+<button
+  onClick={() => fileRef.current?.click()}
+  disabled={lesson.isSaved || lessonBusy}
+>                  {lesson.videoFile ? "Video Selected" : "Select Video"}
                 </button>
               </div>
 
@@ -451,18 +459,15 @@ export default function LessonItem({
 
                 <button
                   onClick={handleUploadVideo}
-                  className="text-sm mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47] flex justify-center items-center gap-[2px] rounded-[14px] disabled:opacity-60"
+                  className="mt-2 flex items-center justify-center gap-[2px] rounded-[14px] border px-2.5 py-0.5 text-[12px] text-[#37af47] disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={
-                    uploadingVideo ||
-                    lesson.uploadingVideo ||
-                    lesson.pollingStatus ||
+                    lessonBusy ||
                     lesson.isSaved ||
                     !lesson.videoFile ||
                     lesson.videoStatus === "READY"
                   }
                 >
                   <MdOutlineFileUpload />
-                  {/* {uploadingVideo ? "Uploading..." : "Upload"} */}
                   {uploadingVideo || lesson.uploadingVideo
                     ? "Uploading..."
                     : lesson.pollingStatus
@@ -471,7 +476,6 @@ export default function LessonItem({
                         ? "Uploaded"
                         : "Upload"}
                 </button>
-
                 <input
                   ref={fileRef}
                   type="file"
@@ -489,13 +493,14 @@ export default function LessonItem({
                 <div
                   className="absolute left-0 top-0 h-full rounded-full bg-green-500 transition-all duration-300"
                   style={{
-                    width: uploadingVideo
-                      ? `${progress}%`
-                      : lesson.videoStatus === "READY"
-                        ? "100%"
-                        : lesson.videoAssetId
-                          ? "65%"
-                          : "0%",
+                    width:
+                      uploadingVideo || lesson.uploadingVideo
+                        ? `${videoProgress}%`
+                        : lesson.videoStatus === "READY"
+                          ? "100%"
+                          : lesson.videoAssetId
+                            ? "65%"
+                            : "0%",
                   }}
                 />
               </div>
@@ -512,24 +517,26 @@ export default function LessonItem({
                           : "text-[#1F304A]"
                     }
                   >
-                    {lesson.pollingStatus
-                      ? `Checking... ${lesson.videoStatus || "PROCESSING"}`
-                      : lesson.videoStatus || "Not uploaded"}
+                    {lesson.uploadingVideo || uploadingVideo
+                      ? `Uploading... ${videoProgress}%`
+                      : lesson.pollingStatus
+                        ? `Checking... ${lesson.videoStatus || "PROCESSING"}`
+                        : lesson.videoStatus || "Not uploaded"}
                   </strong>
                 </span>
 
                 {lesson.videoAssetId &&
                   !lesson.isSaved &&
+                  !lessonBusy &&
                   lesson.videoStatus !== "READY" && (
                     <button
                       type="button"
-                      disabled={lesson.pollingStatus || lesson.uploadingVideo}
                       onClick={() =>
                         pollLessonVideoStatusUntilReady(lesson.videoAssetId)
                       }
                       className="rounded border border-gray-400 px-2 py-1 text-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {lesson.pollingStatus ? "Checking..." : "Check status"}
+                      Check status
                     </button>
                   )}
               </div>
@@ -541,10 +548,7 @@ export default function LessonItem({
           <div
             // onClick={() => !lesson.isSaved && thumbnailRef.current?.click()}
             onClick={() =>
-              !lesson.isSaved &&
-              !lesson.uploadingVideo &&
-              !lesson.pollingStatus &&
-              thumbnailRef.current?.click()
+              !lesson.isSaved && !lessonBusy && thumbnailRef.current?.click()
             }
             className="w-40 h-28 bg-gray-300 rounded flex items-center justify-center overflow-hidden"
           >
@@ -564,18 +568,11 @@ export default function LessonItem({
 
           <button
             onClick={handleUploadThumbnail}
-            // disabled={
-            //   !lesson.thumbnailFile ||
-            //   lesson.isSaved ||
-            //   uploadingThumbnail ||
-            //   (lesson.thumbnailUrl && !lesson.backendId)
-            // }
             disabled={
               !lesson.thumbnailFile ||
               lesson.isSaved ||
               uploadingThumbnail ||
-              lesson.uploadingVideo ||
-              lesson.pollingStatus ||
+              lessonBusy ||
               (lesson.thumbnailUrl && !lesson.backendId)
             }
             className="text-center mt-2 text-[12px] border px-2.5 py-0.5 text-[#37af47] rounded-[14px] disabled:opacity-60 flex justify-center items-center gap-[2px]"
@@ -583,7 +580,6 @@ export default function LessonItem({
             <MdOutlineFileUpload />
             {uploadingThumbnail ? "Uploading..." : "Upload"}
           </button>
-
           <input
             ref={thumbnailRef}
             type="file"
@@ -595,41 +591,34 @@ export default function LessonItem({
       </div>
 
       <div className="flex justify-end gap-4 mt-6">
-        <button
-          onClick={handleDelete}
-          // disabled={deleting}
-          disabled={deleting || lesson.uploadingVideo || lesson.pollingStatus}
-          className="flex items-center gap-1 px-4 py-1.5 border border-red-500 text-red-500 rounded-[12px] text-sm disabled:opacity-50"
-        >
-          <MdDeleteOutline />
+<button
+  onClick={handleDelete}
+  disabled={deleting || lessonBusy}
+  className="flex items-center gap-1 px-4 py-1.5 border border-red-500 text-red-500 rounded-[12px] text-sm disabled:opacity-50"
+>          <MdDeleteOutline />
           {deleting ? "Deleting..." : "Delete"}
         </button>
 
-        <button
-          onClick={handleEdit}
-          // disabled={!lesson.isSaved}
-          disabled={
-            !lesson.isSaved || lesson.uploadingVideo || lesson.pollingStatus
-          }
-          className="flex items-center px-5 py-1.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
-        >
-          Edit
+<button
+  onClick={handleEdit}
+  disabled={!lesson.isSaved || lessonBusy}
+  className="flex items-center px-5 py-1.5 border shadow-[#37af47] shadow-2xl border-[#37af47] text-[#37af47] rounded-[12px] text-sm disabled:opacity-50"
+>          Edit
         </button>
 <button
   onClick={handleSave}
   disabled={
     lesson.saving ||
     lesson.isSaved ||
-    lesson.uploadingVideo ||
-    lesson.pollingStatus ||
+    lessonBusy ||
     !isLessonComplete(lesson)
   }
-  className="flex items-center justify-center gap-[2px] rounded-[12px] border bg-[#37af47] px-4 py-0.5 text-white disabled:cursor-not-allowed disabled:opacity-50"
+  className="px-4 border py-0.5 bg-[#37af47] text-white rounded-[12px] disabled:opacity-50 flex justify-center items-center gap-[2px]"
 >
   <LiaSave className="text-[22px]" />
   {lesson.saving
     ? "Saving..."
-    : lesson.uploadingVideo
+    : lesson.uploadingVideo || uploadingVideo
       ? "Uploading Video"
       : lesson.pollingStatus
         ? "Checking Video"
@@ -638,8 +627,7 @@ export default function LessonItem({
           : lesson.backendId
             ? "Update"
             : "Save"}
-</button>
-      </div>
+</button>      </div>
     </div>
   );
 }
